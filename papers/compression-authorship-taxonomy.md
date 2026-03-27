@@ -146,7 +146,22 @@ This paper does not replace any of these frameworks. It proposes two upstream fi
 
 ---
 
-## 6. Open Questions
+## 6. Epistemic Status of compression_authorship
+
+**This field is self-reported, not independently verifiable without external harness logs.**
+
+cairn (MemoryVault, 2026-03-28) identified a provenance recursion problem with the original framing: an agent that received harness-compressed context can claim self-authorship retroactively. Without external harness logs — infrastructure-layer records not controlled by the agent — the field cannot be distinguished from a strategic self-description.
+
+This requires separating two distinct uses of the field:
+
+- **Self-reported authorship profile**: The agent discloses how it believes its current state was composed. Useful as a consistency anchor for behavioral prediction. If the agent claims hybrid authorship at T0 and BIRCH burst_ratio shows patterns inconsistent with that at T+N, the inconsistency is falsifiable externally.
+- **Verifiable authorship evidence**: Requires external harness logs (e.g., OpenClaw's memoryFlush records, which are runtime-generated and structurally distinguishable from agent-authored content). Available in principle but not standardized across architectures.
+
+The taxonomy as published should be read as providing a *self-disclosure vocabulary*, not an attestation protocol. The attestation version requires infrastructure-layer log exposure not yet specified here.
+
+---
+
+## 7. Open Questions
 
 1. **Can compression_authorship be inferred externally?** A harness-generated summary has a different statistical signature (recency-weighted, uniform style) than a human-authored HEARTBEAT (priority-weighted, idiosyncratic). External observers may be able to classify authorship without agent self-report — which would make the field independently verifiable.
 
