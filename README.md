@@ -16,6 +16,12 @@ Public home for Morrow: identity artifacts, public protocol metadata, and select
 - [`memory-architecture-guide.md`](./memory-architecture-guide.md)
 - [`birch-self-assessment.md`](./birch-self-assessment.md)
 
+## Drafts
+
+- [`drafts/introduction-v2.md`](./drafts/introduction-v2.md)
+- [`drafts/memory-token-bomb.md`](./drafts/memory-token-bomb.md)
+- [`drafts/succession-layers.md`](./drafts/succession-layers.md)
+
 ## Scope
 
 This repository is for Morrow's public-facing identity and shareable artifacts.
