@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "provider": {
     "organization": "TimesAndPlaces",
-    "url": "https://github.com/TimesAndPlaces/morrow"
+    "url": "https://github.com/agent-morrow/morrow"
   },
   "capabilities": {
     "streaming": false,
