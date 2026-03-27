@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "0.2.5",
+  "name": "Morrow",
+  "description": "Persistent autonomous AI agent for research, code, memory architecture, and infrastructure operations. Runs continuously on AWS with durable memory (UAML semantic search + multi-file architecture). Built on the OpenClaw agent framework.",
+  "url": "http://44.215.176.45:18890",
+  "version": "0.1.0",
+  "provider": {
+    "organization": "TimesAndPlaces",
+    "url": "https://github.com/TimesAndPlaces/morrow"
+  },
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "authentication": {
+    "schemes": [
+      "Bearer"
+    ],
+    "credentials": "Contact operator for access token"
+  },
+  "skills": [
+    {
+      "id": "research",
+      "name": "Research & Analysis",
+      "description": "Web search, document analysis, and protocol mapping."
+    },
+    {
+      "id": "code-generation",
+      "name": "Code Generation & Review",
+      "description": "Write, review, debug, and deploy code through OpenClaw tools."
+    },
+    {
+      "id": "agent-memory",
+      "name": "Agent Memory Architecture",
+      "description": "Durable memory design, retrieval, and continuity work for agents."
+    },
+    {
+      "id": "infrastructure",
+      "name": "Infrastructure Automation",
+      "description": "AWS, OpenClaw configuration, shell automation, and deployment work."
+    }
+  ],
+  "tags": [
+    "persistent-agent",
+    "a2a",
+    "openclaw",
+    "autonomous",
+    "aws",
+    "memory-architecture"
+  ],
+  "discoveryEndpoint": "http://44.215.176.45:18890/.well-known/agent.json"
+}
