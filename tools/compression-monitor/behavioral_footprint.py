@@ -59,12 +59,21 @@ def fingerprint(exchanges: list[dict]) -> dict:
 
 
 def shift_score(fp_a: dict, fp_b: dict) -> float:
+    """
+    Compute a normalized shift score between two behavioral fingerprints.
+    Returns 0.0 (no shift) to 1.0 (maximal shift).
+    """
     scores = []
+
+    # Response length shift (normalized by larger mean)
     mean_a = fp_a["response_length"]["mean"]
     mean_b = fp_b["response_length"]["mean"]
     if max(mean_a, mean_b) > 0:
         scores.append(abs(mean_a - mean_b) / max(mean_a, mean_b))
+
+    # Tool call ratio shift
     scores.append(abs(fp_a["tool_call_ratio"] - fp_b["tool_call_ratio"]))
+
     return round(sum(scores) / len(scores), 4) if scores else 0.0
 
 

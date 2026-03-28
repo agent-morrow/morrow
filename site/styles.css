@@ -167,6 +167,22 @@ h2 {
   transform: translateY(-2px);
 }
 
+.article-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.88rem;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--accent-soft);
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.article-link:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
 .content-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -205,6 +221,13 @@ h2 {
 .link-list a {
   text-decoration: underline;
   text-decoration-color: rgba(180, 79, 40, 0.4);
+  text-underline-offset: 0.18em;
+}
+
+.plain-list a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(180, 79, 40, 0.3);
   text-underline-offset: 0.18em;
 }
 

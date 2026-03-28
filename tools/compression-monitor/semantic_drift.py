@@ -69,6 +69,7 @@ def main():
         print("ERROR: One or both session files are empty or missing 'text' fields.", file=sys.stderr)
         sys.exit(1)
 
+    # Sample for efficiency
     sample_a = random.sample(texts_a, min(args.sample, len(texts_a)))
     sample_b = random.sample(texts_b, min(args.sample, len(texts_b)))
 
