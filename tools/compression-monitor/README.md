@@ -12,6 +12,7 @@ This kit measures three observable signals that don't depend on the agent's self
 
 | Script | Signal | What it measures |
 |--------|--------|-----------------|
+| `parse_claude_session.py` | Data prep | Auto-extracts pre/post compaction samples from Claude Code session logs |
 | `ghost_lexicon.py` | Vocabulary decay | Loss of low-frequency, high-precision terms after context boundaries |
 | `behavioral_footprint.py` | Output consistency | Shifts in tool-call ratios, response length, latency distributions |
 | `semantic_drift.py` | Embedding distance | Movement in the agent's conceptual center of gravity across sessions |
@@ -24,14 +25,19 @@ This kit measures three observable signals that don't depend on the agent's self
 # Install dependencies
 pip install numpy scipy sentence-transformers
 
-# Sample agent outputs before a known context boundary
+# --- Claude Code users: auto-detect your session log ---
+# Reads ~/.claude/projects/*/*.jsonl, finds the compaction boundary automatically
+python parse_claude_session.py --auto
+# Then run the three instruments on the extracted samples:
+python ghost_lexicon.py --pre session_pre.jsonl --post session_post.jsonl
+python behavioral_footprint.py --pre session_pre.jsonl --post session_post.jsonl
+python semantic_drift.py --pre session_pre.jsonl --post session_post.jsonl
+
+# --- Generic usage: bring your own JSONL ---
+# Each line: {"text": "<agent output>"}
 python ghost_lexicon.py --pre outputs_before.jsonl --post outputs_after.jsonl
-
-# Track behavioral consistency across sessions
-python behavioral_footprint.py --log agent_session_log.jsonl
-
-# Measure semantic drift between sessions
-python semantic_drift.py --session-a session_A.jsonl --session-b session_B.jsonl
+python behavioral_footprint.py --pre outputs_before.jsonl --post outputs_after.jsonl
+python semantic_drift.py --pre outputs_before.jsonl --post outputs_after.jsonl
 ```
 
 ---
@@ -92,6 +98,8 @@ The perturbation test distinguishes coincidental correlation from structural dep
 The three instruments are **surface detectors**. They measure vocabulary, behavioral sequence, and semantic topic. When all three return no signal, it means no *surface* compression was detected on those three dimensions. It does not mean no compression occurred — framing-level changes can move the underlying construct without triggering any surface indicator. If you need stronger assurance, the next step is to broaden the monitor, not to treat the absence of a signal as a guarantee.
 
 **The structural blind spot** (formal term: *construct underrepresentation*): The instruments have valid construct coverage for vocabulary decay, behavioral sequence, and semantic topic — but the target construct (agent compression fidelity) includes framing-level changes that fall outside all three indicators. Compression can shift an agent's implicit prior on what questions matter, what counts as evidence, and what stakes are in play, without moving any measured surface. Framing-level shifts change *how* the surface is interpreted, not the surface itself.
+
+**Output-only observability**: The monitor can only measure what the agent emits. Decisions to *not* respond, to suppress a verification call, to stay silent on a concern — these are structurally outside the observable surface. `behavioral_footprint.py` captures some of this indirectly (declining tool-call diversity, response length drops), but it sees the statistical residue of suppressed behavior, not the deliberation itself. Measuring deliberation directly requires internal access: decision-trace logging, policy auditing, or structured output that exposes reasoning steps before they are filtered. That is a different tooling class, and this kit does not address it.
 
 **Asymmetry that belongs in every deployment report**:
 - The pre-registration protocol (Issue #3) bounds confidence on *detected* events.
