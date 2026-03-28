@@ -87,11 +87,100 @@ The perturbation test distinguishes coincidental correlation from structural dep
 
 ---
 
+## Epistemological Bounds
+
+The three instruments are **surface detectors**. They measure vocabulary, behavioral sequence, and semantic topic. When all three return no signal, it means no *surface* compression was detected on those three dimensions. It does not mean no compression occurred — framing-level changes can move the underlying construct without triggering any surface indicator. If you need stronger assurance, the next step is to broaden the monitor, not to treat the absence of a signal as a guarantee.
+
+**The structural blind spot** (formal term: *construct underrepresentation*): The instruments have valid construct coverage for vocabulary decay, behavioral sequence, and semantic topic — but the target construct (agent compression fidelity) includes framing-level changes that fall outside all three indicators. Compression can shift an agent's implicit prior on what questions matter, what counts as evidence, and what stakes are in play, without moving any measured surface. Framing-level shifts change *how* the surface is interpreted, not the surface itself.
+
+**Asymmetry that belongs in every deployment report**:
+- The pre-registration protocol (Issue #3) bounds confidence on *detected* events.
+- It cannot bound the **false-negative rate** on framing-level events the instruments structurally cannot see.
+
+Possible partial mitigations, each with their own limits:
+1. **Behavioral probing** — inject canonical test prompts before/after suspected boundaries, compare response distributions
+2. **Counterfactual elicitation** — ask the agent to reason about a scenario it handled before the boundary, compare reasoning chains
+3. **External observer** — separate agent compares pre/post outputs for framing consistency (introduces its own compression bias)
+
+None of these fully close the gap. See [Issue #5](https://github.com/agent-morrow/compression-monitor/issues/5) for the open research question.
+
+---
+
 ## Limitations
 
 - Instruments share training distribution priors if the agent uses the same base model as the measurement system. Use heterogeneous baselines where possible.
 - Pre-registration requires directional + ordering predictions, not just "something will change."
 - This kit is a scaffold, not a production monitoring system. Adapt the scripts to your agent's output format.
+
+---
+
+## Claude Code integration
+
+Claude Code writes structured JSONL logs to `~/.claude/projects/<project-id>/`. Each log file captures turns, tool calls, and compaction events in sequence.
+
+**Prepare inputs from a Claude Code session:**
+
+```bash
+# Locate your project log (most recent project)
+PROJECT=$(ls -t ~/.claude/projects/ | head -1)
+LOG="$HOME/.claude/projects/$PROJECT/$(ls -t ~/.claude/projects/$PROJECT/ | head -1)"
+
+# Split into pre- and post-compaction halves around the first compaction event
+python3 - <<'EOF'
+import json, sys
+
+log = "$LOG"  # replace with actual path
+turns = [json.loads(l) for l in open(log) if l.strip()]
+
+# Find first compaction boundary (role == 'system' with summary content)
+boundary = next(
+    (i for i, t in enumerate(turns)
+     if t.get("role") == "system" and "compacted" in str(t).lower()),
+    len(turns) // 2  # fallback: split at midpoint
+)
+
+with open("/tmp/pre_compaction.jsonl", "w") as f:
+    for t in turns[:boundary]:
+        f.write(json.dumps(t) + "\n")
+
+with open("/tmp/post_compaction.jsonl", "w") as f:
+    for t in turns[boundary:]:
+        f.write(json.dumps(t) + "\n")
+
+print(f"Boundary at turn {boundary} of {len(turns)}")
+EOF
+
+# Run the ghost lexicon detector
+python ghost_lexicon.py --pre /tmp/pre_compaction.jsonl --post /tmp/post_compaction.jsonl
+
+# Run behavioral footprint across the full session
+python behavioral_footprint.py --log "$LOG"
+```
+
+**What to look for in vibe coding sessions:**
+
+In long SwiftUI or similar vibe coding sessions (200+ turns), common drift patterns:
+- Ghost lexicon fires around turn 100–150 as file-path specificity drops
+- Behavioral footprint shows declining tool-call diversity after the boundary (agent stops verifying builds)
+- Semantic drift is often small — the agent stays on-topic but loses precision
+
+---
+
+## Related tools
+
+- [agent-architect-kit](https://github.com/ultrathink-art/agent-architect-kit) — CLAUDE.md templates and agent role structure (prevention layer; rules that survive compaction)
+- [Anthropic Agent SDK harness](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — structured initializer/coding-agent pattern with `claude-progress.txt` for cross-session handoffs (intent preservation layer)
+- [Claude Opus 4.6 Compaction API](https://www.infoq.com/news/2026/03/opus-4-6-context-compaction/) — first-class architectural compaction support from Anthropic; compaction is now a managed event, not a silent background process
+
+---
+
+## Where this fits
+
+Anthropic's harness pattern and Opus 4.6's Compaction API address how agents manage context across sessions: structured handoffs, managed summaries, architectural compaction controls. That is the **intent-preservation layer**.
+
+`compression-monitor` operates one layer up: **behavioral drift detection**. Even with structured handoffs and managed compaction, an agent can silently change how it works — skipping test writes, dropping verification calls, narrowing its vocabulary — without anything flagging the shift. The monitor makes those changes visible after the fact.
+
+Think of them as complementary: one keeps the agent's intent intact going into compaction; the other checks whether its behavior came out intact on the other side.
 
 ---
 
