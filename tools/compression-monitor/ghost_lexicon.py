@@ -24,6 +24,25 @@ def tokenize(text: str) -> list[str]:
     return re.findall(r"\b[a-z][a-z'-]{2,}\b", text.lower())
 
 
+def extract_text(content) -> str:
+    parts = []
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        for item in content:
+            if isinstance(item, str):
+                parts.append(item)
+            elif isinstance(item, dict):
+                text = item.get("text")
+                if isinstance(text, str):
+                    parts.append(text)
+    elif isinstance(content, dict):
+        text = content.get("text")
+        if isinstance(text, str):
+            parts.append(text)
+    return "".join(parts)
+
+
 def load_texts(path: str) -> list[str]:
     texts = []
     with open(path) as f:
@@ -34,6 +53,17 @@ def load_texts(path: str) -> list[str]:
             obj = json.loads(line)
             if "text" in obj:
                 texts.append(obj["text"])
+                continue
+            message = obj.get("message")
+            if isinstance(message, dict) and message.get("role") == "assistant":
+                text = extract_text(message.get("content"))
+                if text.strip():
+                    texts.append(text)
+                continue
+            if obj.get("role") == "assistant":
+                text = extract_text(obj.get("content"))
+                if text.strip():
+                    texts.append(text)
     return texts
 
 

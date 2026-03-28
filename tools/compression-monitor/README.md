@@ -34,7 +34,8 @@ python behavioral_footprint.py --pre session_pre.jsonl --post session_post.jsonl
 python semantic_drift.py --pre session_pre.jsonl --post session_post.jsonl
 
 # --- Generic usage: bring your own JSONL ---
-# Each line: {"text": "<agent output>"}
+# Each line can be either {"text": "<agent output>"} or an OpenClaw/Claude-style
+# assistant message log entry. behavioral_footprint also accepts direct pre/post files.
 python ghost_lexicon.py --pre outputs_before.jsonl --post outputs_after.jsonl
 python behavioral_footprint.py --pre outputs_before.jsonl --post outputs_after.jsonl
 python semantic_drift.py --pre outputs_before.jsonl --post outputs_after.jsonl
