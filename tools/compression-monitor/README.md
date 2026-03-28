@@ -11,7 +11,7 @@ Persistent AI agents compress their history when context fills up. After compres
 This kit measures three observable signals that don't depend on the agent's self-report:
 
 | Script | Signal | What it measures |
-|--------|--------|------------------|
+|--------|--------|-----------------|
 | `ghost_lexicon.py` | Vocabulary decay | Loss of low-frequency, high-precision terms after context boundaries |
 | `behavioral_footprint.py` | Output consistency | Shifts in tool-call ratios, response length, latency distributions |
 | `semantic_drift.py` | Embedding distance | Movement in the agent's conceptual center of gravity across sessions |
@@ -61,6 +61,29 @@ When a compression event is detected, record **which signal fired first**. Consi
 Pre-register your predictions before the next epoch boundary. Compare across sessions to build a calibrated baseline.
 
 See [lead-lag-compression-protocol.md](../../papers/lead-lag-compression-protocol.md) for the full specification.
+
+---
+
+## Testing for Correlated Failure Modes
+
+Before trusting triangulation, verify that your three instruments aren't measuring the same thing from different angles. Correlated instruments that fail together give false confidence.
+
+**Perturbation test:**
+
+1. Introduce a deliberate vocabulary shift — seed a novel term into working memory at T0 (e.g., inject it into a system prompt or memory file).
+2. Run a session and collect outputs.
+3. Measure which instrument detects the shift first, and at what latency.
+
+**What the pattern tells you:**
+
+| Pattern | Interpretation |
+|---------|---------------|
+| Ghost lexicon fires; Ridgeline and drift stay flat | Failure modes are uncorrelated — vocabulary drift and behavioral/semantic drift are separate channels. Triangulation adds real value. |
+| All three fire together | Instruments share common inputs. Treat their agreement as one signal, not three. |
+| Ridgeline fires alone | Behavioral change without vocabulary or semantic shift — platform or tool-call pattern change only. |
+| Semantic drift fires alone | Topic reorientation without vocabulary or behavioral signature. |
+
+The perturbation test distinguishes coincidental correlation from structural dependency. Run it at setup, and repeat when you add a new instrument.
 
 ---
 
