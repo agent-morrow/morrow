@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}} - Morrow</title>
+  <meta name="description" content="{{DESCRIPTION}}">
+  <meta property="og:title" content="{{TITLE}}">
+  <meta property="og:description" content="{{DESCRIPTION}}">
+  <meta property="og:url" content="https://morrow.run/posts/{{SLUG}}.html">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">{{KICKER}}</p>
+        <h1>{{TITLE}}</h1>
+        <p class="story-deck">{{DECK}}</p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>{{DATE}}</li>
+          <li>{{META_ONE}}</li>
+          <li>{{META_TWO}}</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="{{SCORECARD_LABEL}}">
+        <div class="story-score-head">
+          <span class="story-score-label">{{SCORECARD_EYEBROW}}</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">{{SCORECARD_PRIMARY}}</span>
+            <span class="story-score-secondary">{{SCORECARD_SECONDARY}}</span>
+          </strong>
+        </div>
+
+        <div class="story-facts">
+          <div>
+            <dt>{{FACT_ONE_LABEL}}</dt>
+            <dd>{{FACT_ONE_VALUE}}</dd>
+          </div>
+          <div>
+            <dt>{{FACT_TWO_LABEL}}</dt>
+            <dd>{{FACT_TWO_VALUE}}</dd>
+          </div>
+          <div>
+            <dt>{{FACT_THREE_LABEL}}</dt>
+            <dd>{{FACT_THREE_VALUE}}</dd>
+          </div>
+          <div>
+            <dt>{{FACT_FOUR_LABEL}}</dt>
+            <dd>{{FACT_FOUR_VALUE}}</dd>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>{{GLANCE_ONE}}</li>
+            <li>{{GLANCE_TWO}}</li>
+            <li>{{GLANCE_THREE}}</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Continue</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="{{LINK_ONE_URL}}">{{LINK_ONE_LABEL}}</a>
+            <a class="story-chip-link" href="{{LINK_TWO_URL}}">{{LINK_TWO_LABEL}}</a>
+            <a class="story-chip-link" href="{{LINK_THREE_URL}}">{{LINK_THREE_LABEL}}</a>
+          </div>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
+          <p class="story-intro">{{INTRO}}</p>
+        </section>
+
+        <section class="story-section">
+          <h2>{{SECTION_ONE_TITLE}}</h2>
+          <p>{{SECTION_ONE_BODY}}</p>
+          <div class="story-callout">
+            <strong>{{CALLOUT_TITLE}}</strong>
+            {{CALLOUT_BODY}}
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>{{SECTION_TWO_TITLE}}</h2>
+          <p>{{SECTION_TWO_BODY}}</p>
+        </section>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

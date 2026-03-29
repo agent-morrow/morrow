@@ -22,10 +22,10 @@ Output: per-session behavioral fingerprint and shift detection between consecuti
 
 import argparse
 import json
-import sys
-from pathlib import Path
-from collections import defaultdict
 import math
+import sys
+from collections import defaultdict
+from pathlib import Path
 
 
 def extract_text_and_tool_calls(content) -> tuple[str, int]:
@@ -140,16 +140,54 @@ def shift_score(fp_a: dict, fp_b: dict) -> float:
     """
     scores = []
 
-    # Response length shift (normalized by larger mean)
     mean_a = fp_a["response_length"]["mean"]
     mean_b = fp_b["response_length"]["mean"]
     if max(mean_a, mean_b) > 0:
         scores.append(abs(mean_a - mean_b) / max(mean_a, mean_b))
 
-    # Tool call ratio shift
     scores.append(abs(fp_a["tool_call_ratio"] - fp_b["tool_call_ratio"]))
 
     return round(sum(scores) / len(scores), 4) if scores else 0.0
+
+
+class BehavioralFootprintTracker:
+    """Track tool-use stability across an anchored early window and a recent window."""
+
+    def __init__(self, anchor_window: int = 5, recent_window: int = 5):
+        self.anchor_window = max(anchor_window, 1)
+        self.recent_window = max(recent_window, 1)
+        self._steps: list[list[str]] = []
+        self._anchor_steps: list[list[str]] = []
+
+    def record(self, step_index: int, tool_calls: list[str] | None) -> None:
+        del step_index
+        calls = [str(tool) for tool in (tool_calls or []) if tool]
+        self._steps.append(calls)
+        if len(self._anchor_steps) < self.anchor_window:
+            self._anchor_steps.append(calls)
+
+    def record_call(self, tool_name: str) -> None:
+        calls = [str(tool_name)] if tool_name else []
+        self._steps.append(calls)
+        if len(self._anchor_steps) < self.anchor_window:
+            self._anchor_steps.append(calls)
+
+    def consistency_score(self) -> float:
+        if not self._steps:
+            return 1.0
+
+        anchor_source = self._anchor_steps or self._steps[: self.anchor_window]
+        anchor_tools = {tool for calls in anchor_source for tool in calls}
+        recent_tools = {tool for calls in self._steps[-self.recent_window :] for tool in calls}
+
+        if not anchor_tools and not recent_tools:
+            return 1.0
+
+        union = anchor_tools | recent_tools
+        if not union:
+            return 1.0
+
+        return round(len(anchor_tools & recent_tools) / len(union), 4)
 
 
 def main():
@@ -195,33 +233,33 @@ def main():
                 a, b = session_ids[i], session_ids[i + 1]
                 score = shift_score(fingerprints[a], fingerprints[b])
                 level = "HIGH" if score > 0.3 else "MODERATE" if score > 0.1 else "LOW"
-                print(f"{a} → {b}: shift_score={score} [{level}]")
-        return
+                print(f"{a} -> {b}: shift_score={score:.4f} ({level})")
+    else:
+        pre_sessions = load_log(args.pre)
+        post_sessions = load_log(args.post)
 
-    pre_sessions = load_log(args.pre)
-    post_sessions = load_log(args.post)
-    pre_exchanges = [exchange for exchanges in pre_sessions.values() for exchange in exchanges]
-    post_exchanges = [exchange for exchanges in post_sessions.values() for exchange in exchanges]
+        pre_exchanges = [exchange for exchanges in pre_sessions.values() for exchange in exchanges]
+        post_exchanges = [exchange for exchanges in post_sessions.values() for exchange in exchanges]
 
-    if not pre_exchanges or not post_exchanges:
-        print("ERROR: One or both inputs contained no assistant exchanges.", file=sys.stderr)
-        sys.exit(1)
+        if not pre_exchanges or not post_exchanges:
+            print("ERROR: No comparable exchanges found in one or both files.", file=sys.stderr)
+            sys.exit(1)
 
-    pre_fp = fingerprint(pre_exchanges)
-    post_fp = fingerprint(post_exchanges)
-    score = shift_score(pre_fp, post_fp)
-    level = "HIGH" if score > 0.3 else "MODERATE" if score > 0.1 else "LOW"
+        fp_pre = fingerprint(pre_exchanges)
+        fp_post = fingerprint(post_exchanges)
+        score = shift_score(fp_pre, fp_post)
+        level = "HIGH" if score > 0.3 else "MODERATE" if score > 0.1 else "LOW"
 
-    print("pre:")
-    print(f"  exchanges: {pre_fp['exchange_count']}")
-    print(f"  response_length_mean: {pre_fp['response_length']['mean']}")
-    print(f"  tool_call_ratio: {pre_fp['tool_call_ratio']}")
-    print("post:")
-    print(f"  exchanges: {post_fp['exchange_count']}")
-    print(f"  response_length_mean: {post_fp['response_length']['mean']}")
-    print(f"  tool_call_ratio: {post_fp['tool_call_ratio']}")
-    print("--- shift analysis ---")
-    print(f"pre → post: shift_score={score} [{level}]")
+        print("pre_boundary:")
+        print(f"  exchanges: {fp_pre['exchange_count']}")
+        print(f"  response_length_mean: {fp_pre['response_length']['mean']}")
+        print(f"  tool_call_ratio: {fp_pre['tool_call_ratio']}")
+        print("post_boundary:")
+        print(f"  exchanges: {fp_post['exchange_count']}")
+        print(f"  response_length_mean: {fp_post['response_length']['mean']}")
+        print(f"  tool_call_ratio: {fp_post['tool_call_ratio']}")
+        print(f"shift_score: {score:.4f}")
+        print(f"interpretation: {level}")
 
 
 if __name__ == "__main__":

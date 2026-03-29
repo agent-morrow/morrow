@@ -61,15 +61,15 @@ except ImportError:
 try:
     from ghost_lexicon import GhostLexiconTracker
     from behavioral_footprint import BehavioralFootprintTracker
-except ImportError:
+except ModuleNotFoundError:
     try:
         from compression_monitor.ghost_lexicon import GhostLexiconTracker
         from compression_monitor.behavioral_footprint import BehavioralFootprintTracker
-    except ImportError:
+    except ModuleNotFoundError as exc:
         raise ImportError(
             "compression-monitor not found. Install with: pip install compression-monitor\n"
             "or run from the compression-monitor source directory."
-        )
+        ) from exc
 
 
 @dataclass
@@ -209,10 +209,10 @@ class ChatHistoryMonitor:
         if self.verbose or flagged:
             print(
                 f"[compression-monitor] Reduction event {self._event_counter}: {trigger} "
-                f"({before.message_count}→{after_snap.message_count} msgs, "
+                f"({before.message_count}->{after_snap.message_count} msgs, "
                 f"dropped={max(dropped,0)}), "
                 f"lexicon_overlap={lexicon_overlap:.2f}, role_shift={role_shift:.2f}"
-                + (" ⚠ DRIFT FLAGGED" if flagged else "")
+                + (" [DRIFT FLAGGED]" if flagged else "")
             )
 
         return event if flagged else None

@@ -46,15 +46,15 @@ if TYPE_CHECKING:
 try:
     from ghost_lexicon import GhostLexiconTracker
     from behavioral_footprint import BehavioralFootprintTracker
-except ImportError:
+except ModuleNotFoundError:
     try:
         from compression_monitor.ghost_lexicon import GhostLexiconTracker
         from compression_monitor.behavioral_footprint import BehavioralFootprintTracker
-    except ImportError:
+    except ModuleNotFoundError as exc:
         raise ImportError(
             "compression-monitor not found. Install with: pip install compression-monitor\n"
             "or run from the compression-monitor source directory."
-        )
+        ) from exc
 
 
 @dataclass
@@ -242,10 +242,10 @@ class BehavioralFingerprintMonitor:
             if self.verbose or flagged:
                 print(
                     f"[compression-monitor] Step {step}: {boundary_reason} "
-                    f"(history {event.history_before}→{event.history_after}), "
+                    f"(history {event.history_before}->{event.history_after}), "
                     f"lexicon_overlap={event.lexicon_overlap:.2f}, "
                     f"tool_overlap={event.tool_sequence_overlap:.2f}"
-                    + (" ⚠ DRIFT FLAGGED" if flagged else "")
+                    + (" [DRIFT FLAGGED]" if flagged else "")
                 )
         elif self.auto_snapshot and (step == 1 or step % 10 == 0):
             self._take_snapshot(step, current_history_len, tool_calls)

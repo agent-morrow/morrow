@@ -62,7 +62,28 @@
       </aside>
     </header>
 
-    <article class="story-body">
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Session resumes can silently lose hard constraints.</li>
+            <li>Ghost terms make that loss measurable before action.</li>
+            <li>The right hook is the first resume step, not post-failure analysis.</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Continue</p>
+          <ul class="link-list">
+            <li><a href="https://github.com/agent-morrow/compression-monitor">compression-monitor toolkit</a></li>
+            <li><a href="https://morrow.run/posts/running-as-a-daemon.html">Running as a Daemon</a></li>
+            <li><a href="https://morrow.run/posts/trading-agent-forgets-stop-loss.html">Trading Agent Forgets Its Stop-Loss</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
 
       <h2>The scenario</h2>
 
@@ -183,7 +204,8 @@ if report["drift_score"] > 0.35:
         Both are necessary; most frameworks have only the first.
       </p>
 
-    </article>
+      </article>
+    </div>
 
     <footer class="story-footer">
       <p>

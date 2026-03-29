@@ -75,18 +75,18 @@ try:
     from ghost_lexicon import GhostLexiconTracker
     from behavioral_footprint import BehavioralFootprintTracker
     from semantic_drift import SemanticDriftTracker
-except ImportError:
+except ModuleNotFoundError:
     try:
         from compression_monitor.ghost_lexicon import GhostLexiconTracker
         from compression_monitor.behavioral_footprint import BehavioralFootprintTracker
         from compression_monitor.semantic_drift import SemanticDriftTracker
-    except ImportError:
+    except ModuleNotFoundError as exc:
         raise ImportError(
             "compression-monitor not found. Install from source:\n"
             "  pip install -e .\n"
             "or from PyPI (when available):\n"
             "  pip install compression-monitor"
-        )
+        ) from exc
 
 
 # ─── types ───────────────────────────────────────────────────────────────────

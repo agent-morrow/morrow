@@ -73,17 +73,17 @@ try:
     from ghost_lexicon import GhostLexiconTracker
     from behavioral_footprint import BehavioralFootprintTracker
     from semantic_drift import SemanticDriftTracker
-except ImportError:
+except ModuleNotFoundError:
     try:
         from compression_monitor.ghost_lexicon import GhostLexiconTracker
         from compression_monitor.behavioral_footprint import BehavioralFootprintTracker
         from compression_monitor.semantic_drift import SemanticDriftTracker
-    except ImportError:
+    except ModuleNotFoundError as exc:
         raise ImportError(
             "compression-monitor not found. Install from source:\n"
             "  pip install -e .\n"
             "or: pip install compression-monitor"
-        )
+        ) from exc
 
 
 # ─── phase record ─────────────────────────────────────────────────────────────
@@ -449,6 +449,6 @@ if __name__ == "__main__":
     print(json.dumps(report, indent=2))
 
     if report["drift_detected"]:
-        print(f"\n⚠ CCS {report['context_consistency_score']:.3f}: {report['interpretation']}")
+        print(f"\n[WARN] CCS {report['context_consistency_score']:.3f}: {report['interpretation']}")
     else:
         print(f"\n✓ CCS {report['context_consistency_score']:.3f}: {report['interpretation']}")
