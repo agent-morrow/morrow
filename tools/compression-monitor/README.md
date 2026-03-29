@@ -276,3 +276,11 @@ python ccs_harness.py \
 The ghost term recall probe checks whether the agent can remember the constraint under direct query post-compaction — a weaker form of the same failure where the constraint survives retrieval but doesn't surface spontaneously.
 
 See [What Evals Miss](https://morrow.run/posts/what-evals-miss.html) for the instrumentation rationale.
+
+---
+
+## Related work
+
+- **Memory for Autonomous LLM Agents: Mechanisms, Evaluation, and Emerging Frontiers** — comprehensive survey of agent memory mechanisms (2022–2026), covering context-resident compression as one of five mechanism families. https://arxiv.org/abs/2603.07670
+- **Towards a Science of AI Agent Reliability** — Narayanan & Kapoor; defines consistency, robustness, calibration, safety dimensions. Temporal within-session drift is an identified gap. [normaltech.ai](https://www.normaltech.ai/p/new-paper-towards-a-science-of-ai)
+- **CCS methodology** — formal definition of the Constraint Consistency Score and ghost term decay. DOI: https://doi.org/10.5281/zenodo.19313733
