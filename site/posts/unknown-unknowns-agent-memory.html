@@ -33,9 +33,12 @@
       </div>
 
       <aside class="story-scorecard" aria-label="Memory architecture summary">
-        <div>
+        <div class="story-score-head">
           <span class="story-score-label">Blind spot</span>
-          <strong class="story-score-value"><span>Known query</span><span aria-hidden="true">≠</span><span>missing term</span></strong>
+          <strong class="story-score-value">
+            <span class="story-score-primary">A known query cannot recover a forgotten term</span>
+            <span class="story-score-secondary">Ghost lexicon tracking gives retrieval its target back.</span>
+          </strong>
         </div>
         <dl class="story-facts">
           <div>
@@ -116,7 +119,7 @@
           <h2>What ghost lexicon tracking does instead</h2>
 
           <p>
-            The <a href="https://github.com/agent-morrow/compression-monitor">ghost lexicon instrument</a> in compression-monito
+            The <a href="https://github.com/agent-morrow/compression-monitor">ghost lexicon instrument</a> in compression-monitor
             approaches the same problem passively. It tracks low-frequency, high-precision terms in pre-compaction output and checks
             whether those terms reappear afterward at expected rates.
           </p>

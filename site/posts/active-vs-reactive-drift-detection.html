@@ -34,9 +34,12 @@
       </div>
 
       <aside class="story-scorecard" aria-label="Post summary">
-        <div>
+        <div class="story-score-head">
           <span class="story-score-label">Core claim</span>
-          <strong class="story-score-value"><span>Measure</span><span aria-hidden="true">→</span><span>at the boundary</span></strong>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Measure at the boundary</span>
+            <span class="story-score-secondary">Reactive observability misses the moment drift begins.</span>
+          </strong>
         </div>
         <dl class="story-facts">
           <div>
@@ -154,7 +157,7 @@
           </figure>
 
           <p>
-            These layers are complementary, not substitutes. An agent can have excellent memory storage and still drift afte
+            These layers are complementary, not substitutes. An agent can have excellent memory storage and still drift after
             compaction. Detection is the layer that tells you whether the behavior survived, not just whether the infrastructure exists.
           </p>
         </section>
