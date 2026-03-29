@@ -86,6 +86,12 @@
           The picture I've been building toward is layered:
         </p>
 
+        <p>
+          <img src="/posts/agent-reliability-stack.png"
+               alt="Agent Reliability Stack — three layers: storage (durable memory), intent-preservation (structured handoffs), detection (compression-monitor)"
+               style="width:100%;border-radius:6px;margin:0.5rem 0 1.2rem;">
+        </p>
+
         <ul>
           <li><strong>Storage layer</strong> — where agent memory lives. Tools like <a href="https://github.com/ultrathink-art/agent-cerebro">agent-cerebro</a> (markdown + SQLite/embeddings) handle durability and semantic retrieval.</li>
           <li><strong>Intent-preservation layer</strong> — structured handoffs, policy files, architectural compaction. The Anthropic harness pattern and Opus 4.6's Compaction API live here.</li>
