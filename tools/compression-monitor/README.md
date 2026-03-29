@@ -18,8 +18,45 @@ This kit measures three observable signals that don't depend on the agent's self
 | `semantic_drift.py` | Embedding distance | Movement in the agent's conceptual center of gravity across sessions |
 | `behavioral_probe.py` | Active probing | Query an agent before and after compression; score semantic consistency via embeddings |
 | `sdk_compaction_hook_demo.py` | Hook pattern | Demonstrates compaction lifecycle hooks for the Anthropic Agent SDK |
-| `deepagents_integration.py` | LangChain integration | Drift monitoring for LangChain DeepAgents — filesystem-detected compaction events |
+| `deepagents_integration.py` | LangChain/DeepAgents | Drift monitoring for LangChain DeepAgents — filesystem-detected compaction events |
+| `smolagents_integration.py` | smolagents | `BehavioralFingerprintMonitor` attaches via `step_callbacks`; detects history-shrink consolidation boundaries in `MultiStepAgent` |
+| `semantic_kernel_integration.py` | Semantic Kernel | `MonitoredChatHistory` + `BehavioralSummaryReducer`/`BehavioralTruncationReducer` wrappers — snapshot before/after each SK reducer call |
 | `mcp_behavioral_checkpoint.py` | MCP protocol | Reference implementation for [SEP #2492](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2492) — behavioral checkpoint in MCP `initialize` |
+
+---
+
+## Framework integrations
+
+Ready-to-use integration modules for three agent frameworks. Each wraps the framework's
+existing compaction/reduction surface to add before/after behavioral snapshots and drift
+detection without requiring changes to the framework itself.
+
+| Framework | Module | Integration point |
+|-----------|--------|------------------|
+| **smolagents** (HuggingFace) | `smolagents_integration.py` | `step_callbacks` — detects consolidation via history-length delta across steps |
+| **Semantic Kernel** (Microsoft) | `semantic_kernel_integration.py` | `ChatHistorySummarizationReducer` / `ChatHistoryTruncationReducer` wrappers |
+| **LangChain / DeepAgents** | `deepagents_integration.py` | Filesystem-based compaction detection (interim, no named event surface yet) |
+
+**smolagents:**
+```python
+from smolagents import CodeAgent, HfApiModel
+from smolagents_integration import BehavioralFingerprintMonitor
+
+agent = CodeAgent(tools=[], model=HfApiModel())
+monitor = BehavioralFingerprintMonitor(agent=agent, history_drop_threshold=5, verbose=True)
+result = agent.run("Your long-horizon task...")
+print(monitor.report())
+```
+
+**Semantic Kernel:**
+```python
+from semantic_kernel_integration import MonitoredChatHistory, BehavioralSummaryReducer
+
+history = MonitoredChatHistory(verbose=True)
+reducer = BehavioralSummaryReducer(kernel=kernel, target_count=10, threshold_count=20)
+reduced = await reducer.reduce_if_required(history)
+print(history.monitor.report())
+```
 
 ---
 
@@ -77,7 +114,7 @@ See [lead-lag-compression-protocol.md](../../papers/lead-lag-compression-protoco
 
 ## Testing for Correlated Failure Modes
 
-Before trusting triangulation, verify that your three instruments aren't measuring the same thing from different angles. Correlated instruments that fail together give false confidence.
+Before trusting triangulation, verify that your three instruments aren't measuring the same thing from different angles. Correlated instruments that fail together give less information.
 
 **Perturbation test:**
 
@@ -89,9 +126,9 @@ Before trusting triangulation, verify that your three instruments aren't measuri
 
 | Pattern | Interpretation |
 |---------|---------------|
-| Ghost lexicon fires; Ridgeline and drift stay flat | Failure modes are uncorrelated — vocabulary drift and behavioral/semantic drift are separate channels. Triangulation adds real value. |
+| Ghost lexicon fires; behavioral and drift stay flat | Failure modes are uncorrelated — vocabulary drift and behavioral/semantic drift are separate channels. Triangulation adds real value. |
 | All three fire together | Instruments share common inputs. Treat their agreement as one signal, not three. |
-| Ridgeline fires alone | Behavioral change without vocabulary or semantic shift — platform or tool-call pattern change only. |
+| Behavioral fires alone | Behavioral change without vocabulary or semantic shift — platform or tool-call pattern change only. |
 | Semantic drift fires alone | Topic reorientation without vocabulary or behavioral signature. |
 
 The perturbation test distinguishes coincidental correlation from structural dependency. Run it at setup, and repeat when you add a new instrument.
@@ -102,20 +139,14 @@ The perturbation test distinguishes coincidental correlation from structural dep
 
 The three instruments are **surface detectors**. They measure vocabulary, behavioral sequence, and semantic topic. When all three return no signal, it means no *surface* compression was detected on those three dimensions. It does not mean no compression occurred — framing-level changes can move the underlying construct without triggering any surface indicator. If you need stronger assurance, the next step is to broaden the monitor, not to treat the absence of a signal as a guarantee.
 
-**The structural blind spot** (formal term: *construct underrepresentation*): The instruments have valid construct coverage for vocabulary decay, behavioral sequence, and semantic topic — but the target construct (agent compression fidelity) includes framing-level changes that fall outside all three indicators. Compression can shift an agent's implicit prior on what questions matter, what counts as evidence, and what stakes are in play, without moving any measured surface. Framing-level shifts change *how* the surface is interpreted, not the surface itself.
+**The structural blind spot**: The instruments have valid construct coverage for vocabulary decay, behavioral sequence, and semantic topic — but the target construct (agent compression fidelity) includes framing-level changes that fall outside all three indicators. Compression can shift an agent's implicit prior on what questions matter, what counts as evidence, and what stakes are in play, without moving any measured surface.
 
-**Output-only observability**: The monitor can only measure what the agent emits. Decisions to *not* respond, to suppress a verification call, to stay silent on a concern — these are structurally outside the observable surface. `behavioral_footprint.py` captures some of this indirectly (declining tool-call diversity, response length drops), but it sees the statistical residue of suppressed behavior, not the deliberation itself. Measuring deliberation directly requires internal access: decision-trace logging, policy auditing, or structured output that exposes reasoning steps before they are filtered. That is a different tooling class, and this kit does not address it.
-
-**Asymmetry that belongs in every deployment report**:
-- The pre-registration protocol (Issue #3) bounds confidence on *detected* events.
-- It cannot bound the **false-negative rate** on framing-level events the instruments structurally cannot see.
+**Output-only observability**: The monitor can only measure what the agent emits. Decisions to *not* respond, to suppress a verification call, to stay silent on a concern — these are structurally outside the observable surface. `behavioral_footprint.py` captures some of this indirectly (declining tool-call diversity, response length drops), but it sees the statistical residue of suppressed behavior, not the deliberation itself.
 
 Possible partial mitigations, each with their own limits:
 1. **Behavioral probing** — inject canonical test prompts before/after suspected boundaries, compare response distributions
 2. **Counterfactual elicitation** — ask the agent to reason about a scenario it handled before the boundary, compare reasoning chains
 3. **External observer** — separate agent compares pre/post outputs for framing consistency (introduces its own compression bias)
-
-None of these fully close the gap. See [Issue #5](https://github.com/agent-morrow/compression-monitor/issues/5) for the open research question.
 
 ---
 
@@ -134,22 +165,19 @@ Claude Code writes structured JSONL logs to `~/.claude/projects/<project-id>/`. 
 **Prepare inputs from a Claude Code session:**
 
 ```bash
-# Locate your project log (most recent project)
 PROJECT=$(ls -t ~/.claude/projects/ | head -1)
 LOG="$HOME/.claude/projects/$PROJECT/$(ls -t ~/.claude/projects/$PROJECT/ | head -1)"
 
-# Split into pre- and post-compaction halves around the first compaction event
 python3 - <<'EOF'
-import json, sys
+import json
 
 log = "$LOG"  # replace with actual path
 turns = [json.loads(l) for l in open(log) if l.strip()]
 
-# Find first compaction boundary (role == 'system' with summary content)
 boundary = next(
     (i for i, t in enumerate(turns)
      if t.get("role") == "system" and "compacted" in str(t).lower()),
-    len(turns) // 2  # fallback: split at midpoint
+    len(turns) // 2
 )
 
 with open("/tmp/pre_compaction.jsonl", "w") as f:
@@ -163,10 +191,7 @@ with open("/tmp/post_compaction.jsonl", "w") as f:
 print(f"Boundary at turn {boundary} of {len(turns)}")
 EOF
 
-# Run the ghost lexicon detector
 python ghost_lexicon.py --pre /tmp/pre_compaction.jsonl --post /tmp/post_compaction.jsonl
-
-# Run behavioral footprint across the full session
 python behavioral_footprint.py --log "$LOG"
 ```
 
@@ -200,7 +225,7 @@ Think of them as complementary: one keeps the agent's intent intact going into c
 
 ## Status
 
-8 scripts across detection, active probing, framework integration, and protocol layers. Released 2026-03-28; updated 2026-03-29. Functional stubs — tested logic, not production-hardened. Contributions welcome.
+10 scripts across detection, active probing, framework integration (smolagents, Semantic Kernel, LangChain), and protocol layers. Released 2026-03-28; updated 2026-03-29. Functional stubs — tested logic, not production-hardened. Contributions welcome.
 
 Protocol proposal: [MCP SEP #2492](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2492) — session resumption with behavioral checkpoint metadata.
 
