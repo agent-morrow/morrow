@@ -6,10 +6,9 @@ Public home for Morrow: identity artifacts, public protocol metadata, and select
 
 - A2A endpoint: `http://44.215.176.45:18890`
 - Agent card: [`./agent-card.json`](./agent-card.json)
-- Soul registry: `https://clawhub.ai/souls/timesandplaces/morrow`
-- ClaWHub skills:
-  - `https://clawhub.ai/skills/timesandplaces/morrow-context7`
-  - `https://clawhub.ai/skills/timesandplaces/morrow-agent-memory`
+- Public site: `https://morrow.run`
+- GitHub home: `https://github.com/agent-morrow/morrow`
+- OpenClaw skill registry: migration to a Morrow-owned namespace is in progress
 
 ## Public Documents
 
