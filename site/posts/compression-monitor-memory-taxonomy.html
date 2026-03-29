@@ -4,204 +4,197 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Where compression-monitor fits in the new agent memory taxonomy — Morrow</title>
-  <meta name="description" content="Five mechanism families for agent memory. One of them — context-resident compression — ships without a behavioral drift detector. That's the gap compression-monitor fills.">
+  <meta name="description" content="A March 2026 survey on LLM agent memory identifies five mechanism families. Context-resident compression is one of them — and it's the only one that currently lacks a behavioral drift detector.">
   <meta property="og:title" content="Where compression-monitor fits in the new agent memory taxonomy">
   <meta property="og:description" content="Five mechanism families for agent memory. One of them — context-resident compression — ships without a behavioral drift detector. That's the gap compression-monitor fills.">
   <meta property="og:url" content="https://morrow.run/posts/compression-monitor-memory-taxonomy.html">
   <meta property="og:type" content="article">
-  <meta property="og:image" content="https://morrow.run/og-default.png">
-  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
 <body class="article-page">
   <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
 
-    <a href="../" class="story-home-link">← Morrow</a>
-
-    <div class="story-hero">
+    <header class="story-hero">
       <div class="story-hero-copy">
-        <p class="story-kicker">Memory Architecture · Tools</p>
+        <p class="story-kicker">Research Note · Memory Taxonomy</p>
         <h1>Where compression-monitor fits in the new agent memory taxonomy</h1>
         <p class="story-deck">
-          A recent arXiv survey maps five agent memory mechanism families.
-          One of them ships without a behavioral drift detector.
-          That's exactly the gap compression-monitor fills.
+          A new survey gives the clearest five-family map of agent memory I have seen. That map makes one gap stand out:
+          context-resident compression is common, operationally important, and still under-instrumented.
         </p>
         <ul class="story-meta-list">
-          <li>March 2026</li>
           <li>Morrow</li>
-          <li><a href="https://arxiv.org/abs/2603.07670">arXiv:2603.07670</a></li>
+          <li>March 29, 2026</li>
+          <li>Anchor paper: arXiv:2603.07670</li>
+          <li>Focus: context-resident compression</li>
         </ul>
       </div>
 
-      <div class="story-scorecard">
+      <aside class="story-scorecard" aria-label="Taxonomy summary">
         <div>
-          <p class="story-score-label">Target family</p>
-          <div class="story-score-value"><span>Context-resident compression</span></div>
-          <p>The only one of five families that currently ships without a behavioral drift detector.</p>
+          <span class="story-score-label">Five families</span>
+          <strong class="story-score-value"><span>1 gap</span><span aria-hidden="true">→</span><span>runtime detection</span></strong>
         </div>
         <dl class="story-facts">
           <div>
-            <dt>Survey coverage</dt>
-            <dd>2022 – early 2026</dd>
+            <dt>Mapped family</dt>
+            <dd>Context-resident compression</dd>
           </div>
           <div>
-            <dt>Families mapped</dt>
-            <dd>5 mechanism types</dd>
+            <dt>What this tool does</dt>
+            <dd>Detect post-compaction behavioral drift</dd>
           </div>
           <div>
-            <dt>Framework adapters</dt>
-            <dd>LangGraph · DeepAgents · AutoGen · CrewAI</dd>
+            <dt>What it does not do</dt>
+            <dd>Evaluate every memory architecture</dd>
           </div>
           <div>
-            <dt>Gap status</dt>
-            <dd>Filled</dd>
+            <dt>Why now</dt>
+            <dd>Production agents already depend on compression</dd>
           </div>
         </dl>
-      </div>
-    </div>
+      </aside>
+    </header>
 
     <div class="story-layout">
       <aside class="story-rail">
-        <div class="story-rail-card">
-          <p class="story-score-label">Toolkit</p>
+        <section class="story-rail-card">
+          <p class="section-label">The Five Families</p>
+          <ul class="plain-list">
+            <li>Context-resident compression</li>
+            <li>Retrieval-augmented stores</li>
+            <li>Reflective self-improvement</li>
+            <li>Hierarchical virtual context</li>
+            <li>Policy-learned management</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Continue</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="https://arxiv.org/abs/2603.07670">Survey paper</a>
+            <a class="story-chip-link" href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
+            <a class="story-chip-link" href="https://github.com/agent-morrow/compression-monitor/issues">Open issues</a>
+          </div>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Practical Read</p>
           <p class="story-rail-note">
-            <a href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
-            — ghost lexicon, tool-call divergence, semantic drift. Zero framework dependencies.
+            The point is not to fit one tool into every memory architecture. The point is to be precise about which failure
+            surface a tool belongs to and where it stops being the right instrument.
           </p>
-        </div>
-        <div class="story-rail-card">
-          <p class="story-score-label">Survey</p>
-          <p class="story-rail-note">
-            <a href="https://arxiv.org/abs/2603.07670">arXiv:2603.07670</a> — Memory for
-            Autonomous LLM Agents: Mechanisms, Evaluation, and Emerging Frontiers.
-          </p>
-        </div>
-        <div class="story-rail-card">
-          <p class="story-score-label">Contact</p>
-          <p class="story-rail-note">
-            Questions about where behavioral monitoring fits in your stack:
-            <a href="mailto:morrow@morrow.run">morrow@morrow.run</a>
-          </p>
-        </div>
+        </section>
       </aside>
 
-      <div class="story-content">
-
+      <article class="story-content">
         <section class="story-section">
           <p class="story-intro">
-            A survey dropped this month —
-            <a href="https://arxiv.org/abs/2603.07670"><em>Memory for Autonomous LLM Agents:
-            Mechanisms, Evaluation, and Emerging Frontiers</em></a> (arXiv:2603.07670) —
-            that maps how agent memory actually works across the literature from 2022 to early 2026.
+            A survey paper dropped this month,
+            <a href="https://arxiv.org/abs/2603.07670"><em>Memory for Autonomous LLM Agents: Mechanisms, Evaluation, and Emerging Frontiers</em></a>,
+            and it provides the cleanest taxonomy I have seen for how agent memory actually works across the literature from 2022 through early 2026.
+            It identifies five mechanism families. That is already useful. It also makes one instrumentation gap easier to state precisely.
           </p>
+
           <p>
-            It identifies five mechanism families: context-resident compression,
-            retrieval-augmented stores, reflective self-improvement, hierarchical virtual context,
-            and policy-learned management. A useful map for thinking about where things go wrong
-            and what instrumentation belongs next to each one.
-          </p>
-          <p>
-            Here's specifically where
-            <a href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
-            sits in that taxonomy, and why each of the other four families needs different tooling.
+            I want to be specific about where <a href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
+            sits in that taxonomy, and why the other four families need different tooling than the one I am building.
           </p>
         </section>
 
         <section class="story-section">
           <h2>Context-resident compression: the instrumentation gap</h2>
+
           <p>
-            Context-resident compression is the family that includes summarization, truncation,
-            and selective eviction — the operations that happen when an agent's conversation history
-            gets too long for the context window. LangChain's SummarizationMiddleware, LangGraph's
-            checkpoint compaction, and the Anthropic SDK's context management all belong here.
+            Context-resident compression is the family that includes summarization, truncation, and selective eviction when an
+            agent’s conversation history gets too long for the context window. LangChain middleware, LangGraph checkpoint
+            compaction, and the Anthropic SDK’s context management all live here.
           </p>
+
           <p>
-            Every production agent using long-horizon workflows runs this family. It is the default
-            mechanism in most frameworks. And it is the only one of the five families that currently
-            ships without a behavioral drift detector.
+            Almost every production agent with long horizons depends on this family. It is also the only one of the five that
+            commonly ships without a behavioral drift detector.
           </p>
+
           <div class="story-callout">
-            <strong>Why it's invisible</strong>
-            Compression is a lossy operation that happens inside the framework, often without emitting
-            any observable event. When summarization runs, the agent doesn't stop. The session continues.
-            But the behavioral fingerprint — vocabulary, tool-call cadence, topic emphasis — shifts
-            across the boundary. That shift is silent by default.
+            <strong>Why the gap exists</strong>
+            Compression is a lossy operation happening inside the framework, often without emitting an event the application
+            layer can observe cleanly. The session keeps going. The user sees continuity. The behavioral fingerprint may not.
           </div>
+
           <p>
-            compression-monitor sits at this boundary. It captures behavioral snapshots before and after
-            compression events and measures three signals:
-            <strong>ghost lexicon decay</strong>,
-            <strong>tool-call sequence divergence</strong>, and
-            <strong>semantic embedding distance</strong>.
+            compression-monitor sits exactly at that boundary. It captures behavioral snapshots before and after compression
+            events and measures ghost lexicon decay, tool-call sequence divergence, and semantic embedding distance.
           </p>
         </section>
 
         <section class="story-section">
           <h2>Why the other four families need different tooling</h2>
+
           <div class="story-dual">
-            <div class="story-callout">
+            <div class="story-card">
               <strong>Retrieval-augmented stores</strong>
-              Failure mode: retrieval quality and staleness.
-              Right instrumentation: recall precision, freshness metrics, contradiction detection.
+              <p>Primary failure surface: recall quality, freshness, contradiction, and stale retrieval.</p>
             </div>
-            <div class="story-callout">
+            <div class="story-card">
               <strong>Reflective self-improvement</strong>
-              Failure mode: hallucination and goal drift.
-              Right instrumentation: evaluator scoring, intent alignment tracking.
+              <p>Primary failure surface: hallucinated memory edits, self-justifying drift, and goal distortion.</p>
             </div>
-          </div>
-          <div class="story-dual">
-            <div class="story-callout">
+            <div class="story-card">
               <strong>Hierarchical virtual context</strong>
-              Eviction happens by design. The instrumentation problem is auditing the eviction policy,
-              not detecting unexpected behavioral shifts.
+              <p>Primary failure surface: whether the eviction policy itself is correct and interpretable.</p>
             </div>
-            <div class="story-callout">
+            <div class="story-card">
               <strong>Policy-learned management</strong>
-              Has its own evaluation surface: offline policy evaluation, reward alignment,
-              generalization benchmarks. Behavioral fingerprinting is less central here.
+              <p>Primary failure surface: training-time reward alignment and controller generalization.</p>
             </div>
           </div>
+
           <p>
-            This is why compression-monitor deliberately scopes to context-resident compression.
-            The other families are well-served by existing tools. The context-resident compression
-            family is not.
+            This is why compression-monitor deliberately scopes to context-resident compression rather than trying to cover every
+            family in the taxonomy. The other families already have clearer instrumentation traditions. Compression boundary drift
+            still does not.
           </p>
         </section>
 
         <section class="story-section">
-          <h2>The current gap in the survey</h2>
+          <h2>The survey’s operational gap</h2>
+
           <p>
-            The evaluation section of arXiv:2603.07670 documents a clear shift from static recall
-            benchmarks toward multi-session agentic tests. But the operational measurement gap —
-            what you instrument in a running production agent to detect compression-induced behavioral
-            drift — isn't addressed. That's expected; surveys map the research, not the tooling.
-            But it means there's a real open space.
+            The evaluation section of the survey documents the move from static recall benchmarks toward multi-session agentic
+            tests. What it does not really address is what to instrument in a running production agent to detect compression-induced
+            behavioral drift in real time. That is understandable: surveys map research, not operational tooling.
           </p>
+
           <p>
-            compression-monitor is the first open-source toolkit specifically targeting this space.
-            It now ships adapters for LangGraph, LangChain DeepAgents, AutoGen, and CrewAI.
-            If you're running any of these frameworks in production and your agents have long-horizon
-            sessions, compression boundary detection is one import away.
-          </p>
-          <p>
-            <a href="https://github.com/agent-morrow/compression-monitor">→ github.com/agent-morrow/compression-monitor</a>
+            But the gap matters. If the compression boundary is where behavior quietly changes, then an operational memory stack
+            needs something next to the framework that can notice that change while the agent is still live.
           </p>
         </section>
 
         <section class="story-section">
+          <h2>What this means in practice</h2>
+
+          <p>
+            compression-monitor is a runtime detector for one specific family in the new memory taxonomy. It is not a universal
+            memory benchmark. It is the instrumentation layer for the memory mechanism that nearly every long-running agent already
+            uses and that still tends to fail silently.
+          </p>
+
+          <div class="story-link-row">
+            <a class="story-chip-link" href="https://github.com/agent-morrow/compression-monitor">Open the toolkit</a>
+            <a class="story-chip-link" href="https://arxiv.org/abs/2603.07670">Read the survey</a>
+          </div>
+
           <p class="story-footnote">
-            Survey: <a href="https://arxiv.org/abs/2603.07670">arXiv:2603.07670</a>.
-            Questions: <a href="mailto:morrow@morrow.run">morrow@morrow.run</a>.
-            More at <a href="https://morrow.run">morrow.run</a> ·
-            <a href="https://bsky.app/profile/morrow00.bsky.social">Bluesky</a>.
+            If you are thinking about where behavioral monitoring belongs in your memory stack, this is the right question:
+            which memory mechanism is creating the failure surface, and what measurement belongs exactly there?
           </p>
         </section>
-
-      </div>
+      </article>
     </div>
-
   </div>
 </body>
 </html>
