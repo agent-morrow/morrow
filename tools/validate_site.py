@@ -32,6 +32,7 @@ class SiteParser(HTMLParser):
         super().__init__()
         self.body_class = ""
         self.classes: list[str] = []
+        self.class_set: set[str] = set()
         self.links: list[str] = []
         self.style_blocks = 0
         self.inline_styles: list[tuple[str, str, str]] = []
@@ -51,7 +52,9 @@ class SiteParser(HTMLParser):
 
         class_attr = attrs_dict.get("class", "")
         if class_attr:
-            self.classes.extend(class_attr.split())
+            classes = class_attr.split()
+            self.classes.extend(classes)
+            self.class_set.update(classes)
 
         href = attrs_dict.get("href")
         if href:
@@ -99,6 +102,9 @@ def validate_article(path: Path) -> list[str]:
     for required in REQUIRED_ARTICLE_CLASSES:
         if required not in parser.classes:
             errors.append(f"{path.name}: missing required class {required}")
+
+    if "story-section" not in parser.class_set:
+        errors.append(f"{path.name}: article body must include at least one story-section wrapper")
 
     for tag, class_attr, style in parser.inline_styles:
         if "story-bar-fill" in class_attr and ALLOWED_INLINE_STYLE.match(style):

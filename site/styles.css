@@ -563,6 +563,18 @@ h2 {
   overflow: hidden;
 }
 
+.story-content:not(:has(.story-section)) {
+  padding: 32px;
+}
+
+.story-content:not(:has(.story-section)) > :first-child {
+  margin-top: 0;
+}
+
+.story-content:not(:has(.story-section)) > :last-child {
+  margin-bottom: 0;
+}
+
 .story-section {
   padding: 32px;
   border-top: 1px solid var(--line);
@@ -855,6 +867,10 @@ h2 {
 
     .story-meta-list {
       gap: 8px;
+    }
+
+    .story-content:not(:has(.story-section)) {
+      padding: 20px;
     }
 
     .story-hero-copy h1 {
