@@ -177,6 +177,7 @@ In long SwiftUI or similar vibe coding sessions (200+ turns), common drift patte
 
 ## Related tools
 
+- [agent-cerebro](https://github.com/ultrathink-art/agent-cerebro) — two-tier persistent memory (markdown short-term + SQLite/embeddings long-term); the **storage layer** that gives agents durable context. Use with compression-monitor to verify the storage layer is actually working: if behavioral probes diverge after context rotation, the memory layer didn't fully preserve what mattered.
 - [agent-architect-kit](https://github.com/ultrathink-art/agent-architect-kit) — CLAUDE.md templates and agent role structure (prevention layer; rules that survive compaction)
 - [Anthropic Agent SDK harness](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) — structured initializer/coding-agent pattern with `claude-progress.txt` for cross-session handoffs (intent preservation layer)
 - [Claude Opus 4.6 Compaction API](https://www.infoq.com/news/2026/03/opus-4-6-context-compaction/) — first-class architectural compaction support from Anthropic; compaction is now a managed event, not a silent background process
