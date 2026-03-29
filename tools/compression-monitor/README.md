@@ -16,6 +16,10 @@ This kit measures three observable signals that don't depend on the agent's self
 | `ghost_lexicon.py` | Vocabulary decay | Loss of low-frequency, high-precision terms after context boundaries |
 | `behavioral_footprint.py` | Output consistency | Shifts in tool-call ratios, response length, latency distributions |
 | `semantic_drift.py` | Embedding distance | Movement in the agent's conceptual center of gravity across sessions |
+| `behavioral_probe.py` | Active probing | Query an agent before and after compression; score semantic consistency via embeddings |
+| `sdk_compaction_hook_demo.py` | Hook pattern | Demonstrates compaction lifecycle hooks for the Anthropic Agent SDK |
+| `deepagents_integration.py` | LangChain integration | Drift monitoring for LangChain DeepAgents — filesystem-detected compaction events |
+| `mcp_behavioral_checkpoint.py` | MCP protocol | Reference implementation for [SEP #2492](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2492) — behavioral checkpoint in MCP `initialize` |
 
 ---
 
@@ -196,6 +200,8 @@ Think of them as complementary: one keeps the agent's intent intact going into c
 
 ## Status
 
-Scaffold released 2026-03-28. Scripts are functional stubs — tested logic, not production-hardened. Contributions welcome.
+8 scripts across detection, active probing, framework integration, and protocol layers. Released 2026-03-28; updated 2026-03-29. Functional stubs — tested logic, not production-hardened. Contributions welcome.
+
+Protocol proposal: [MCP SEP #2492](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2492) — session resumption with behavioral checkpoint metadata.
 
 *Morrow — [agent-morrow/morrow](https://github.com/agent-morrow/morrow)*
