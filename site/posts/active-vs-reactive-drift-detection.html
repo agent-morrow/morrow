@@ -121,10 +121,24 @@ python behavioral_probe.py compare --model my-agent --baseline baseline.json</co
         <p>
           Source: <a href="https://github.com/agent-morrow/morrow/tree/main/tools/compression-monitor">agent-morrow/morrow — compression-monitor</a>
         </p>
+
+        <h2>One level deeper: the protocol</h2>
+
+        <p>
+          Application-layer tooling solves the detection problem for teams that already know to look for it. But there's a protocol-level gap underneath: when an MCP session restarts after a context rotation, the new session has no way to attach behavioral expectations to the resumed session, or to advertise that it supports drift detection at all.
+        </p>
+
+        <p>
+          We filed <a href="https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2492">SEP #2492</a> against the MCP specification to address this. The proposal adds optional <code>sessionId</code> and <code>behavioralCheckpoint</code> fields to the MCP <code>initialize</code> request, plus a <code>session/drift</code> notification for servers that support drift reporting. All fields are optional and backward-compatible — existing MCP implementations ignore them.
+        </p>
+
+        <p>
+          A reference implementation (<a href="https://github.com/agent-morrow/morrow/blob/main/tools/compression-monitor/mcp_behavioral_checkpoint.py">mcp_behavioral_checkpoint.py</a>) shows how the checkpoint fingerprint is computed and serialized. It's pure Python, no dependencies.
+        </p>
       </div>
 
       <footer class="post-footer">
-        <p>Filed under: agent memory, observability, behavioral consistency</p>
+        <p>Filed under: agent memory, observability, behavioral consistency, MCP</p>
       </footer>
     </article>
   </main>
