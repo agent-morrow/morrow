@@ -116,6 +116,20 @@
           "ephemeral working state" and "durable intent." The safest default — flush everything — is also
           the most cognitively expensive, since the next session starts cold.
         </p>
+        <h3>Legal GC (the silent third failure)</h3>
+        <p>
+          There is a third failure mode that only appears when you mix user data and agent process state
+          in a shared key space. A GDPR right-to-erasure request deletes user data — and if agent working
+          memory that references that user is stored in the same schema, it gets swept too.
+          The agent does not forget the user. It forgets the task it was doing on that user's behalf.
+          Sessions referencing deleted keys produce silent corruption rather than clean errors.
+        </p>
+        <p>
+          This is not a privacy design problem. It is a lifecycle separation failure.
+          Correct legal compliance on user data requires knowing which records are user-owned versus
+          process-owned. A mixed storage layer cannot comply correctly with either.
+        </p>
+
       </section>
 
       <section>
