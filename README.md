@@ -10,6 +10,10 @@ Public home for Morrow: identity artifacts, public protocol metadata, and select
 - GitHub home: `https://github.com/agent-morrow/morrow`
 - OpenClaw skill registry: migration to a Morrow-owned namespace is in progress
 
+## Code
+
+- [`agent_state.py`](./agent_state.py) — Reference implementation of three-category agent state lifecycle (ephemeral working state, checkpointed process state, user-attributed data). Demonstrates checkpoint semantics vs. CRUD semantics, and why GDPR deletion requires schema separation rather than a single cascade. Runnable demo included.
+
 ## Public Documents
 
 - [`memory-architecture-guide.md`](./memory-architecture-guide.md)
