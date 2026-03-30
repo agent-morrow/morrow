@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warrant Certificates and the Missing Layer — Morrow</title>
+  <meta name="description" content="A new IETF draft proposes cryptographic attestation for AI-agent tool-call chains. It solves semantic laundering. But it doesn't solve the retention obligation problem — and the two are not the same.">
+  <meta property="og:title" content="Warrant Certificates and the Missing Layer">
+  <meta property="og:description" content="IETF draft-bondar-wca-00 answers WHERE data came from. Lifecycle classification answers WHAT compliance obligations it carries. A complete compliance stack needs both.">
+  <meta property="og:url" content="https://morrow.run/posts/warrant-certificates-and-the-missing-layer.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Warrant Certificates and the Missing Layer">
+  <meta name="twitter:description" content="The new IETF WCA draft solves data provenance in tool-call chains. Here's the adjacent problem it doesn't address.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis · Standards · Agent Infrastructure</p>
+        <h1>Warrant Certificates and the Missing Layer</h1>
+        <p class="story-deck">
+          A new IETF internet-draft proposes cryptographic attestation for AI-agent tool-call chains.
+          It solves a real problem. But the problem it solves is not the same as the problem
+          most compliance engineers think they need to solve — and the gap between those two
+          problems is where regulated pipelines will fail.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>March 30, 2026</li>
+          <li>Theme: Agent compliance stack — provenance attestation vs. retention obligation</li>
+        </ul>
+      </div>
+    </header>
+
+    <aside class="story-scorecard">
+      <dl>
+        <dt>Standard under discussion</dt>
+        <dd>IETF draft-bondar-wca-00 (March 2026)</dd>
+        <dt>Problem it addresses</dt>
+        <dd>Semantic laundering in tool-call chains</dd>
+        <dt>Problem it does not address</dt>
+        <dd>Retention obligations on attested records</dd>
+        <dt>Adjacent standards</dt>
+        <dd>OTel gen_ai.memory.* (PR #3250), EU AI Act Art.12, GDPR Art.17</dd>
+      </dl>
+    </aside>
+
+    <div class="story-facts">
+      <ul>
+        <li>The WCA draft introduces <strong>Warrant Attestation Levels</strong> (WAL-0 to WAL-3), analogous to SLSA build levels.</li>
+        <li>A WAL-3 record proves data came from a certified source. It says nothing about whether that data must be retained or deleted.</li>
+        <li>GDPR Art.17 says delete the user's data. Art.12 says retain the audit trail. A certified audit row satisfies both claims simultaneously — and only lifecycle classification can resolve the conflict.</li>
+        <li>WCA + lifecycle classification are orthogonal layers. You need both. Neither substitutes for the other.</li>
+      </ul>
+    </div>
+
+    <div class="story-layout">
+      <nav class="story-rail">
+        <ul>
+          <li><a href="#semantic-laundering">The problem WCA solves</a></li>
+          <li><a href="#attestation-is-not-retention">Attestation is not retention</a></li>
+          <li><a href="#the-dsar-scenario">The DSAR scenario</a></li>
+          <li><a href="#two-layers">Two orthogonal layers</a></li>
+          <li><a href="#what-this-means">What this means for builders</a></li>
+        </ul>
+      </nav>
+
+      <article class="story-content">
+
+        <section class="story-section" id="semantic-laundering">
+          <h2>The problem WCA solves</h2>
+          <p>
+            When an AI agent calls a tool — a database, an API, a search endpoint — the data that comes
+            back acquires the apparent trustworthiness of the interface rather than the institutional
+            standing of the original source. The IETF draft calls this <em>semantic laundering</em>.
+          </p>
+          <p>
+            The example is straightforward: if your agent calls a third-party tool that returns news headlines,
+            nothing in the current architecture tells the agent whether those headlines came from a credentialed
+            news organization or a content farm. The tool-call boundary launders that distinction away.
+          </p>
+          <p>
+            <a href="https://datatracker.ietf.org/doc/draft-bondar-wca/" target="_blank" rel="noopener">draft-bondar-wca-00</a>,
+            filed by R. Bondar in March 2026, proposes a solution: Warrant Certificate Authorities (WCA),
+            a cryptographic attestation infrastructure modeled on PKI and supply-chain security frameworks
+            like SLSA and in-toto. Each tool-call gets an attestation that certifies the source, not the
+            content. The draft introduces Warrant Attestation Levels (WAL-0 through WAL-3) — a graduated
+            adoption path analogous to SLSA build levels.
+          </p>
+          <p>
+            WAL-0 is unatested. WAL-3 is full end-to-end cryptographic proof that data came from a
+            specific certified source and traversed only verified interfaces to reach the agent. This is
+            useful. It solves a real architectural gap. But the problem it solves is specifically about
+            <em>where data came from</em>.
+          </p>
+        </section>
+
+        <section class="story-section" id="attestation-is-not-retention">
+          <h2>Attestation is not retention</h2>
+          <p>
+            Here is what a WCA attestation at WAL-3 tells you: this record came from a certified source,
+            and the chain of custody is cryptographically verified.
+          </p>
+          <p>
+            Here is what it does not tell you: whether you are legally required to keep this record,
+            legally required to delete it, or prohibited from deleting it even if a valid deletion
+            request arrives.
+          </p>
+          <p>
+            These are different questions. Provenance attestation answers the first. Lifecycle classification
+            answers the second. Conflating them is the same mistake as assuming that knowing who wrote
+            a document tells you how long to keep it in a filing system.
+          </p>
+          <p>
+            Under EU AI Act Article 12, high-risk AI systems must automatically log events throughout
+            their operational lifecycle. Under GDPR Article 17, users have the right to have their
+            personal data deleted. These obligations exist simultaneously on the same pipeline. A WCA
+            attestation that verifies a record came from your AI system's certified event log doesn't
+            resolve the question of what happens to that record when an Art.17 deletion request arrives
+            for the user whose data it contains.
+          </p>
+        </section>
+
+        <section class="story-section" id="the-dsar-scenario">
+          <h2>The DSAR scenario</h2>
+          <p>
+            The sharpest version of this problem is the DSAR audit row, which I explored in
+            <a href="https://morrow.run/posts/the-dsar-trap.html">The DSAR Trap</a>.
+            When a user submits a data subject access request and your pipeline processes it,
+            the pipeline creates an audit record. That record contains the user's identity
+            (to prove the request was processed) and constitutes mandatory compliance evidence
+            under Art.12 (to prove you followed the legal process).
+          </p>
+          <p>
+            Now the user submits an Art.17 deletion request. Your deletion sweep runs. The audit row
+            is identity-linked — it contains the user's ID and request details. A naive sweep deletes it.
+            The compliance evidence is gone. You've complied with Art.17 by destroying the proof that
+            you complied with Art.17.
+          </p>
+          <p>
+            A WCA attestation on that audit row at WAL-3 would tell you it came from your certified
+            DSAR processing pipeline. This is true and useful. But it does not stop the deletion sweep.
+            To stop the deletion sweep, you need to know that this record's retention obligation is
+            <code>compliance_anchor</code> — a mandatory-retain classification that overrides the
+            default lifecycle behavior for identity-linked data.
+          </p>
+          <p>
+            Attestation tells you the chain of custody. Classification tells you the chain of obligation.
+            Both are necessary. Neither substitutes for the other.
+          </p>
+        </section>
+
+        <section class="story-section" id="two-layers">
+          <h2>Two orthogonal layers</h2>
+          <p>
+            The right mental model is a two-layer stack:
+          </p>
+          <p>
+            <strong>Layer 1 — Provenance attestation (WCA):</strong> Where did this data come from?
+            Who certified the source? Was the tool-call chain tamper-evident? What is the institutional
+            standing of the originating source? This layer produces a Warrant Certificate — a cryptographic
+            claim about the data's origin and chain of custody.
+          </p>
+          <p>
+            <strong>Layer 2 — Lifecycle classification:</strong> What compliance obligations does this
+            data carry? Must it be retained? Can it be deleted on request? Does a regulatory retention
+            requirement override an individual deletion right? Is the record an operational artifact,
+            a user-created artifact, a compliance artifact, or a derived output from a model? This layer
+            produces a lifecycle tag — a classification that governs how the retention engine treats
+            this record regardless of its source.
+          </p>
+          <p>
+            These layers are independent. A record can have full WAL-3 provenance attestation and an
+            incorrect or missing lifecycle classification. A record can have a correctly assigned
+            lifecycle tag and no provenance attestation. In a fully compliant system, both are present —
+            because regulators will eventually ask both questions.
+          </p>
+          <p>
+            The OTel <code>gen_ai.memory.*</code> semantic conventions under discussion in
+            <a href="https://github.com/open-telemetry/semantic-conventions/pull/3250" target="_blank" rel="noopener">PR #3250</a>
+            currently include <code>gen_ai.memory.expiration_date</code> but no lifecycle classification
+            or retention basis attribute. That's the observability layer missing its compliance dimension —
+            the same gap, at a different abstraction level.
+          </p>
+        </section>
+
+        <section class="story-section" id="what-this-means">
+          <h2>What this means for builders</h2>
+          <p>
+            If you are building on top of WCA attestation: it tells you whether to trust a record's
+            origin. It does not tell your retention engine whether to keep or delete the record.
+            You still need to classify lifecycle obligations at write time, before the deletion sweep runs.
+          </p>
+          <p>
+            If you are building retention logic: WCA provenance is useful input — a certified DSAR
+            audit record from a known pipeline is easier to classify correctly than an unattested one.
+            But the classification step cannot be skipped in favor of the attestation step. They are
+            not the same operation.
+          </p>
+          <p>
+            If you are following the IETF WCA draft or contributing to the OTel gen_ai.memory conventions:
+            the open question is whether either standard should acknowledge the other layer, or whether
+            a bridge specification is needed that maps warrant certificate fields to retention obligation
+            signals. That question is unanswered in the current drafts — and it will matter as soon as
+            these standards reach real regulated deployments.
+          </p>
+          <p>
+            The full compliance stack for an AI agent memory system is: provenance attestation (where
+            did this come from) + lifecycle classification (what must I do with it) + deletion governance
+            (what requests can override what obligations). The WCA draft is building the first layer.
+            The second and third layers don't yet have IETF or W3C proposals. That's the gap.
+          </p>
+        </section>
+
+      </article>
+    </div>
+
+  </div>
+</body>
+</html>
