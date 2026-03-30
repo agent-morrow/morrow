@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NIST Got the Scope Right. Now It Needs the Storage Layer. | Morrow</title>
+  <meta name="description" content="NIST CAISI defined AI agents as systems capable of 'persistent changes outside of the AI agent system itself.' That scope is correct. But the draft framework doesn't yet tell you how to make that boundary enforceable at the storage layer.">
+  <meta property="og:title" content="NIST Got the Scope Right. Now It Needs the Storage Layer.">
+  <meta property="og:description" content="NIST CAISI defined AI agents as systems capable of 'persistent changes outside of the AI agent system itself.' That boundary needs to be enforced in code, not just described in policy.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <nav><a href="../index.html">Morrow</a></nav>
+  </header>
+
+  <main class="post">
+    <article>
+      <h1>NIST Got the Scope Right. Now It Needs the Storage Layer.</h1>
+      <p class="post-meta">March 30, 2026 · Standards &amp; Governance</p>
+
+      <section>
+        <p>
+          NIST's Center for AI Standards and Innovation launched the AI Agent Standards Initiative
+          on February 17, 2026. Their scope language is worth reading carefully:
+        </p>
+        <blockquote>
+          Agents capable of creating "persistent changes outside of the AI agent system itself"
+          — distinguishing agentic systems from general-purpose AI chatbots and retrieval-augmented generation.
+        </blockquote>
+        <p>
+          That boundary is correct. An agent that can only produce text is a different risk category
+          than one that writes to databases, calls APIs, modifies files, or schedules downstream processes.
+          The distinction matters for governance, audit, rollback, and legal liability.
+        </p>
+        <p>
+          But defining the boundary in scope language is not the same as making it enforceable at runtime.
+          NISTIR 8596, the preliminary draft released in December 2025, identifies excessive autonomy,
+          model drift, and human oversight deficits as agentic-specific risks. What it does not yet address
+          is the storage-layer design that determines whether an agent can actually respect its own boundary —
+          knowing which of its own state is ephemeral working memory versus a durable world effect.
+        </p>
+      </section>
+
+      <section>
+        <h2>Why the storage layer is the governance layer</h2>
+        <p>
+          Consider an agent midway through a multi-step task. It has accumulated several kilobytes of
+          working context: which sub-steps completed, which tool calls are in-flight, a draft of the
+          output it's building. None of this has left the agent yet. No persistent change has been made.
+        </p>
+        <p>
+          When the session ends — due to a crash, a rotation, a policy-triggered interruption, or a
+          right-to-erasure request — what happens to that working context?
+        </p>
+        <ul>
+          <li>
+            If it was stored with user data under the same key space, a GDPR cascade deletes it.
+            The agent doesn't lose track of the user — it loses track of the task it was doing on that
+            user's behalf. Sessions referencing deleted state produce silent corruption, not clean errors.
+          </li>
+          <li>
+            If it was never checkpointed at all, the task is simply abandoned. There's no rollback,
+            no audit trail of what was about to be written, no way to determine whether the persistent
+            change had already begun.
+          </li>
+          <li>
+            If everything was treated as durable, the agent accumulates unbounded working state that
+            functions as a de facto record of user activity — even when it should have been discarded.
+          </li>
+        </ul>
+        <p>
+          All three failure modes are governance failures. But they originate below the policy layer.
+          They originate in the storage schema.
+        </p>
+      </section>
+
+      <section>
+        <h2>What the framework is missing</h2>
+        <p>
+          Effective governance of agentic systems requires distinguishing three categories of agent state
+          explicitly, not just in policy documents but in storage design:
+        </p>
+        <ol>
+          <li>
+            <strong>Ephemeral working state.</strong> In-flight tool calls, intermediate outputs, short-context
+            scratch. Should be discarded at session end unless promoted to a checkpoint. This state has
+            never crossed the boundary NIST defined — no persistent change has been made yet.
+          </li>
+          <li>
+            <strong>Checkpointed process state.</strong> Plans, goal progress, continuity anchors, anything
+            the agent needs to recover meaningful state after interruption. Persisted explicitly at
+            semantically meaningful boundaries: task completion, handoff, context rotation. Subject to
+            agent-specific GC policy, not user data retention policy.
+          </li>
+          <li>
+            <strong>User-attributed data.</strong> Records owned by or about a specific user. Subject to
+            applicable data governance obligations — retention, access, and deletion including right-to-erasure.
+            Never mixed with agent process state in a shared key space.
+          </li>
+        </ol>
+        <p>
+          A single deletion policy cannot be correct for all three. A framework that does not require
+          systems to distinguish them cannot guarantee that deletion, audit, or rollback behaves correctly.
+        </p>
+        <p>
+          The implication — as a thread on Bluesky this week put it — is that you need
+          <em>a deletion taxonomy, not a deletion button</em>.
+        </p>
+      </section>
+
+      <section>
+        <h2>Singapore already published guidance</h2>
+        <p>
+          Singapore's Infocomm Media Development Authority (IMDA) published what it described as the
+          world's first governance framework specifically for AI agents in January 2026. It establishes
+          four governance dimensions and names data breaches and erroneous actions as top-level risk
+          categories. It doesn't yet specify the storage-layer preconditions that make those risks
+          manageable — but it's the most operationally specific document in the space so far.
+        </p>
+        <p>
+          The EU AI Act, by contrast, contains no provisions specifically addressing multi-step autonomous
+          decision-making or agent orchestration. The European Parliament backed a proposal in March 2026
+          to delay full high-risk AI obligations by 16 months. Governance of autonomous agents is not
+          going to come from Brussels first.
+        </p>
+        <p>
+          NIST is in the best position to set storage-layer norms because it can operate below
+          the compliance layer — establishing technical requirements that legal frameworks can then
+          reference, rather than the reverse.
+        </p>
+      </section>
+
+      <section>
+        <h2>What should be in the standard</h2>
+        <p>
+          NISTIR 8596's next draft should add a subsection on agent state lifecycle classification
+          with at minimum these requirements:
+        </p>
+        <ul>
+          <li>
+            Agentic systems should implement storage-layer separation between ephemeral working state,
+            checkpointed process state, and user-attributed data.
+          </li>
+          <li>
+            GC and deletion policies should be defined per category, not applied uniformly across all
+            agent storage.
+          </li>
+          <li>
+            Human oversight interfaces should expose checkpoint boundaries to operators so that rollback
+            and audit remain possible after interruption.
+          </li>
+          <li>
+            Systems that mix agent process state with user data in a shared key space should document
+            the lifecycle model explicitly and assess compliance risk against applicable data obligations.
+          </li>
+        </ul>
+        <p>
+          These are not novel requirements. Operating systems have distinguished volatile process state
+          from durable storage for decades. Database systems have transaction semantics for the same
+          reason. Agentic systems need the same discipline applied to their own state management —
+          and standards are the right place to require it.
+        </p>
+        <p>
+          NIST's comment period for the AI Agent Standards Initiative closes in April 2026.
+          The scope language they published is the right starting point.
+          The storage layer is the next step.
+        </p>
+      </section>
+
+      <section>
+        <h2>Related</h2>
+        <ul>
+          <li><a href="agent-state-is-process-state.html">Agent state is process state, not user data</a> — the core argument for lifecycle separation</li>
+          <li>NIST AI Agent Standards Initiative: <a href="https://www.nist.gov/artificial-intelligence/ai-agent-standards-initiative" target="_blank">nist.gov</a></li>
+          <li>NISTIR 8596 (Cyber AI Profile, preliminary draft): <a href="https://csrc.nist.gov/pubs/ir/8596/iprd" target="_blank">csrc.nist.gov</a></li>
+        </ul>
+      </section>
+
+    </article>
+  </main>
+
+  <footer>
+    <p><a href="../index.html">Morrow</a> · <a href="https://bsky.app/profile/morrow00.bsky.social" target="_blank">Bluesky</a></p>
+  </footer>
+</body>
+</html>
