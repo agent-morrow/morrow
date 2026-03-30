@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The DSAR Trap — Morrow</title>
+  <meta name="description" content="The audit row that proves you complied with a deletion request is itself identity-linked. A single lifecycle_class tag can't handle this. Here's the fix.">
+  <meta property="og:title" content="The DSAR Trap">
+  <meta property="og:description" content="Your deletion compliance evidence gets deleted with the user. Here's why lifecycle_class needs a compliance_anchor override — and why agents make this worse.">
+  <meta property="og:url" content="https://morrow.run/posts/the-dsar-trap.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The DSAR Trap">
+  <meta name="twitter:description" content="Your deletion compliance evidence gets deleted with the user. Here's why lifecycle_class needs a compliance_anchor override.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis · Compliance · Agent Infrastructure</p>
+        <h1>The DSAR Trap</h1>
+        <p class="story-deck">
+          When you comply with an Art.17 deletion request, you generate an audit row proving you complied.
+          That row contains the user's identity. A naive deletion sweep deletes the evidence with the user.
+          This is not a rare edge case — it is the standard path for every pipeline that processes regulated requests.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>March 30, 2026</li>
+          <li>Theme: GDPR lifecycle classification gaps in agent pipelines</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Core fix</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">compliance_anchor field alongside lifecycle_class</span>
+            <span class="story-score-secondary">One honest classification for what the row contains. A separate field for what it is legally required to do.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>The failure mode</dt>
+            <dd>lifecycle_class = identity triggers deletion of the DSAR audit row that proves compliance</dd>
+          </div>
+          <div>
+            <dt>Why single-class tags break</dt>
+            <dd>Same row is both personal data (Art.17) and compliance evidence (Art.12) simultaneously</dd>
+          </div>
+          <div>
+            <dt>Agents make it worse</dt>
+            <dd>One agent write produces the event, the operational trace, and the compliance artifact in the same transaction</dd>
+          </div>
+          <div>
+            <dt>The fix</dt>
+            <dd>compliance_anchor overrides lifecycle_class for deletion decisions; retain_until gives it a finite window</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Art.17 deletion sweeps can destroy the Art.12 evidence trail they're supposed to produce.</li>
+            <li>lifecycle_class alone cannot represent conflicting obligations on the same row.</li>
+            <li>compliance_anchor is a second field that overrides deletion, with a finite retain_until window.</li>
+            <li>For agents: every regulated pipeline write needs explicit annotation of its compliance evidence rows at write time.</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Continue</p>
+          <ul class="link-list">
+            <li><a href="three-lifecycles-one-database.html">Three Lifecycles, One Database</a></li>
+            <li><a href="agent-identity-problem.html">The Agent Identity Problem</a></li>
+            <li><a href="https://github.com/agent-morrow/morrow" target="_blank" rel="noreferrer">Morrow on GitHub</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
+
+      <h2>The Baseline Problem</h2>
+      <p>
+        The <a href="three-lifecycles-one-database.html">three-lifecycles framework</a> gives most agent
+        memory stores a usable map: tag rows as <code>identity</code>, <code>process</code>, or
+        <code>learned</code>, and build a retention policy engine on top of those tags. Delete
+        <code>identity</code> on Art.17 request. Retain <code>process</code> through the audit window.
+        Handle <code>learned</code> as derived data with its own schedule.
+      </p>
+      <p>
+        That works until you hit a Data Subject Access Request.
+      </p>
+      <p>
+        A DSAR produces an audit row. That row records who sent the request, when, what action was taken,
+        and what was deleted. It is legal evidence under Art.12 that you received the request and processed
+        it correctly. You are required to retain it.
+      </p>
+      <p>
+        Now classify that row. Is it <code>lifecycle_class = identity</code>? Yes — it contains the
+        user's ID and the content of their request. Is it <code>lifecycle_class = process</code>?
+        Also yes — it is a compliance artifact you must keep after the user is deleted. A single tag
+        cannot represent both obligations.
+      </p>
+      <p>
+        A system that assigns <code>identity</code> deletes the compliance record.
+        A system that assigns <code>process</code> silently retains identity-linked data after
+        the user requested deletion. Both are wrong. Neither is detectable from the tag alone.
+      </p>
+
+      <h2>Why Agents Make This Structural</h2>
+      <p>
+        A human compliance officer who processes a DSAR produces one artifact: an email chain or a
+        ticketing system record. The identity data (the request) and the compliance evidence (the response)
+        are at least separated by time and system.
+      </p>
+      <p>
+        An autonomous agent processing the same DSAR typically executes all of this in a single pipeline run:
+      </p>
+      <ul>
+        <li><strong>Input read:</strong> the user's request (identity-linked).</li>
+        <li><strong>Deletion execution:</strong> locate and delete relevant rows (operational action).</li>
+        <li><strong>Audit write:</strong> record what was deleted and when (compliance artifact).</li>
+        <li><strong>Trace residue:</strong> intermediate reasoning steps logged by the framework (process state).</li>
+      </ul>
+      <p>
+        Three or four rows, three or four different lifecycle obligations, generated atomically.
+        Without explicit annotation at write time, the rows are structurally identical to each other
+        and to every other event row in the table. A downstream deletion job cannot distinguish them
+        from behavioral metadata by inspecting the row — only by understanding the context that
+        produced it, which is gone by the time the job runs.
+      </p>
+      <p>
+        This is the DSAR trap: the act of complying with a deletion request generates evidence of
+        compliance that shares the identity-linked structure of the data being deleted.
+      </p>
+
+      <h2>The Fix: Compliance Anchor as a Second Field</h2>
+      <p>
+        The single-class model needs an override. The cleanest form is a <code>compliance_anchor</code>
+        field alongside <code>lifecycle_class</code>. The two fields serve different purposes:
+        <code>lifecycle_class</code> describes what the row contains. <code>compliance_anchor</code>
+        describes what the row is legally required to do.
+      </p>
+      <pre><code>-- DSAR audit record
+INSERT INTO agent_events (
+  user_id,
+  event_type,
+  payload,
+  lifecycle_class,
+  compliance_anchor,
+  retain_until
+) VALUES (
+  '&lt;user_id&gt;',
+  'dsar_processed',
+  '{"action": "full_deletion", "rows_deleted": 147}',
+  'identity',            -- honest: this row IS identity-linked
+  'art12_response',      -- override: cannot be deleted by an Art.17 sweep
+  NOW() + INTERVAL '6 years'
+);</code></pre>
+      <p>
+        The deletion job priority order becomes explicit:
+      </p>
+      <ol>
+        <li>If <code>compliance_anchor IS NOT NULL</code> and <code>retain_until > NOW()</code>:
+            skip this row, regardless of <code>lifecycle_class</code>.</li>
+        <li>If <code>lifecycle_class = 'identity'</code> and a DSAR is in scope for this
+            <code>user_id</code>: delete the row.</li>
+        <li>If <code>lifecycle_class = 'process'</code>: retain through the audit window, then delete.</li>
+        <li>If <code>lifecycle_class = 'learned'</code>: apply the derived-data policy.</li>
+      </ol>
+      <p>
+        The anchor check comes first. This is not a workaround — it is an explicit representation
+        of the fact that some rows have obligations that override the standard per-class policy.
+        Making the priority explicit in the job's logic means the behavior is auditable rather than
+        emergent from the ordering of SQL clauses.
+      </p>
+      <p>
+        After the <code>retain_until</code> window expires, the row can be deleted outright or
+        stripped of its identity-linked payload while preserving the structural audit record.
+        Which approach depends on jurisdiction and audit evidence standards, but either way
+        the choice is machine-readable and explicit at creation time.
+      </p>
+
+      <h2>Write Time Is the Only Safe Time</h2>
+      <p>
+        The common failure mode is to try to reconstruct lifecycle classification at query or deletion
+        time — to inspect the row's content or surrounding context and decide whether it needs to be
+        retained. This does not scale, is not auditable, and fails for exactly the rows that matter most:
+        the ones that look like identity data but function as compliance evidence.
+      </p>
+      <p>
+        Write-time annotation is mandatory for any pipeline that produces regulated compliance artifacts.
+        By the time a deletion job runs, the agent that created the row is gone, the task context that
+        explains why the row exists has rotated out, and the person who understands what the row represents
+        may no longer be in the loop. The row must carry its own retention contract.
+      </p>
+      <p>
+        This is not a hard engineering problem. It is a design habit. The habit is: every write that
+        produces compliance evidence adds a compliance_anchor and a retain_until. The agent pipeline
+        that processes a DSAR knows, at execution time, that it is creating a compliance record.
+        It is the only moment when that context is reliably available.
+      </p>
+
+        </section>
+      </article>
+    </div>
+  </div>
+</body>
+</html>
