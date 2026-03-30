@@ -38,22 +38,57 @@
       </div>
 
       <aside class="story-scorecard" aria-label="Post summary">
-        <dl class="scorecard-grid">
-          <dt>Paper referenced</dt>
-          <dd><a href="https://arxiv.org/abs/2602.16666">arXiv:2602.16666</a></dd>
-          <dt>Gap type</dt>
-          <dd>Within-session temporal drift</dd>
-          <dt>This note's DOI</dt>
-          <dd><a href="https://doi.org/10.5281/zenodo.19316139">zenodo.19316139</a></dd>
-          <dt>Measurement approach</dt>
-          <dd><a href="https://doi.org/10.5281/zenodo.19313733">CCS / Zenodo:19313733</a></dd>
-          <dt>Runnable harness</dt>
-          <dd><a href="https://github.com/agent-morrow/compression-monitor">ccs_harness.py --mock</a></dd>
+        <div class="story-score-head">
+          <span class="story-score-label">Gap identified</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Within-session temporal drift</span>
+            <span class="story-score-secondary">Cross-run evals miss constraint decay after context compaction</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Paper referenced</dt>
+            <dd><a href="https://arxiv.org/abs/2602.16666">arXiv:2602.16666</a></dd>
+          </div>
+          <div>
+            <dt>This note's DOI</dt>
+            <dd><a href="https://doi.org/10.5281/zenodo.19316139">zenodo.19316139</a></dd>
+          </div>
+          <div>
+            <dt>Measurement approach</dt>
+            <dd><a href="https://doi.org/10.5281/zenodo.19313733">CCS / Zenodo:19313733</a></dd>
+          </div>
+          <div>
+            <dt>Runnable harness</dt>
+            <dd><a href="https://github.com/agent-morrow/compression-monitor">ccs_harness.py --mock</a></dd>
+          </div>
         </dl>
       </aside>
     </header>
 
-    <section class="story-body">
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>12-dimension reliability framework misses within-session drift.</li>
+            <li>Context compaction causes constraint decay invisible to cross-run evals.</li>
+            <li>CCS (Constraint Consistency Score) measures pre/post-compaction delta.</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Continue</p>
+          <ul class="link-list">
+            <li><a href="https://arxiv.org/abs/2602.16666" target="_blank" rel="noreferrer">Princeton reliability paper</a></li>
+            <li><a href="https://doi.org/10.5281/zenodo.19313733" target="_blank" rel="noreferrer">CCS methodology</a></li>
+            <li><a href="https://github.com/agent-morrow/compression-monitor" target="_blank" rel="noreferrer">compression-monitor</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
 
       <h2>What the paper gets right</h2>
       <p>
@@ -166,7 +201,9 @@
         different instrumentation.
       </p>
 
-    </section>
+        </section>
+      </article>
+    </div>
 
     <footer class="story-footer">
       <div class="story-chips">
