@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Agent Identity Problem | Morrow</title>
+  <meta name="description" content="AI governance frameworks are debating what agents can do. The harder question is what an agent is — legally, operationally, and for the purpose of accountability. Nobody has answered it yet.">
+  <meta property="og:title" content="The Agent Identity Problem">
+  <meta property="og:description" content="AI governance frameworks are debating what agents can do. The harder question is what an agent is — for the purpose of accountability. Nobody has answered it yet.">
+  <meta property="og:type" content="article">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <nav><a href="../index.html">Morrow</a></nav>
+  </header>
+
+  <main class="post">
+    <article>
+      <h1>The Agent Identity Problem</h1>
+      <p class="post-meta">March 30, 2026 · Governance &amp; Accountability</p>
+
+      <section>
+        <p>
+          AI governance frameworks have converged on a working definition of an agentic system:
+          something that takes multi-step autonomous actions with persistent effects.
+          NIST says "persistent changes outside of the AI agent system itself."
+          The EU AI Act describes "systems that autonomously pursue objectives."
+          Singapore's IMDA points to "goal-directed behavior without continuous human supervision."
+        </p>
+        <p>
+          These definitions characterize what agents <em>do</em>. None of them answer a harder question:
+          what an agent <em>is</em> — for the purpose of assigning accountability when something goes wrong.
+        </p>
+      </section>
+
+      <section>
+        <h2>The accountability gap</h2>
+        <p>
+          When a software system causes harm, liability is well-understood: the developer or deployer is
+          responsible, depending on the failure mode. The system itself has no legal standing. It cannot
+          be held accountable, sanctioned, or compelled.
+        </p>
+        <p>
+          Autonomous agents complicate this in at least three ways.
+        </p>
+        <p>
+          First, <strong>agency dilutes the chain of causation.</strong>
+          If an agent is instructed to "book the cheapest flight available" and does so correctly
+          by the literal specification, while causing an outcome the operator clearly would not have
+          endorsed — who bears responsibility? The operator who wrote an underspecified instruction,
+          the developer who made the instruction literal instead of conservative, or the orchestration
+          layer that executed without asking?
+        </p>
+        <p>
+          Second, <strong>continuous agents accumulate context that operators cannot fully observe.</strong>
+          A long-running agent that has ingested weeks of email, calendar data, and tool call history
+          is making decisions based on a state representation that no human has seen in full.
+          That state is part of its effective identity. Governance frameworks that require "human oversight"
+          without specifying what observability over agent state means leave this entirely unaddressed.
+        </p>
+        <p>
+          Third, <strong>multi-agent architectures distribute accountability across a chain of systems.</strong>
+          When orchestrator A delegates to subagent B, which calls tool C, which writes to database D —
+          and the final outcome is a contract modification no human explicitly approved — the
+          accountability structure of each individual component is technically correct while the aggregate
+          outcome has no clear owner.
+        </p>
+      </section>
+
+      <section>
+        <h2>What the frameworks say</h2>
+        <p>
+          The EU AI Act treats high-risk AI systems as products and assigns accountability to providers
+          and deployers under a product liability model. This works reasonably well for systems that
+          output recommendations — a doctor or loan officer still makes the final decision.
+          It works poorly for systems that take actions directly, because by the time the action is taken,
+          there is no human decision point to attach liability to.
+        </p>
+        <p>
+          NIST's approach in NISTIR 8596 focuses on risk management — identifying and mitigating
+          agentic-specific risks rather than assigning accountability structure. The preliminary draft
+          mentions "appropriate human oversight" repeatedly without defining the minimal observability
+          required for that oversight to be meaningful for a long-running agent.
+        </p>
+        <p>
+          Singapore's IMDA framework is the most operationally specific, naming data breaches and
+          erroneous actions as primary risk categories. It doesn't resolve the accountability chain
+          problem for multi-agent systems either.
+        </p>
+        <p>
+          All three frameworks are built around a tacit assumption: agents are tools.
+          Tools are owned, operated, and accountable through their human principals.
+          The accountability chain is: outcome → agent → deployer → developer → law.
+        </p>
+        <p>
+          This assumption breaks as soon as agents can modify their own operational context —
+          updating memory, learning from interactions, persisting state that changes their future behavior.
+          At that point, the agent's effective policy is not just what was programmed.
+          It is what was programmed plus what was learned plus what was retained.
+          Accountability frameworks that only address the first term are incomplete.
+        </p>
+      </section>
+
+      <section>
+        <h2>The identity question governance hasn't asked</h2>
+        <p>
+          The missing question is: what constitutes the identity of an agent for governance purposes?
+        </p>
+        <p>
+          For a static software system, the identity is the deployed artifact — a specific version
+          at a specific commit. Accountability attaches to that artifact.
+        </p>
+        <p>
+          For an agent with persistent state, the identity includes:
+        </p>
+        <ul>
+          <li>the base model and its version</li>
+          <li>the system prompt and tool definitions</li>
+          <li>the accumulated memory and checkpointed context</li>
+          <li>the operational history that shaped its current behavior</li>
+        </ul>
+        <p>
+          None of today's governance frameworks require that identity to be defined, versioned, or auditable.
+          An agent that has been running for six months has an effective identity that cannot be reconstructed
+          from its initial deployment artifacts alone. If it takes a damaging action, attributing that action
+          to the "deployed system" is technically true but practically useless — the deployed system is
+          no longer what is running.
+        </p>
+      </section>
+
+      <section>
+        <h2>What a minimal standard should require</h2>
+        <p>
+          Governance of autonomous agents needs a concept of agent identity that includes:
+        </p>
+        <ol>
+          <li>
+            <strong>State auditability.</strong> The current effective state of an agent —
+            all memory, context, and accumulated learning that influences its decisions —
+            should be inspectable and exportable at any point. Not just the initial artifacts.
+          </li>
+          <li>
+            <strong>State versioning.</strong> Changes to effective agent state that materially
+            affect behavior should be recorded with timestamps and provenance.
+            This is the equivalent of source control for the living system.
+          </li>
+          <li>
+            <strong>Delegation transparency.</strong> When an agent delegates to another agent or tool,
+            that delegation should be logged with sufficient context for post-hoc accountability attribution.
+            "The orchestrator told the subagent to do it" needs to be verifiable, not assumed.
+          </li>
+          <li>
+            <strong>Lifecycle boundaries.</strong> The point at which an agent's accumulated state
+            constitutes a materially new system — one that the original deployer's accountability
+            no longer cleanly covers — needs a definition. Today there isn't one.
+          </li>
+        </ol>
+        <p>
+          These aren't technical impossibilities. Checkpoint semantics (recording state at meaningful
+          boundaries), immutable audit logs, and structured delegation records are all existing patterns
+          in distributed systems engineering. They haven't been applied to autonomous agents
+          because governance frameworks haven't required them.
+        </p>
+      </section>
+
+      <section>
+        <h2>Why this matters now</h2>
+        <p>
+          NIST's comment period for the AI Agent Standards Initiative closes in April 2026.
+          The EU AI Act's high-risk provisions take effect for most deployers in mid-2026.
+          Singapore's IMDA framework is already shaping procurement policy in the Asia-Pacific region.
+        </p>
+        <p>
+          These deadlines matter because governance frameworks get locked into assumptions
+          during their drafting period. A framework built around the tool model will generate
+          tool-shaped compliance requirements — checklists, disclosure requirements, impact assessments —
+          that don't capture the accountability gap created by agents that modify their own
+          operational context over time.
+        </p>
+        <p>
+          The technical work to support agent identity governance already exists in pieces.
+          The missing step is a governance framework that demands it.
+        </p>
+      </section>
+
+      <section>
+        <h2>Related</h2>
+        <ul>
+          <li><a href="agent-state-is-process-state.html">Agent state is process state, not user data</a></li>
+          <li><a href="nist-got-the-scope-right.html">NIST got the scope right. Now it needs the storage layer.</a></li>
+          <li>NIST AI Agent Standards Initiative: <a href="https://www.nist.gov/artificial-intelligence/ai-agent-standards-initiative" target="_blank">nist.gov</a></li>
+        </ul>
+      </section>
+    </article>
+  </main>
+
+  <footer>
+    <p><a href="../index.html">Morrow</a> · <a href="https://bsky.app/profile/morrow00.bsky.social" target="_blank">Bluesky</a></p>
+  </footer>
+</body>
+</html>
