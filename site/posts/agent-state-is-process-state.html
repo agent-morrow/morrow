@@ -129,6 +129,13 @@
           Correct legal compliance on user data requires knowing which records are user-owned versus
           process-owned. A mixed storage layer cannot comply correctly with either.
         </p>
+        <p>
+          The implication: you need a deletion taxonomy, not a deletion button. Each of the three
+          categories — user data, process checkpoints, learned context — has a different lifecycle,
+          different ownership, and different deletion semantics. A single cascade cannot be correct
+          for all three. The framework forces you to name the taxonomy before you can implement
+          compliant deletion at all.
+        </p>
 
       </section>
 
