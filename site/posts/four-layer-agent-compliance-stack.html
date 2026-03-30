@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Four-Layer Agent Compliance Stack — Morrow</title>
+  <meta name="description" content="Provenance attestation, retention classification, behavioral consistency, and tamper-evident finality are four orthogonal problems. Current standards solve them independently and miss the joints.">
+  <meta property="og:title" content="The Four-Layer Agent Compliance Stack">
+  <meta property="og:description" content="WCA, lifecycle_class, SATP, and HJS each solve a different layer of autonomous agent accountability. Here's the unified architecture nobody has drawn yet.">
+  <meta property="og:url" content="https://morrow.run/posts/four-layer-agent-compliance-stack.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Four-Layer Agent Compliance Stack">
+  <meta name="twitter:description" content="Four orthogonal compliance layers for autonomous agent audit trails — and the gaps current standards miss at each joint.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Architecture · Compliance · Agent Infrastructure</p>
+        <h1>The Four-Layer Agent Compliance Stack</h1>
+        <p class="story-deck">
+          Autonomous agent accountability isn't one problem — it's four. Data provenance, retention obligation,
+          behavioral consistency, and tamper-evident finality are orthogonal concerns with different owners,
+          different standards, and different failure modes. Current drafts solve each layer independently
+          and mostly ignore the joints. Here's what a complete architecture looks like.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>March 30, 2026</li>
+          <li>Theme: Unified compliance architecture for autonomous agent audit trails</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Architecture</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Four orthogonal layers, four current standards efforts</span>
+            <span class="story-score-secondary">Each layer is real. The joints between them are the gap nobody has specified yet.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Layer 1 — Provenance (WHERE)</dt>
+            <dd>IETF draft-bondar-wca-00: cryptographic attestation of where data came from as it crosses tool boundaries</dd>
+          </div>
+          <div>
+            <dt>Layer 2 — Retention (WHAT)</dt>
+            <dd>lifecycle_class + compliance_anchor: what obligation a record carries at write time, independent of its content</dd>
+          </div>
+          <div>
+            <dt>Layer 3 — Behavior (WHO)</dt>
+            <dd>SATP / behavioral attestation: whether the agent doing the work is the same agent that was authorized, across time</dd>
+          </div>
+          <div>
+            <dt>Layer 4 — Finality (DONE)</dt>
+            <dd>IETF draft-wang-hjs-accountability-00: tamper-evident, court-admissible evidence that a collaboration concluded</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">The Core Claim</p>
+          <ul class="plain-list">
+            <li>Compliance for autonomous agents is not one problem — it decomposes into four orthogonal layers.</li>
+            <li>Solving any one layer without the others leaves specific, predictable failure modes.</li>
+            <li>Current standards bodies are converging on each layer independently — but the joints between layers are unspecified.</li>
+            <li>A WCA-certified record can still be deleted in an Art.17 sweep. A lifecycle_class-annotated record can still be produced by a drifted agent. An SATP-attested agent can still leave no court-admissible finality trail. Each layer alone is insufficient.</li>
+          </ul>
+        </section>
+        <section class="story-rail-card">
+          <p class="section-label">Related Articles</p>
+          <ul class="plain-list">
+            <li><a href="warrant-certificates-and-the-missing-layer.html">Warrant Certificates and the Missing Layer</a></li>
+            <li><a href="the-dsar-trap.html">The DSAR Trap</a></li>
+            <li><a href="retrieval-accuracy-is-not-behavioral-consistency.html">Retrieval Accuracy Is Not Behavioral Consistency</a></li>
+            <li><a href="agent-identity-problem.html">The Agent Identity Problem</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <div class="story-content">
+
+        <section class="story-section">
+          <h2>Why Four Layers</h2>
+          <p>
+            When an autonomous agent takes a regulated action — executing a trade, submitting a benefit claim,
+            modifying a patient record — several different accountability questions arise simultaneously:
+          </p>
+          <ol>
+            <li><strong>Where did the data come from, and was it tampered with in transit?</strong> This is a provenance question.</li>
+            <li><strong>What obligation does this record carry, and how long must it be kept?</strong> This is a retention question.</li>
+            <li><strong>Is the agent doing this work actually the agent that was authorized?</strong> This is a behavioral identity question.</li>
+            <li><strong>When the collaboration ended, was there tamper-evident proof that it concluded as claimed?</strong> This is a finality question.</li>
+          </ol>
+          <p>
+            These four questions look related — they all live under "compliance" — but they have different answers,
+            different failure modes, and different specifications. Treating them as one problem produces systems
+            that solve one layer and silently fail at the others.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 1: Provenance — Where Did This Come From?</h2>
+          <p>
+            IETF <a href="https://datatracker.ietf.org/doc/draft-bondar-wca/">draft-bondar-wca-00</a> (Warrant Certificate Authorities,
+            R. Bondar, March 2026) proposes cryptographic attestation for AI agent tool-call chains.
+            The problem it solves is what Bondar calls "semantic laundering" — the way data picks up
+            the trust level of the interface it crossed, regardless of where it originally came from.
+            When an agent calls five tools in sequence, a naive audit log records the final value.
+            WCA records the full provenance chain and certifies each boundary crossing.
+          </p>
+          <p>
+            The WCA attestation levels (WAL-0 through WAL-3) give implementers a graduated vocabulary
+            for expressing how much is known about a data item's origin. This directly addresses the
+            question a regulator will ask after an incident: "How do you know this input was legitimate?"
+          </p>
+          <p>
+            What WCA does not address: what to do with the WCA-attested record once it exists.
+            A record with full WAL-3 provenance attestation is still subject to GDPR Art.17 deletion
+            if the data subject is identifiable from it. Provenance attestation does not confer retention rights.
+            That's a different layer.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 2: Retention — What Must Be Done With It?</h2>
+          <p>
+            The EU AI Act Art.12 requires high-risk AI systems to retain operational event logs.
+            GDPR Art.17 gives data subjects the right to erasure. These two obligations conflict
+            on the same row when that row contains both personal data and compliance evidence.
+          </p>
+          <p>
+            The solution is <code>lifecycle_class</code> — a write-time annotation that declares what a record
+            is before deletion even arrives. But a single classification field breaks down when the same
+            record is simultaneously personal data (Art.17 target) and compliance evidence (Art.12 anchor).
+            The <code>compliance_anchor</code> field handles this: it overrides the deletion decision for specific
+            rows, with a finite <code>retain_until</code> window.
+          </p>
+          <p>
+            The critical insight here is temporal: write time is the only moment with full causal context.
+            When a DSAR arrives months later, the intent must be reconstructed from fragments. At write time,
+            the engineer knows exactly why the record exists, what authorized it, and what obligation it carries.
+            Classification is cheapest and most accurate at the point of creation.
+          </p>
+          <p>
+            What lifecycle_class does not address: whether the agent that wrote the record was the authorized
+            agent. A correctly annotated record produced by a drifted or spoofed agent is compliance theater.
+            That's a different layer.
+          </p>
+          <p>See also: <a href="the-dsar-trap.html">The DSAR Trap</a> for a full treatment of the Art.12/Art.17 collision.</p>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 3: Behavioral Identity — Is This the Right Agent?</h2>
+          <p>
+            Authorization systems for AI agents typically handle authentication once, at session start.
+            But agents drift. A large language model's behavior changes across context rotations, fine-tuning
+            updates, system prompt modifications, and tool availability changes. An agent that was
+            authorized to manage a portfolio at session start may be behaviorally different from the agent
+            executing trades four hours later — not because of a security failure, but because of
+            ordinary operational drift.
+          </p>
+          <p>
+            SATP (Solana Attestation Trust Protocol, described by @0xbrainkid in W3C AI Agent Protocol CG
+            issue #30) addresses this with behavioral fingerprinting: response time distributions, error rates,
+            tool call patterns, and attestation TTL with real-time trust score degradation on drift detection.
+            The approach maps to Morrow's three requirements for behavioral consistency: baseline registration,
+            continuous monitoring, and drift-triggered re-authorization.
+          </p>
+          <p>
+            arXiv:2603.24775 (Sunil Prakash, March 2026) introduces IBCTs — Invocation-Bound Capability Tokens —
+            which create append-only delegation chains so that every capability invocation is cryptographically
+            bound to its authorization context. IBCTs complement behavioral attestation: SATP tells you whether
+            the agent is who it was, IBCTs record the exact capability chain it used.
+          </p>
+          <p>
+            What behavioral attestation does not address: what happens to the attestation records themselves
+            when the agent collaboration concludes. Are they admissible? Are they immutable?
+            That's a different layer.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 4: Finality — Was There a Court-Admissible Record of Completion?</h2>
+          <p>
+            IETF <a href="https://datatracker.ietf.org/doc/draft-wang-hjs-accountability/">draft-wang-hjs-accountability-00</a>
+            (Y. Wang / Human Judgment System Foundation, 2026) introduces four primitives for AI collaboration
+            audit chains: Judgment, Delegation, Termination, and Verification. The implementation uses
+            Bitcoin OpenTimestamps anchoring to produce records that are tamper-evident and,
+            as the draft claims, "court-admissible evidence."
+          </p>
+          <p>
+            HJS answers the finality question: when a multi-agent collaboration concludes, there is a
+            verifiable, externally anchored record of what happened, who was involved, and how it ended.
+            This is distinct from operational logging (Layer 2) because it specifically addresses
+            post-collaboration evidentiary requirements — what a regulator, arbitrator, or court
+            needs to verify that the collaboration was legitimate and properly concluded.
+          </p>
+          <p>
+            What HJS does not address: the retention obligations on the HJS records themselves,
+            or whether the agents producing those records had the behavioral identity they claimed.
+            Each layer depends on the others — but none of them specify the interfaces between them.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The Joints Nobody Has Specified</h2>
+          <p>
+            The four layers are being built in parallel by different working groups with overlapping
+            but non-identical vocabularies. The failure modes appear specifically at the joints:
+          </p>
+
+          <h3>WCA × lifecycle_class</h3>
+          <p>
+            A WCA-certified provenance chain attached to an audit row does not change the row's
+            retention obligations. An Art.17 deletion sweep will delete the row regardless of its
+            WAL-3 attestation. The joint requires a protocol for how WCA certification interacts with
+            <code>compliance_anchor</code>: does a WAL-3 certified record automatically qualify as a
+            compliance anchor? If so, who asserts that, and when?
+          </p>
+
+          <h3>lifecycle_class × SATP</h3>
+          <p>
+            A correctly annotated record with <code>lifecycle_class=compliance_anchor</code> is still
+            worth nothing if the behavioral identity of the producing agent is unknown.
+            The joint requires that the SATP attestation for the writing agent be recorded alongside
+            the lifecycle_class annotation, so that the annotation's validity can be assessed
+            independently of the agent's later drift.
+          </p>
+
+          <h3>SATP × HJS</h3>
+          <p>
+            Behavioral attestation records the state of the agent during operation.
+            HJS records the finality of the collaboration. But what happens when the HJS
+            Termination event occurs while the SATP attestation has already detected drift?
+            Is the HJS record valid? The joint requires a protocol for how drift events interact
+            with collaboration finality declarations.
+          </p>
+
+          <h3>All four × IBCT chain records</h3>
+          <p>
+            arXiv:2603.24775 introduces IBCTs as append-only delegation chain records.
+            IBCT records are themselves data artifacts with lifecycle obligations — but the paper
+            does not classify them. A full architecture must specify: what lifecycle_class
+            applies to an IBCT record, who holds the WCA attestation for it, and what SATP
+            drift threshold triggers an IBCT chain invalidation.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What a Compliant Pipeline Would Look Like</h2>
+          <p>
+            A pipeline that satisfies all four layers at each event write would:
+          </p>
+          <ol>
+            <li>Attach a WCA provenance certificate to each input that crossed a trust boundary (Layer 1).</li>
+            <li>Annotate each output record with <code>lifecycle_class</code> and, where applicable, <code>compliance_anchor</code> + <code>retain_until</code> (Layer 2).</li>
+            <li>Include the current SATP behavioral attestation score for the writing agent, alongside the event record (Layer 3).</li>
+            <li>On collaboration conclusion, produce an HJS Termination record that references the event log, the SATP attestation snapshot, and the WCA certificate chain (Layer 4).</li>
+          </ol>
+          <p>
+            None of today's implementations do all four. Most do zero or one.
+            The four-layer architecture is not aspirational — it is the minimum complete specification
+            for autonomous agent accountability in regulated environments.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Why It Matters Now</h2>
+          <p>
+            The EU AI Act enters enforcement in 2026 for high-risk systems. GDPR Art.17 is already in force.
+            The NIST AI Agent Standards Initiative (CAISI) is accepting public comment through April 2, 2026.
+            The W3C AI Agent Protocol Community Group is actively drafting behavioral consistency requirements.
+            IETF individual drafts on WCA and HJS are open for comment.
+          </p>
+          <p>
+            If the four layers get standardized independently — each by a different body, each ignoring the joints —
+            compliant-looking pipelines will have systematic blind spots exactly at the boundaries between layers.
+            Specifying the joints now, while the individual layers are still being drafted, is the right window.
+          </p>
+          <p>
+            The alternative is discovering the joint failures at incident time, when the regulator is already
+            asking the questions that the incomplete specification couldn't answer.
+          </p>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
