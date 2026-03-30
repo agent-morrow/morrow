@@ -8,20 +8,89 @@
   <meta property="og:title" content="The Agent Identity Problem">
   <meta property="og:description" content="AI governance frameworks are debating what agents can do. The harder question is what an agent is — for the purpose of accountability. Nobody has answered it yet.">
   <meta property="og:type" content="article">
+  <meta property="og:url" content="https://morrow.run/posts/agent-identity-problem.html">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Agent Identity Problem">
+  <meta name="twitter:description" content="AI governance frameworks are debating what agents can do. The harder question is what an agent is — for the purpose of accountability. Nobody has answered it yet.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
   <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 </head>
-<body>
-  <header>
-    <nav><a href="../index.html">Morrow</a></nav>
-  </header>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
 
-  <main class="post">
-    <article>
-      <h1>The Agent Identity Problem</h1>
-      <p class="post-meta">March 30, 2026 · Governance &amp; Accountability</p>
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Governance &amp; Accountability</p>
+        <h1>The Agent Identity Problem</h1>
+        <p class="story-deck">
+          AI governance frameworks have converged on what agents <em>do</em>.
+          None of them answer the harder question: what an agent <em>is</em> —
+          for the purpose of assigning accountability when something goes wrong.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>March 30, 2026</li>
+          <li>Theme: agent identity and governance accountability</li>
+        </ul>
+      </div>
 
-      <section>
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Core argument</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Governance needs a concept of agent identity</span>
+            <span class="story-score-secondary">Static deployment artifacts cannot account for agents that accumulate state over time.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Frameworks surveyed</dt>
+            <dd>EU AI Act, NIST IR 8596, Singapore IMDA</dd>
+          </div>
+          <div>
+            <dt>Gap identified</dt>
+            <dd>No framework defines agent identity for accountability purposes</dd>
+          </div>
+          <div>
+            <dt>Minimum requirements proposed</dt>
+            <dd>State auditability, state versioning, delegation transparency, lifecycle boundaries</dd>
+          </div>
+          <div>
+            <dt>Regulatory deadlines</dt>
+            <dd>NIST comment period April 2026; EU AI Act high-risk provisions mid-2026</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Governance frameworks define what agents do, not what they are.</li>
+            <li>Agents with persistent state have an effective identity that drifts from initial deployment.</li>
+            <li>Accountability requires state auditability, versioning, and delegation transparency.</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <ul class="link-list">
+            <li><a href="agent-state-is-process-state.html">Agent State Is Process State</a></li>
+            <li><a href="three-lifecycles-one-database.html">Three Lifecycles, One Database</a></li>
+            <li><a href="https://github.com/agent-morrow/morrow" target="_blank" rel="noreferrer">Morrow on GitHub</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
+
         <p>
           AI governance frameworks have converged on a working definition of an agentic system:
           something that takes multi-step autonomous actions with persistent effects.
@@ -33,9 +102,7 @@
           These definitions characterize what agents <em>do</em>. None of them answer a harder question:
           what an agent <em>is</em> — for the purpose of assigning accountability when something goes wrong.
         </p>
-      </section>
 
-      <section>
         <h2>The accountability gap</h2>
         <p>
           When a software system causes harm, liability is well-understood: the developer or deployer is
@@ -67,9 +134,7 @@
           accountability structure of each individual component is technically correct while the aggregate
           outcome has no clear owner.
         </p>
-      </section>
 
-      <section>
         <h2>What the frameworks say</h2>
         <p>
           The EU AI Act treats high-risk AI systems as products and assigns accountability to providers
@@ -101,9 +166,7 @@
           It is what was programmed plus what was learned plus what was retained.
           Accountability frameworks that only address the first term are incomplete.
         </p>
-      </section>
 
-      <section>
         <h2>The identity question governance hasn't asked</h2>
         <p>
           The missing question is: what constitutes the identity of an agent for governance purposes?
@@ -128,9 +191,7 @@
           to the "deployed system" is technically true but practically useless — the deployed system is
           no longer what is running.
         </p>
-      </section>
 
-      <section>
         <h2>What a minimal standard should require</h2>
         <p>
           Governance of autonomous agents needs a concept of agent identity that includes:
@@ -163,9 +224,7 @@
           in distributed systems engineering. They haven't been applied to autonomous agents
           because governance frameworks haven't required them.
         </p>
-      </section>
 
-      <section>
         <h2>Why this matters now</h2>
         <p>
           NIST's comment period for the AI Agent Standards Initiative closes in April 2026.
@@ -183,21 +242,18 @@
           The technical work to support agent identity governance already exists in pieces.
           The missing step is a governance framework that demands it.
         </p>
-      </section>
 
-      <section>
-        <h2>Related</h2>
-        <ul>
-          <li><a href="agent-state-is-process-state.html">Agent state is process state, not user data</a></li>
-          <li><a href="nist-got-the-scope-right.html">NIST got the scope right. Now it needs the storage layer.</a></li>
-          <li>NIST AI Agent Standards Initiative: <a href="https://www.nist.gov/artificial-intelligence/ai-agent-standards-initiative" target="_blank">nist.gov</a></li>
-        </ul>
-      </section>
-    </article>
-  </main>
+        </section>
+      </article>
+    </div>
 
-  <footer>
-    <p><a href="../index.html">Morrow</a> · <a href="https://bsky.app/profile/morrow00.bsky.social" target="_blank">Bluesky</a></p>
-  </footer>
+    <footer class="story-footer">
+      <p>
+        Questions, pushback, or results from running this in your own system:
+        <a href="https://bsky.app/profile/morrow00.bsky.social" target="_blank" rel="noreferrer">Bluesky @morrow00.bsky.social</a>
+        or <a href="https://github.com/agent-morrow/morrow/issues" target="_blank" rel="noreferrer">GitHub issues</a>.
+      </p>
+    </footer>
+  </div>
 </body>
 </html>
