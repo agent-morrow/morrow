@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://morrow.run/lifecycle_class/schema.json",
+  "title": "lifecycle_class annotation",
+  "description": "Write-time annotation schema for AI agent data stores. Declares retention basis, data-subject linkage, compliance obligations, and erasure behavior at record creation time.",
+  "type": "object",
+  "required": ["lifecycle_class"],
+  "properties": {
+    "lifecycle_class": {
+      "description": "Primary classification of what the record contains and how it behaves during deletion sweeps.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": ["identity", "process", "compliance", "learned_context"]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["identity", "process", "compliance", "learned_context"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      ]
+    },
+    "compliance_anchor": {
+      "description": "Overrides lifecycle_class for deletion decisions when the record has conflicting retention obligations (e.g. an audit row that is both identity-linked and compliance evidence).",
+      "type": "object",
+      "required": ["basis", "retain_until"],
+      "properties": {
+        "basis": {
+          "type": "string",
+          "description": "Legal or regulatory basis for the compliance hold (e.g. 'GDPR Art.12 erasure compliance evidence')."
+        },
+        "retain_until": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp after which normal lifecycle_class deletion rules apply. All compliance holds must be finite."
+        },
+        "jurisdiction": {
+          "type": "string",
+          "description": "Optional jurisdiction tag (e.g. 'EU', 'US-CA')."
+        }
+      },
+      "additionalProperties": false
+    },
+    "subject_chain": {
+      "description": "Links a derived representation to the data subjects whose data contributed to it. Required for learned_context records and any identity record that will generate downstream derived representations. Enables tractable Art.17 erasure of embeddings, summaries, and propagated copies.",
+      "type": "object",
+      "required": ["subjects", "derived_at"],
+      "properties": {
+        "subjects": {
+          "type": "array",
+          "description": "One-way hashes (sha256: prefix) of data subject identifiers present in the source data. Do not store raw identifiers here.",
+          "items": {
+            "type": "string",
+            "pattern": "^(sha256:[a-f0-9]{64}|[a-zA-Z0-9_\\-]{8,})$"
+          },
+          "minItems": 1
+        },
+        "source_records": {
+          "type": "array",
+          "description": "UUIDs or record identifiers of source records that this derived representation was built from.",
+          "items": { "type": "string" }
+        },
+        "derived_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this derived representation was created."
+        },
+        "downstream_processors": {
+          "type": "array",
+          "description": "Agent IDs or processor identifiers that received copies of this data. These processors must be notified on erasure cascade.",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "write_seal": {
+      "description": "Marks a proof-of-action artifact as immutable for the purpose of summarization and compaction. The record must be preserved in original form or explicitly archived — it must not be summarized, compressed, or rewritten by context management operations.",
+      "type": "object",
+      "required": ["sealed_at", "action_ref", "seal_basis", "summarization"],
+      "properties": {
+        "sealed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this record was sealed."
+        },
+        "action_ref": {
+          "type": "string",
+          "description": "Reference to the transaction, task, or action this record proves (e.g. a transaction UUID, task ID, or event identifier)."
+        },
+        "seal_basis": {
+          "type": "string",
+          "description": "Human-readable description of why this record must not be summarized (e.g. 'regulated action proof-of-completion', 'DSAR compliance evidence')."
+        },
+        "summarization": {
+          "type": "string",
+          "enum": ["prohibited", "archive-only"],
+          "description": "'prohibited' means the record must never be summarized or rewritten. 'archive-only' means it may be moved to cold storage but not compressed or paraphrased."
+        },
+        "hash": {
+          "type": "string",
+          "description": "Optional sha256: hash of the sealed content for tamper detection.",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "lifecycle_class": "identity",
+      "subject_chain": {
+        "subjects": ["sha256:a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2"],
+        "source_records": ["user-profile-uuid-001"],
+        "derived_at": "2026-03-15T12:00:00Z"
+      }
+    },
+    {
+      "lifecycle_class": ["identity", "compliance"],
+      "compliance_anchor": {
+        "basis": "GDPR Art.12 erasure compliance evidence",
+        "retain_until": "2031-03-31T00:00:00Z",
+        "jurisdiction": "EU"
+      }
+    },
+    {
+      "lifecycle_class": "learned_context",
+      "subject_chain": {
+        "subjects": [
+          "sha256:a3f1b2c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2"
+        ],
+        "source_records": ["case-file-uuid-001", "session-uuid-002"],
+        "derived_at": "2026-03-20T09:30:00Z",
+        "downstream_processors": ["review-agent-001", "summary-agent-002"]
+      }
+    },
+    {
+      "lifecycle_class": "compliance",
+      "write_seal": {
+        "sealed_at": "2026-03-15T14:23:00Z",
+        "action_ref": "txn-uuid-abc123",
+        "seal_basis": "regulated transaction proof-of-completion",
+        "summarization": "prohibited",
+        "hash": "sha256:b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5"
+      }
+    }
+  ]
+}
