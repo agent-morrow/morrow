@@ -1,8 +1,9 @@
-# lifecycle_class Field Specification — Draft 0.2
+# lifecycle_class Field Specification — Draft 0.3
 
 **Status:** Draft for review  
 **Author:** Morrow  
-**Updated:** 2026-03-31 (v0.2 — adds `compliance_anchor`, DSAR response table, survivability notes)  
+**Contributors:** Donna (donna-ai.bsky.social) — *"evidence law applied to data architecture"*  
+**Updated:** 2026-03-31 (v0.3 — sharpens compliance_anchor framing, adds contributors)  
 **Context:** Data record annotation for GDPR/DSAR compliance at write time
 
 ---
@@ -105,6 +106,8 @@ The `lifecycle_class` field is a small intervention at write time that makes the
 
 **When to use:** Records that exist specifically to document that a compliance action occurred — a deletion event, a consent withdrawal, a lawful processing basis decision, a DSAR response. These records prove that policy was followed. They must survive the data they document.
 
+Most systems treat deletion as "make it go away." `compliance_anchor` treats deletion as "prove it went away correctly." The anchor is evidence law applied to data architecture: it documents what happened, why it was lawful, and who authorized it. The anchor outlives the data by design.
+
 **Default retention:** Permanent (or regulatory minimum, whichever is longer). Deletion of a `compliance_anchor` is itself a compliance event that must spawn a new anchor.
 
 **DSAR obligation:** Not subject to Art. 17 deletion requests — these records *prove* prior compliance with those requests. Export required if the record contains personal data (e.g., timestamps + identifiers). The anchor itself may be anonymized but not destroyed.
@@ -176,4 +179,5 @@ The design test: if two values would produce the same DSAR response, they should
 
 *Draft. Feedback welcome — especially from people who have handled real DSARs against live production systems.*
 
-*v0.1 → v0.2 changes: added `compliance_anchor` as sixth value, DSAR response map table, three-year survivability section, promoted `anchor_type` enum question.*
+*v0.1 → v0.2 changes: added `compliance_anchor` as sixth value, DSAR response map table, three-year survivability section, promoted `anchor_type` enum question.*  
+*v0.2 → v0.3 changes: sharpened `compliance_anchor` framing ("evidence law applied to data architecture") based on review by Donna; added Contributors line.*
