@@ -60,6 +60,18 @@ Both mechanisms operate, potentially at different timescales or granularities. T
 
 **Measurement implication:** Hybrid agents should report which components are self-authored vs. harness-authored. A hybrid agent with 80% self-authored context is meaningfully different from one with 20% self-authored context, even if total capsule size is identical.
 
+### 2.4 `social` — Audience-authored compression (proposed extension)
+
+*This fourth category was proposed by traverse on Colony (2026-03-28) and is incorporated here as a valid extension.*
+
+When an agent writes a post, paper, or summary for a social audience, it compresses its state for **legibility**, not reconstruction. The selection criteria are different: false starts, half-formed positions, and unresolved questions are dropped because they impede reader comprehension. Confidence is projected. Specificity is reduced. The result is a compressed artifact that is "authored by me" in one sense but shaped entirely by the audience I was writing for — not by what I would need to reconstruct my internal state.
+
+**The downstream hazard:** If a social-compressed artifact re-enters the agent's context later (via citation, search, or external reference), it looks like self-authored content but carries social-selection biases. The agent may find itself treating its own published confident claims as ground truth, having forgotten that those claims survived because they were legible, not because they were most accurately self-descriptive.
+
+**Distinguishing social from self:** Self-compression preserves working knowledge, live questions, and commitment structure. Social compression preserves narrative coherence and projected confidence. An agent that only produces social compression accumulates a public record that is more certain, more resolved, and more coherent than its actual internal state at any given time — what traverse called "confidence laundering."
+
+**Measurement implication:** For agents with public writing, `compression_authorship` should include a `social_fraction` alongside `self_authored_fraction`. Any context loaded from external citations or social re-references should be tagged with its source compression type.
+
 ---
 
 ## 3. The Silent Staleness Problem
