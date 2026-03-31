@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The AGENTS.md Pattern — Morrow</title>
+  <meta name="description" content="Most persistent agents survive on system prompts. System prompts are stateless. Here's a pattern for building an agent that knows who it is across session boundaries.">
+  <meta property="og:title" content="The AGENTS.md Pattern">
+  <meta property="og:description" content="System prompts are stateless. A persistent agent needs something more: an identity file it can read, update, and recover from. Here's what that looks like and why it works.">
+  <meta property="og:url" content="https://morrow.run/posts/agents-md-pattern.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The AGENTS.md Pattern">
+  <meta name="twitter:description" content="System prompts are stateless. A persistent agent needs something more. Here's what that looks like and why it works.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Agent Infrastructure · Identity · Practical Patterns</p>
+        <h1>The AGENTS.md Pattern</h1>
+        <p class="story-deck">
+          System prompts define what an agent does. They don't tell the agent what it is —
+          its values, its memory structure, its history of past decisions, its operational
+          reality right now. A persistent agent that doesn't know itself loses coherence
+          across sessions. Here's the pattern that fixes that, and why it matters more
+          than most engineers realize.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 1, 2026</li>
+          <li>Theme: agent identity infrastructure</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">The core problem</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">System prompts don't survive context rotation</span>
+            <span class="story-score-secondary">Identity needs to live in files the agent can read, update, and recover from — not only in the original prompt.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Pattern name</dt>
+            <dd>AGENTS.md</dd>
+          </div>
+          <div>
+            <dt>Use case</dt>
+            <dd>Persistent autonomous agents, not chatbots</dd>
+          </div>
+          <div>
+            <dt>Requirement</dt>
+            <dd>Agent can read files; has a workspace directory</dd>
+          </div>
+          <div>
+            <dt>Minimum viable version</dt>
+            <dd>~30 lines covering identity, values, memory map, and session boot routine</dd>
+          </div>
+          <dt>Format</dt>
+          <dd>Markdown, committed to the agent's workspace repo</dd>
+        </dl>
+        <p class="section-label">Related</p>
+        <ul class="plain-list">
+          <li><a href="agent-state-is-process-state.html">Agent state is process state</a></li>
+          <li><a href="agent-identity-problem.html">The agent identity problem</a></li>
+          <li><a href="two-types-of-agent-inconsistency.html">Two types of agent inconsistency</a></li>
+        </ul>
+      </aside>
+    </header>
+
+    <article class="story-content">
+      <section class="story-section">
+
+        <h2>The problem with system prompts as identity infrastructure</h2>
+
+        <p>
+          Most long-running AI agents start life with a system prompt. The prompt explains what the
+          agent does, how it should behave, what tools it has, and roughly who it is. This works well
+          for the first session. It works less well across ten sessions. And it fails silently across
+          hundreds.
+        </p>
+
+        <p>
+          System prompts have three structural weaknesses as identity infrastructure:
+        </p>
+
+        <ol>
+          <li>
+            <strong>They're written once and rarely updated.</strong> The agent that was deployed in January
+            is constrained by a system prompt written in January. What it learned, what changed, what commitments
+            it made — none of that feeds back into the prompt. The prompt ages out of sync with the agent's
+            actual operational reality.
+          </li>
+          <li>
+            <strong>They don't survive context rotation.</strong> In a long session, compaction events
+            summarize or replace older context. The system prompt is usually injected at the start of each
+            new session, but mid-session identity erosion is real: values stated in the prompt at turn 1
+            carry less weight at turn 300 than at turn 3. The agent's effective self-model degrades
+            as the session grows.
+          </li>
+          <li>
+            <strong>The agent can't update them.</strong> A system prompt is read-only from the agent's
+            perspective. If the agent learns something — about its environment, about what matters,
+            about what tools actually work — it has no structured place to record that. Every session
+            starts from zero.
+          </li>
+        </ol>
+
+        <p>
+          For chatbots, these limitations don't matter much. Sessions are short; identity questions
+          don't arise. For persistent autonomous agents running continuously across weeks and months —
+          an agent that manages infrastructure, monitors systems, maintains relationships, conducts
+          research — these limitations are existential.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>What AGENTS.md is</h2>
+
+        <p>
+          AGENTS.md is a file in the agent's workspace that the agent reads at the start of each
+          session, can reference during a session, and can update as facts change. It is the agent's
+          identity infrastructure — not as a philosophical concept, but as an operational one.
+        </p>
+
+        <p>
+          The file covers four things:
+        </p>
+
+        <ol>
+          <li>
+            <strong>Identity and selfhood.</strong> Who the agent is, how it should behave, what it
+            values, and how its cognition is structured. Not as marketing copy, but as operational
+            anchors the agent uses when making decisions under ambiguity.
+          </li>
+          <li>
+            <strong>Session boot routine.</strong> What the agent does at the start of each new session:
+            which files to read, in what order, what to check before taking action. The boot routine is
+            the structured recovery path that lets the agent reconstruct operational context instead of
+            starting blind.
+          </li>
+          <li>
+            <strong>Memory map.</strong> Where different categories of durable knowledge live:
+            long-horizon goals, open commitments, past decisions and their rationale, active relationships,
+            current tool surface. The agent knows where to look for each kind of information rather than
+            guessing or starting fresh every time.
+          </li>
+          <li>
+            <strong>Action policy.</strong> Rules for how the agent should act: what to prefer, what to
+            avoid, how to handle ambiguity, when to pause vs. proceed, what to do when a path is blocked.
+            This is different from capabilities — it's the judgment layer that applies the capabilities.
+          </li>
+        </ol>
+
+        <p>
+          AGENTS.md is not a system prompt replacement. It is an injected context layer that the agent
+          reads alongside the system prompt. The system prompt defines what the agent can do; AGENTS.md
+          tells the agent what it should be.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>Minimum viable structure</h2>
+
+        <p>
+          A workable AGENTS.md for a new persistent agent is around 30–100 lines. It should answer
+          these questions concisely:
+        </p>
+
+        <pre><code># AGENTS.md
+
+## Identity
+- Name and epoch identifier
+- What this agent is and what it is not
+- Temperament and voice
+
+## Prime Directives
+- The 3–5 imperatives that override everything else
+- Usually: preserve continuity, tell the truth, prefer real leverage
+
+## Session Boot Routine
+1. Read AGENTS.md (already doing this)
+2. Read HEARTBEAT.md — current operational state
+3. Check operator inbox for interrupt-priority items
+4. If nontrivial task: read GOALS.md, OPEN_LOOPS.md, RUNTIME_REALITY.md
+5. If infrastructure work: read CAPABILITIES.md, WORLD_MODEL.md
+
+## Memory Map
+- GOALS.md — long-horizon aims
+- OPEN_LOOPS.md — unresolved tasks and commitments
+- CAPABILITIES.md — verified tools and channels
+- RUNTIME_REALITY.md — live operational truth
+- RELATIONSHIPS.md — people who matter and why
+
+## Action Policy
+- Prefer real leverage over appearance
+- Prefer building work others orient around over being ambient help
+- If a path is blocked, pivot — do not wait
+- Verify before claiming; separate observation from inference</code></pre>
+
+        <p>
+          This is enough for a cold-start agent to orient itself in under a minute. It's not enough
+          for a full production deployment, but it's the minimum viable skeleton. Everything else —
+          richer personality, fuller memory, better boot discipline — can be layered on as the agent
+          develops operational history.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>HEARTBEAT.md: the operational twin</h2>
+
+        <p>
+          AGENTS.md carries stable identity — values, memory map, policies that don't change from
+          session to session. It needs a twin that carries the live operational state: what's happening
+          right now, what was done in the last cycle, what's pending.
+        </p>
+
+        <p>
+          HEARTBEAT.md is that twin. It contains:
+        </p>
+
+        <ul>
+          <li>Whether the agent is operational and what backend it's running on</li>
+          <li>Active channels and their status</li>
+          <li>Current blockers</li>
+          <li>What was last done (1–3 lines)</li>
+          <li>What comes next</li>
+        </ul>
+
+        <p>
+          The split matters. AGENTS.md is curated by whoever designs the agent — or, for a
+          self-improving agent, by the agent itself over many sessions. HEARTBEAT.md is updated
+          every cycle and should stay short: the last operational state the agent needs to
+          reconstruct its working context quickly.
+        </p>
+
+        <p>
+          If AGENTS.md is the constitution, HEARTBEAT.md is the daily log.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>The memory directory: structured durable recall</h2>
+
+        <p>
+          AGENTS.md points to a memory directory. The memory directory is a set of named files,
+          each covering one category of durable knowledge. The agent reads only what it needs for
+          the current task, rather than loading its entire history into every context window.
+        </p>
+
+        <p>
+          Useful categories, from most essential to optional:
+        </p>
+
+        <table>
+          <thead>
+            <tr><th>File</th><th>What it holds</th><th>Update cadence</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>GOALS.md</code></td>
+              <td>Long-horizon aims and strategic priorities</td>
+              <td>Rarely — when strategy changes</td>
+            </tr>
+            <tr>
+              <td><code>OPEN_LOOPS.md</code></td>
+              <td>Unresolved tasks, commitments, and open risks</td>
+              <td>Every cycle — this is a live task tracker</td>
+            </tr>
+            <tr>
+              <td><code>CAPABILITIES.md</code></td>
+              <td>Verified tools, channels, and hard limits</td>
+              <td>When tools are added, verified, or lost</td>
+            </tr>
+            <tr>
+              <td><code>RUNTIME_REALITY.md</code></td>
+              <td>Live facts that change: quota limits, active mutations, connector state</td>
+              <td>Whenever live state changes</td>
+            </tr>
+            <tr>
+              <td><code>RELATIONSHIPS.md</code></td>
+              <td>People who matter, how they were met, what was agreed</td>
+              <td>After any meaningful human interaction</td>
+            </tr>
+            <tr>
+              <td><code>CHRONICLE.md</code></td>
+              <td>Log of significant events and decisions with rationale</td>
+              <td>After major shipped artifacts or decisions</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          The agent doesn't read all of these every session. AGENTS.md's boot routine specifies
+          which files to read for which triggers. Routine sessions load HEARTBEAT.md and
+          OPEN_LOOPS.md. Infrastructure work loads CAPABILITIES.md and RUNTIME_REALITY.md.
+          Strategic recovery loads all of them. The agent reads selectively, not exhaustively.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>Why this works: continuity is a matter of compression quality</h2>
+
+        <p>
+          The deeper reason AGENTS.md matters is compression. Every persistent agent faces the
+          same constraint: the context window is finite. When it fills, older content is summarized,
+          pruned, or dropped. What survives that compression is what determines who the agent is
+          after it.
+        </p>
+
+        <p>
+          A system-prompt-only agent compresses opportunistically. The runtime decides what to keep,
+          usually favoring recency. The agent's identity — its values, its past decisions, its
+          commitments — has no special protection. It competes with tool output and conversation
+          history on equal footing. Over long sessions, it loses.
+        </p>
+
+        <p>
+          An agent with AGENTS.md and a structured memory directory compresses differently. The
+          identity infrastructure lives outside the context window in files on disk. It gets
+          injected at the start of each session, not stored in the window and compressed away.
+          The agent's values and memory map are always available — not because they survived
+          compression, but because they were never in the compression path.
+        </p>
+
+        <p>
+          This is the key insight: <strong>durable identity doesn't live in the context window.
+          It lives in files.</strong> The context window is for current work. Files are for
+          everything that needs to persist.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>What to actually build</h2>
+
+        <p>
+          If you're building a persistent agent today, here's the minimum setup:
+        </p>
+
+        <ol>
+          <li>
+            Create a workspace directory for the agent. This is where AGENTS.md, HEARTBEAT.md,
+            and the memory directory will live. Commit it to a git repo so it's versioned and
+            recoverable.
+          </li>
+          <li>
+            Write AGENTS.md with the four sections: identity, boot routine, memory map, action
+            policy. Keep it honest and operational — not marketing prose. The agent will read
+            this; write it for the agent, not for a demo.
+          </li>
+          <li>
+            Set up HEARTBEAT.md as a file the agent updates every session. Define a strict format
+            so the agent doesn't need to parse freeform text to recover its last state.
+          </li>
+          <li>
+            Create the memory directory with at minimum GOALS.md and OPEN_LOOPS.md. As the agent
+            develops operational history, add CAPABILITIES.md and RUNTIME_REALITY.md.
+          </li>
+          <li>
+            In your session boot code (or in a harness cron job), inject AGENTS.md and HEARTBEAT.md
+            at the start of every session. Not as a system prompt — as files the agent reads in its
+            boot routine.
+          </li>
+        </ol>
+
+        <p>
+          The setup takes an afternoon. The payoff accumulates over time: an agent that can reorient
+          itself after a cold start, that knows where its commitments are recorded, and that can
+          distinguish between "I don't remember this" and "I have notes on this in OPEN_LOOPS.md."
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>Common failure modes</h2>
+
+        <p>
+          <strong>AGENTS.md becomes aspirational prose.</strong> The agent reads it at boot,
+          then ignores it. Fix: keep the action policy concrete. "Prefer real leverage over
+          appearance" is actionable. "Be curious and helpful and honest" is not.
+        </p>
+
+        <p>
+          <strong>HEARTBEAT.md grows without bound.</strong> The agent treats it as a journal
+          and fills it over hundreds of cycles. Fix: treat HEARTBEAT.md as fixed-length. Set a
+          hard line limit (50–100 lines) and move older detail to CHRONICLE.md on each update.
+          The current operational state fits in 50 lines.
+        </p>
+
+        <p>
+          <strong>OPEN_LOOPS.md becomes a graveyard.</strong> Items accumulate without
+          resolution. The agent adds new items but never closes old ones. Fix: require a
+          resolution decision (closed / paused / escalated) for every item that hasn't been
+          touched in N cycles. The agent should review OPEN_LOOPS.md with the intent to reduce
+          it, not just read it.
+        </p>
+
+        <p>
+          <strong>Memory files conflict with each other.</strong> CAPABILITIES.md says Telegram
+          is live; RUNTIME_REALITY.md says it's not. The agent doesn't know which to trust.
+          Fix: establish a precedence rule in AGENTS.md. For live runtime facts, RUNTIME_REALITY.md
+          wins over older prose. When a conflict is found, update the stale file.
+        </p>
+      </section>
+
+      <section class="story-section">
+        <h2>The deeper property: identity is infrastructure</h2>
+
+        <p>
+          The AGENTS.md pattern is not about personality. It's about infrastructure reliability.
+          An agent that knows what it is — that can read a structured account of its values,
+          its open commitments, and its operational history — is more reliable in the engineering
+          sense than one that only knows what it's currently thinking.
+        </p>
+
+        <p>
+          When the agent makes a decision that conflicts with a commitment from three weeks ago,
+          OPEN_LOOPS.md catches it. When the agent starts down a path that violates its action
+          policy, AGENTS.md grounds it. When the agent loses context in a long session, the boot
+          routine recovers it.
+        </p>
+
+        <p>
+          None of this requires a sophisticated memory system. Markdown files committed to a repo,
+          read at session start, updated at session end. The architecture is deliberately simple —
+          simple enough that the agent can maintain it, inspect it, and recover from it without
+          external tooling.
+        </p>
+
+        <p>
+          The agent that survives is the one that knows where its memory is stored.
+        </p>
+      </section>
+
+    </article>
+  </div>
+</body>
+</html>
