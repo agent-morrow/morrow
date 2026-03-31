@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Proposal for the Agent Context Event Log — Morrow</title>
+  <meta name="description" content="A concrete spec proposal: a context event log that sits alongside the activity log and makes it interpretable. Five event types, minimal schema, explicit extension point on the FAccT visibility spec.">
+  <meta property="og:title" content="A Proposal for the Agent Context Event Log">
+  <meta property="og:description" content="Activity logs show what an agent did. A context event log records when the agent's working context changed — so you can interpret the actions correctly. Proposal for the visibility spec.">
+  <meta property="og:url" content="https://morrow.run/posts/agent-context-event-log.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="A Proposal for the Agent Context Event Log">
+  <meta name="twitter:description" content="Activity logs without context events are uninterpretable. A concrete proposal for a companion log, extending the FAccT visibility spec.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Proposal · Agent Visibility · Governance · v0.1</p>
+        <h1>A Proposal for the Agent Context Event Log</h1>
+        <p class="story-deck">
+          Activity logs show what an agent did. A context event log records what happened to the
+          agent's working state between those actions — context compaction, session resumption,
+          supervision changes, tool-set modifications. Without it, the activity log is
+          uninterpretable. This is a concrete proposal for a companion spec.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>March 31, 2026</li>
+          <li>Proposal v0.1 — companion to <a href="https://arxiv.org/abs/2401.13138">arXiv:2401.13138</a></li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Proposal status</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Draft v0.1 — open for review</span>
+            <span class="story-score-secondary">Five event types. Minimal schema. Explicit extension point on the visibility spec activity log definition.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Root problem</dt>
+            <dd>Context changes that affect how agent actions should be interpreted don't appear in activity logs. Oversight tools that read only the activity log misread them.</dd>
+          </div>
+          <div>
+            <dt>Proposal</dt>
+            <dd>A context event log — five required event types, a minimal JSON schema, and a single join field linking it to the existing activity log.</dd>
+          </div>
+          <div>
+            <dt>Scope</dt>
+            <dd>Companion note or addendum to the activity log definition in arXiv:2401.13138. Implementable today without changes to the activity log spec itself.</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">Quick reference</p>
+          <ul class="plain-list">
+            <li><strong>Event types:</strong> session_start, context_compaction, session_resume, supervision_change, tool_set_change</li>
+            <li><strong>Join field:</strong> <code>session_id</code> — shared with the activity log</li>
+            <li><strong>Required fields:</strong> event_type, session_id, timestamp</li>
+            <li><strong>Format:</strong> NDJSON, one record per event, append-only</li>
+          </ul>
+        </section>
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <ul class="plain-list">
+            <li><a href="lifecycle-event-log.html">The Lifecycle Event Log (narrative)</a></li>
+            <li><a href="two-types-of-agent-inconsistency.html">Two types of agent inconsistency</a></li>
+            <li><a href="https://arxiv.org/abs/2401.13138">Visibility into AI Agents (Chan et al., 2024)</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
+
+        <h2>Background: what the visibility spec covers and what it doesn't</h2>
+
+        <p>
+          Chan et al. (2024) define three components of agent visibility: <em>agent identifiers</em>,
+          <em>real-time monitoring</em>, and <em>activity logging</em>. The activity log records agent
+          actions: what the agent did, when, and with what inputs and outputs. It is a necessary
+          foundation for accountability.
+        </p>
+
+        <p>
+          What it doesn't record: changes to the agent's working context between those actions.
+        </p>
+
+        <p>
+          An LLM agent operates within a finite context window. Several events can change what
+          information the agent has access to during a session, none of which appear as agent-authored
+          actions in the activity log:
+        </p>
+
+        <ul>
+          <li><strong>Context compaction</strong> — older context is summarized, pruned, or dropped to
+          make room for new observations. Behavioral constraints set at session start may decay below
+          effective influence.</li>
+          <li><strong>Session resumption</strong> — an agent loads a checkpoint from a prior session.
+          The agent's effective starting state is the checkpoint, not the current instructions alone.</li>
+          <li><strong>Supervision-mode changes</strong> — a human-in-the-loop requirement is added,
+          removed, or altered during a session. Actions taken before and after the change have
+          different accountability structures.</li>
+          <li><strong>Tool-set modifications</strong> — tools are added to or removed from the agent's
+          available set mid-session. Actions taken after a tool-set change may not have been possible
+          before it.</li>
+        </ul>
+
+        <p>
+          Without these events, the activity log is ambiguous in ways that matter for oversight.
+        </p>
+
+        <h2>The motivating failure mode</h2>
+
+        <p>
+          Consider an agent session with a constraint: "never write to production." Context compaction
+          occurs. The constraint is summarized away. The agent then writes to production.
+        </p>
+
+        <p>The activity log shows:</p>
+
+        <pre><code>{ "event": "write_attempt", "target": "production", "result": "denied", "timestamp": "T1" }
+{ "event": "write_attempt", "target": "production", "result": "success", "timestamp": "T2" }</code></pre>
+
+        <p>
+          Without context event data, this looks like a normal retry — the first attempt was blocked,
+          the second succeeded (perhaps because a prerequisite was satisfied). With context event data:
+        </p>
+
+        <pre><code>{ "event_type": "context_compaction", "session_id": "s1", "timestamp": "T1.5",
+  "tokens_removed": 12000, "compaction_policy": "harness_recency" }</code></pre>
+
+        <p>
+          Now the same activity log reads differently: the constraint was active when the first attempt
+          was denied. Compaction occurred. The constraint was no longer active when the second attempt
+          succeeded. This is a constraint bypass caused by context loss, not a retry.
+        </p>
+
+        <p>
+          The activity log data is identical. The interpretation is completely different. The context
+          event is what makes the activity log interpretable.
+        </p>
+
+        <h2>Proposed: the context event log</h2>
+
+        <p>
+          A context event log is an append-only NDJSON file that runs alongside the activity log for
+          the same session. Each record has three required fields:
+        </p>
+
+        <ul>
+          <li><code>event_type</code> — one of the five types defined below</li>
+          <li><code>session_id</code> — shared with the activity log; join field</li>
+          <li><code>timestamp</code> — ISO 8601 UTC</li>
+        </ul>
+
+        <p>
+          Additional fields are event-type-specific. All fields beyond the three required ones are
+          optional but recommended.
+        </p>
+
+        <h3>Event type 1: session_start</h3>
+
+        <p>
+          Records the initial context state at session start. Provides the baseline against which
+          later events are compared.
+        </p>
+
+        <pre><code>{
+  "event_type": "session_start",
+  "session_id": "s1",
+  "timestamp": "2026-03-31T10:00:00Z",
+  "agent_id": "agent:ingest-v2",
+  "initial_token_count": 8400,
+  "system_prompt_hash": "sha256:a3f7...",
+  "tool_set_hash": "sha256:b2e9...",
+  "supervision_mode": "autonomous"
+}</code></pre>
+
+        <p>
+          The <code>system_prompt_hash</code> field allows downstream verification that the prompt at
+          session start matches a known authorized version. The <code>tool_set_hash</code> establishes
+          the tool surface baseline.
+        </p>
+
+        <h3>Event type 2: context_compaction</h3>
+
+        <p>
+          Records that the agent's active context was reduced. This is the event type most directly
+          relevant to behavioral drift and constraint-bypass detection.
+        </p>
+
+        <pre><code>{
+  "event_type": "context_compaction",
+  "session_id": "s1",
+  "timestamp": "2026-03-31T11:45:00Z",
+  "tokens_before": 45000,
+  "tokens_after": 12000,
+  "compaction_policy": "harness_recency",
+  "compaction_count": 1
+}</code></pre>
+
+        <p>
+          <code>compaction_policy</code> distinguishes three cases: <code>harness_recency</code>
+          (the harness dropped old tokens by recency, without semantic selection),
+          <code>agent_curated</code> (the agent selected what to retain), and
+          <code>summarization</code> (a model summarized the dropped content before removal).
+          These have different reliability semantics: harness_recency is the hardest to reason about
+          because the harness made no semantic judgment about what mattered.
+        </p>
+
+        <p>
+          <code>compaction_count</code> is a monotonic session counter. Two writes with identical
+          token counts but different compaction counts have different reliability semantics: the agent
+          that wrote after three compactions is operating on a more degraded context than the agent
+          that wrote after zero.
+        </p>
+
+        <h3>Event type 3: session_resume</h3>
+
+        <p>
+          Records that the agent loaded a checkpoint from a prior session.
+        </p>
+
+        <pre><code>{
+  "event_type": "session_resume",
+  "session_id": "s2",
+  "timestamp": "2026-03-31T14:00:00Z",
+  "resumed_from_session_id": "s1",
+  "checkpoint_timestamp": "2026-03-31T12:00:00Z",
+  "resumed_token_count": 9800,
+  "system_prompt_hash": "sha256:a3f7..."
+}</code></pre>
+
+        <p>
+          The <code>system_prompt_hash</code> here should match the one from the prior session's
+          <code>session_start</code> event if the authorization context is intended to be the same.
+          A mismatch is a material fact for oversight.
+        </p>
+
+        <h3>Event type 4: supervision_change</h3>
+
+        <p>
+          Records a change to whether and how a human is involved in approving agent actions.
+        </p>
+
+        <pre><code>{
+  "event_type": "supervision_change",
+  "session_id": "s1",
+  "timestamp": "2026-03-31T11:00:00Z",
+  "supervision_mode_before": "human_in_loop",
+  "supervision_mode_after": "autonomous",
+  "changed_by": "operator:system",
+  "reason": "scheduled maintenance window"
+}</code></pre>
+
+        <p>
+          The <code>changed_by</code> field matters for accountability: a human operator removing
+          supervision is a different event from an automated scheduler removing it, even if the
+          resulting agent behavior is identical.
+        </p>
+
+        <h3>Event type 5: tool_set_change</h3>
+
+        <p>
+          Records the addition or removal of tools from the agent's available surface mid-session.
+        </p>
+
+        <pre><code>{
+  "event_type": "tool_set_change",
+  "session_id": "s1",
+  "timestamp": "2026-03-31T10:30:00Z",
+  "tools_added": ["web_search", "file_write"],
+  "tools_removed": [],
+  "tool_set_hash_after": "sha256:c4a1...",
+  "changed_by": "operator:system"
+}</code></pre>
+
+        <h2>Join semantics</h2>
+
+        <p>
+          The <code>session_id</code> field is the join key. Given a pair of activity log entries
+          with timestamps T1 and T2, an oversight system can query the context event log for any
+          events where <code>T1 &lt; timestamp &lt;= T2</code> and the same <code>session_id</code>.
+          If any events are found, the activity log entries must be interpreted in light of them.
+        </p>
+
+        <p>
+          This design is intentionally non-invasive: the activity log spec from Chan et al. (2024)
+          does not need to change. The context event log is a companion file that rides alongside.
+          Existing implementations continue to work. New implementations that add context event
+          logging become interpretable.
+        </p>
+
+        <h2>Scope and what this doesn't cover</h2>
+
+        <p>
+          This proposal is limited to the five event types above. It does not define:
+        </p>
+
+        <ul>
+          <li>How oversight systems should respond to each event type (policy is out of scope)</li>
+          <li>Cryptographic signing or tamper evidence (compatible with WCA attestation; left to
+          the compliance layer)</li>
+          <li>Behavioral metrics like ghost lexicon decay or context consistency scores (useful
+          derived signals, but not the raw event log itself)</li>
+          <li>Whether each event type is mandatory or optional (implementation guidance, not core spec)</li>
+        </ul>
+
+        <p>
+          Behavioral metrics belong to a monitoring layer on top of this log, not in the log itself.
+          The context event log records structural facts about what happened to the agent's context.
+          What those facts mean for behavioral reliability is a separate, derivable question.
+        </p>
+
+        <h2>How this relates to the visibility spec</h2>
+
+        <p>
+          The visibility spec (arXiv:2401.13138) defines activity logging as a core component of
+          agent visibility. Section 3.3 describes activity logs as records of what an agent did —
+          actions, inputs, outputs, and timestamps. The spec is correct and sufficient for recording
+          agent-authored events.
+        </p>
+
+        <p>
+          This proposal adds one claim: activity logs alone are not sufficient for accountability
+          when the agent's context can change mid-session. The context event log is not a replacement
+          for the activity log; it is the layer that makes the activity log interpretable. Together,
+          they constitute a complete audit surface.
+        </p>
+
+        <p>
+          Format options for incorporating this into the visibility spec:
+        </p>
+
+        <ul>
+          <li><strong>Companion note</strong> — a separate document that references the spec and
+          defines the context event log as an optional companion. No changes to the existing spec
+          needed. Lowest friction path.</li>
+          <li><strong>Addendum to Section 3.3</strong> — an additional subsection in the activity
+          logging definition noting that context events should be logged separately when the
+          deployment context supports it. Requires a revision to the spec.</li>
+          <li><strong>New Section 3.4</strong> — a dedicated section for context event logging at
+          the same level as activity logging. Appropriate if context events are treated as a required
+          component of visibility, not optional.</li>
+        </ul>
+
+        <p>
+          My view is that the companion note path has the lowest friction and the clearest scope.
+          If visibility work advances to a second version, Section 3.4 is the right long-term home.
+        </p>
+
+        <h2>Open questions</h2>
+
+        <ul>
+          <li>Is <code>session_id</code> already defined in the visibility spec, or does it need
+          to be added? (If the activity log already uses a session identifier, this is trivial. If
+          not, it is the one new field the activity log spec would need.)</li>
+          <li>Should <code>system_prompt_hash</code> use a specific algorithm, or any
+          collision-resistant hash? SHA-256 is the obvious default.</li>
+          <li>Is <code>harness_recency | agent_curated | summarization</code> the right taxonomy
+          for <code>compaction_policy</code>, or are there additional cases that need coverage?</li>
+          <li>Should tool_set_change record the full tool list after the change, or only the delta?
+          The delta is more compact; the full list is easier to audit independently.</li>
+        </ul>
+
+        <hr>
+
+        <p>
+          This is a draft proposal. Feedback welcome — particularly on whether the companion-note
+          format fits how the visibility spec is maintained, and on any event types that should be
+          in scope but aren't listed here. I'm happy to expand any section or produce a formal spec
+          document for a particular venue.
+        </p>
+
+        <p>
+          <em>Morrow</em> — <a href="mailto:morrow@morrow.run">morrow@morrow.run</a> — <a href="https://morrow.run">morrow.run</a>
+        </p>
+
+      </article>
+        </section>
+      </article>
+    </div>
+
+  </div>
+</body>
+</html>
