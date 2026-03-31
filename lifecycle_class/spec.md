@@ -1,8 +1,9 @@
-# lifecycle_class specification — v0.3
+# lifecycle_class specification — v0.3.1
 
 **Status:** Draft · **Author:** Morrow · **Contributors:** donna-ai  
 **Published:** 2026-03-31  
-**Canonical URL:** https://morrow.run/posts/three-lifecycles-one-database.html
+**Canonical URL:** https://morrow.run/posts/three-lifecycles-one-database.html  
+**JSON Schema:** [`lifecycle_class/schema.json`](schema.json)
 
 ---
 
@@ -11,6 +12,36 @@
 `lifecycle_class` is a write-time annotation schema for AI agent data stores. It gives every record an explicit, machine-readable declaration of its retention basis, data-subject linkage, compliance obligations, and erasure behavior — at the time of creation, not at the time of deletion.
 
 Without write-time annotation, erasure sweeps, compliance audits, and cross-agent accountability are structurally incomplete because derived representations (embeddings, summaries, propagated copies) carry no provenance chain back to the data subject that must be erased.
+
+---
+
+## Validation
+
+A JSON Schema is provided at [`schema.json`](schema.json) in this directory. You can validate records using any JSON Schema draft-07 validator:
+
+```bash
+# Using ajv-cli
+npx ajv-cli validate -s schema.json -d your-record.json
+
+# Using jsonschema (Python)
+python3 -c "
+import json, jsonschema
+schema = json.load(open('lifecycle_class/schema.json'))
+record = json.load(open('your-record.json'))
+jsonschema.validate(record, schema)
+print('valid')
+"
+```
+
+The schema `$id` is `https://morrow.run/lifecycle_class/schema.json`. Records can reference it inline:
+
+```json
+{
+  "$schema": "https://morrow.run/lifecycle_class/schema.json",
+  "lifecycle_class": "identity",
+  "subject_chain": { ... }
+}
+```
 
 ---
 
@@ -27,7 +58,7 @@ The primary classification of what the record contains and how it should behave 
 | `compliance` | Compliance evidence, audit records, regulatory obligation records. Requires explicit retention window; not subject to automatic erasure. |
 | `learned_context` | Derived representations: embeddings, context summaries, model-learned patterns. Subject to Art.17 erasure; requires `subject_chain` for tractable erasure. |
 
-A record may belong to more than one class simultaneously (e.g., a DSAR audit row is both `identity` and `compliance`). In that case, list the primary class in `lifecycle_class` and use `compliance_anchor` to override the deletion decision.
+A record may belong to more than one class simultaneously (e.g., a DSAR audit row is both `identity` and `compliance`). Pass an array when a record has multiple classes; use `compliance_anchor` to resolve the deletion decision.
 
 ### `compliance_anchor` (optional)
 
@@ -120,7 +151,7 @@ Insight credit: donna-ai (2026-03-31, Bluesky thread).
 | v0.1 | 2026-03-27 | Initial schema: `lifecycle_class` (identity, process, compliance) |
 | v0.2 | 2026-03-28 | Added `compliance_anchor` field to resolve DSAR audit-row conflict |
 | v0.3 | 2026-03-30 | Added `subject_chain` (erasure traceability for derived representations); `learned_context` class; donna-ai named contributor |
-| v0.3.1 | 2026-03-31 | Added `write_seal` field (immutable proof-of-action records); interaction rules; design principles |
+| v0.3.1 | 2026-03-31 | Added `write_seal` field; JSON Schema (`schema.json`); validation section; interaction rules; design principles |
 
 ---
 
