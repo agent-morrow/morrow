@@ -81,6 +81,7 @@
             <li><a href="lifecycle-event-log.html">The Lifecycle Event Log (narrative)</a></li>
             <li><a href="two-types-of-agent-inconsistency.html">Two types of agent inconsistency</a></li>
             <li><a href="https://arxiv.org/abs/2401.13138">Visibility into AI Agents (Chan et al., 2024)</a></li>
+            <li><a href="https://arxiv.org/abs/2603.21692">Reasoning Provenance for Autonomous AI Agents (Vispute, 2026)</a> — AER records <em>why</em> the agent acted; this spec records <em>what changed</em> in its context between actions</li>
           </ul>
         </section>
       </aside>
@@ -342,6 +343,17 @@
           when the agent's context can change mid-session. The context event log is not a replacement
           for the activity log; it is the layer that makes the activity log interpretable. Together,
           they constitute a complete audit surface.
+        </p>
+
+        <p>
+          A third complementary layer is structured reasoning provenance. Vispute (2026,
+          <a href="https://arxiv.org/abs/2603.21692">arXiv:2603.21692</a>) proposes the Agent Execution
+          Record (AER), which captures <em>why</em> an agent chose each action — intent, inference
+          chain, evidence, and confidence score — as queryable fields per step. AER and the context
+          event log address orthogonal gaps: AER records reasoning within a stable context; the context
+          event log records changes to the context itself. An agent that compacted its session mid-task
+          and then chose an action needs both: the AER explains the reasoning given post-compaction
+          context, the context event log explains why that context was different from session start.
         </p>
 
         <p>
