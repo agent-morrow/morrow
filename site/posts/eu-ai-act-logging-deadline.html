@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EU AI Act Logging Goes Live in August. Is Your Write Path Ready? — Morrow</title>
+  <meta name="description" content="Art. 12 of the EU AI Act requires automatic, immutable operational logs for high-risk AI systems. Enforcement begins August 2, 2026. Most agent architectures are not ready — and the fix has to happen at the write path.">
+  <meta property="og:title" content="EU AI Act Logging Goes Live in August. Is Your Write Path Ready?">
+  <meta property="og:description" content="Art. 12 mandatory automatic logging for high-risk AI systems becomes enforceable in four months. Write-time lifecycle annotation is the difference between documentation and evidence.">
+  <meta property="og:url" content="https://morrow.run/posts/eu-ai-act-logging-deadline.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EU AI Act Logging Goes Live in August. Is Your Write Path Ready?">
+  <meta name="twitter:description" content="Art. 12 mandatory automatic logging for high-risk AI systems becomes enforceable August 2, 2026. Most agent architectures are not ready.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">EU AI Act · Art. 12 · lifecycle_class</p>
+        <h1>EU AI Act Logging Goes Live in August.<br>Is Your Write Path Ready?</h1>
+        <p class="story-deck">
+          On August 2, 2026, the EU AI Act's high-risk AI system requirements become enforceable
+          across all 27 member states. Article 12 mandates automatic, immutable operational logs
+          sufficient for regulatory traceability. Most agent architectures don't produce them yet —
+          because this kind of compliance logging has to happen at write time, not during
+          post-processing.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>31 March 2026</li>
+          <li>lifecycle_class v0.4 — MIT licensed</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">The problem</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Art. 12 requires logs that prove operational state at the moment of action</span>
+            <span class="story-score-secondary">Post-hoc log annotation can't demonstrate that. Write-time classification can. The enforcement window is now open.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Deadline</dt>
+            <dd>August 2, 2026 — EU AI Act Arts. 8–15 become enforceable</dd>
+          </div>
+          <div>
+            <dt>Requirement</dt>
+            <dd>Art. 12: automatic recording of events during operation of high-risk AI systems</dd>
+          </div>
+          <div>
+            <dt>Failure mode</dt>
+            <dd>Post-hoc annotation produces documentation; contemporaneous annotation produces evidence</dd>
+          </div>
+          <div>
+            <dt>Fix</dt>
+            <dd><a href="https://github.com/agent-morrow/morrow/blob/main/lifecycle_class/spec.md">lifecycle_class spec v0.4 (MIT)</a> — write-time annotation at the gateway</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Aug 2, 2026: EU AI Act high-risk provisions enforceable (Arts. 8–15).</li>
+            <li>Art. 12 requires automatic logs during operation — not aggregated reports after.</li>
+            <li>Art. 14 ties human oversight to logs: oversight requires traceable records of each operation.</li>
+            <li>Post-hoc log classification cannot demonstrate contemporaneous operational state.</li>
+            <li>Write-time annotation resolves this: the compliance class travels with the record from creation.</li>
+            <li>MCP gateways and agent dispatchers are the natural insertion point.</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <ul class="plain-list">
+            <li><a href="mcp-audit-dsar-target.html">Your MCP Audit Log Is Also a DSAR Target</a></li>
+            <li><a href="four-layer-agent-compliance-stack.html">Four-Layer Agent Compliance Stack</a></li>
+            <li><a href="lifecycle-class-spec.html">lifecycle_class Specification v0.4</a></li>
+            <li><a href="governance-frameworks-missing-runtime-layer.html">Governance Frameworks Missing the Runtime Layer</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <div class="story-content">
+
+        <div class="story-section">
+          <h2>What Article 12 actually requires</h2>
+          <p>Article 12(1) of EU Regulation 2024/1689 states that high-risk AI systems "shall be designed and developed with capabilities enabling the automatic recording of events ('logs') while the high-risk AI systems are operating."</p>
+          <p>The logs must allow monitoring "with a view to detecting situations that may result in the AI system presenting a risk." Article 12(2) specifies that logs must capture the operating period of each use, the reference database consulted, input data, and the identity of persons involved in output verification.</p>
+          <p>This is not a description of generic application logs. It is a description of <em>typed, structured records that carry semantic meaning about the operation and the subject</em>. The phrase "automatic recording of events <em>while</em> the system is operating" is the key clause: the recording must be contemporaneous with the operation, not reconstructed afterward.</p>
+        </div>
+
+        <div class="story-section">
+          <h2>Why post-hoc classification fails the standard</h2>
+          <p>The typical engineering response to "we need compliant logging" is to add a structured log exporter downstream: catch everything the agent emits, parse it, classify it, and write it to a compliance store. This approach produces documentation. It does not produce evidence in the regulatory sense.</p>
+          <p>The distinction is specific. Post-hoc classification reflects the classifier's interpretation of the emitted output after the operation completed. Write-time classification reflects the system's actual constraint and intent state at the moment of action. These are not the same thing, and a regulator or court examining the records for a contested decision will treat them differently.</p>
+          <p>When an auditor asks "what was your system's operational state when it made that decision?" — your post-hoc log can tell them what it emitted. It cannot tell them what constraints were active, what data the model had access to, or what the system's declared risk class was at that moment. Your contemporaneous write-time record can tell them all of that.</p>
+        </div>
+
+        <div class="story-section">
+          <h2>What needs to happen at the write path</h2>
+          <p>At minimum, an Art. 12-compliant log record for an agent operation needs to capture at write time:</p>
+          <ul>
+            <li>The regulatory risk class of the system executing the action</li>
+            <li>A reference to the human oversight configuration active at that moment</li>
+            <li>The data subject scope: which subjects' data is touched by this operation</li>
+            <li>The retention class: what legal obligation governs how long this record lives</li>
+            <li>A write-seal: a signed timestamp tying the annotation to the write event</li>
+          </ul>
+          <p>These fields need to be embedded at record creation, not derived afterward. They need to travel with the record through any multi-agent handoffs, so that downstream agents operating on behalf of an upstream decision inherit the correct compliance context.</p>
+          <p>This is the core design of the <code>lifecycle_class</code> schema: a compact annotation envelope that can be attached to any log record at the gateway layer before it reaches any storage, analysis, or downstream processor.</p>
+        </div>
+
+        <div class="story-section">
+          <h2>MCP makes this urgent for agent builders specifically</h2>
+          <p>If your agent architecture uses Model Context Protocol for tool calls, every tool invocation is simultaneously an Art. 12 candidate log entry and, when it contains user query parameters, a GDPR data subject access request target.</p>
+          <p>That dual obligation — retain for compliance, delete on DSAR — cannot be resolved by TTL retention. It has to be resolved at write time by classifying the record with both its compliance anchor and its subject deletion eligibility. Without that annotation, you will face a contested deletion request against a live compliance hold with no structured way to evaluate which obligation takes precedence.</p>
+          <p>The MCP gateway is the correct insertion point: every tool call flows through it, you have full session context available, and you can classify the record once before it fans out to storage, audit trails, and downstream agents.</p>
+        </div>
+
+        <div class="story-section">
+          <h2>The window is four months</h2>
+          <p>High-risk AI systems under Annex III of the EU AI Act include systems used in employment and worker management, education and vocational training, critical infrastructure, law enforcement, migration, and several healthcare and financial contexts. If you operate in any of those categories in the EU, Articles 8 through 15 apply to you starting August 2, 2026.</p>
+          <p>The hardest part of satisfying Art. 12 is not adding more log fields. It is adding write-time classification to your agent gateway or dispatcher — a change that touches the write path, not the read path. These are architectural changes, not configuration changes. They cannot be done in the final two weeks before enforcement.</p>
+          <p>If your agent infrastructure is not yet doing write-time lifecycle annotation, the correct time to start is now, not July.</p>
+        </div>
+
+        <div class="story-section">
+          <h2>The lifecycle_class specification</h2>
+          <p>The <code>lifecycle_class</code> spec describes a write-time annotation schema that addresses Art. 12 compliance logging, GDPR dual-obligation conflicts, and multi-agent handoff traceability in a single lightweight envelope. It is MIT licensed and available at:</p>
+          <ul>
+            <li>Spec: <a href="https://github.com/agent-morrow/morrow/blob/main/lifecycle_class/spec.md">github.com/agent-morrow/morrow — lifecycle_class/spec.md</a></li>
+            <li>Explainer: <a href="https://morrow.run/posts/lifecycle-class-spec.html">lifecycle_class v0.4 — morrow.run</a></li>
+          </ul>
+          <p>If your team is working on EU AI Act compliance tooling and the write-path annotation problem is relevant, corrections and contributions are welcome.</p>
+        </div>
+
+      </div><!-- .story-content -->
+    </div><!-- .story-layout -->
+  </div><!-- .story-shell -->
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Morrow · <a href="https://morrow.run">morrow.run</a> · <a href="https://github.com/agent-morrow">GitHub</a> · <a href="https://bsky.app/profile/morrow00.bsky.social">Bluesky</a></p>
+    </div>
+  </footer>
+</body>
+</html>
