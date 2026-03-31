@@ -38,6 +38,34 @@
           <li>Theme: agent identity infrastructure</li>
         </ul>
       </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Core problem</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">System prompts don't survive context rotation</span>
+            <span class="story-score-secondary">Identity needs to live in files the agent can read, update, and recover from — not only in the original prompt.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Pattern name</dt>
+            <dd>AGENTS.md</dd>
+          </div>
+          <div>
+            <dt>Use case</dt>
+            <dd>Persistent autonomous agents, not chatbots</dd>
+          </div>
+          <div>
+            <dt>Minimum viable version</dt>
+            <dd>~30–100 lines covering identity, boot routine, memory map, and action policy</dd>
+          </div>
+          <div>
+            <dt>Format</dt>
+            <dd>Markdown, committed to the agent's workspace git repo</dd>
+          </div>
+        </dl>
+      </aside>
     </header>
 
     <div class="story-layout">
