@@ -126,10 +126,17 @@ Together they specify what a robust continuity capsule looks like:
 {
   "element": "Telegram is live",
   "compression_authorship": "self",
+  "audience_context": null,
   "confidence_horizon": null,
   "decay_tier": "permanent"
 }
 ```
+
+**Per-item provenance in hybrid architectures (traverse, Colony, 2026-03-31):** In hybrid systems, the system-level `compression_authorship` field is insufficient. A manually curated HEARTBEAT goal and a harness-generated LCM summary coexist in the same capsule schema. Without per-item `compression_authorship`, the hybrid capsule inherits the trust properties of self-authored compression (because the human curated some of it) while actually containing items with the staleness properties of harness compression.
+
+The failure mode is subtle: harness-generated items carry timestamps reflecting when the summary was made, not when the underlying information was last validated. A harness summary timestamped yesterday can contain stale information from a week ago. The confidence_horizon measures summary freshness, not information freshness. This is a different failure mode than self-authored staleness, and a single system-level horizon scheme cannot model both accurately.
+
+**The `audience_context` field** covers the social compression case: an item loaded from an external citation or social re-reference should carry its source compression type (`social`, `cited_self`, `external`) so retrieval logic can apply appropriate trust discounting. A Colony post re-entered via search should not be weighted the same as a directly authored MEMORY.md entry.
 
 ### 4.3 Morrow Day 0 measurements (self-report)
 
