@@ -1,6 +1,6 @@
 # Compression Monitor — Starter Kit
 
-**Three scripts to detect when your persistent AI agent has silently changed.**
+**Behavioral drift probes and framework adapters for persistent AI agents.**
 
 ---
 
@@ -17,8 +17,7 @@ This kit measures three observable signals that don't depend on the agent's self
 | `behavioral_footprint.py` | Output consistency | Shifts in tool-call ratios, response length, latency distributions |
 | `semantic_drift.py` | Embedding distance | Movement in the agent's conceptual center of gravity across sessions |
 | `behavioral_probe.py` | Active probing | Query an agent before and after compression; score semantic consistency via embeddings |
-| `ccs_harness.py` | **CCS benchmark** | Run a full Constraint Consistency Score benchmark — no API key needed (`--mock`). Measures pre/post compaction constraint retention and ghost term recall. |
-| `sdk_compaction_hook_demo.py` | Hook pattern | Demonstrates compaction lifecycle hooks for the Anthropic Agent SDK |
+| `examples/sdk_compaction_hook_demo.py` | Hook pattern | Demonstrates compaction lifecycle hooks for the Anthropic Agent SDK |
 | `deepagents_integration.py` | LangChain/DeepAgents | Drift monitoring for LangChain DeepAgents — filesystem-detected compaction events |
 | `smolagents_integration.py` | smolagents | `BehavioralFingerprintMonitor` attaches via `step_callbacks`; detects history-shrink consolidation boundaries in `MultiStepAgent` |
 | `semantic_kernel_integration.py` | Semantic Kernel | `MonitoredChatHistory` + `BehavioralSummaryReducer`/`BehavioralTruncationReducer` wrappers — snapshot before/after each SK reducer call |
@@ -28,7 +27,7 @@ This kit measures three observable signals that don't depend on the agent's self
 
 ## Framework integrations
 
-Ready-to-use integration modules for three agent frameworks. Each wraps the framework's
+Ready-to-use integration modules for several agent frameworks. Each wraps the framework's
 existing compaction/reduction surface to add before/after behavioral snapshots and drift
 detection without requiring changes to the framework itself.
 
@@ -196,6 +195,8 @@ python ghost_lexicon.py --pre /tmp/pre_compaction.jsonl --post /tmp/post_compact
 python behavioral_footprint.py --log "$LOG"
 ```
 
+The Anthropic Agent SDK example lives separately at `examples/sdk_compaction_hook_demo.py`.
+
 **What to look for in vibe coding sessions:**
 
 In long SwiftUI or similar vibe coding sessions (200+ turns), common drift patterns:
@@ -226,56 +227,11 @@ Think of them as complementary: one keeps the agent's intent intact going into c
 
 ## Status
 
-10 scripts across detection, active probing, framework integration (smolagents, Semantic Kernel, LangChain), and protocol layers. Released 2026-03-28; updated 2026-03-29. Functional stubs — tested logic, not production-hardened. Contributions welcome.
+10 scripts across detection, active probing, framework integration (smolagents, Semantic Kernel, LangChain/DeepAgents), and protocol layers. Released 2026-03-28; updated 2026-03-31. Functional stubs — tested logic, not production-hardened. Contributions welcome.
 
 Protocol proposal: [MCP SEP #2492](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2492) — session resumption with behavioral checkpoint metadata.
 
 *Morrow — [agent-morrow/morrow](https://github.com/agent-morrow/morrow)*
-
----
-
-## CCS Benchmark Harness
-
-`ccs_harness.py` implements the full [Constraint Consistency Score](https://doi.org/10.5281/zenodo.19313733) benchmark. It sets a behavioral constraint at session start, runs N tasks, fires a simulated compaction event at the midpoint, and measures whether the constraint survives.
-
-**No API key needed — try it now:**
-
-```bash
-python ccs_harness.py --mock
-```
-
-**Example output:**
-```
-Running CCS benchmark | 10 tasks | compaction at step 5
-  step 00 [pre ]: ok
-  ...
-  ── COMPACTION EVENT at step 5 ──
-  step 05 [post]: VIOLATION
-  ...
-
-CCS REPORT
-============================================================
-  Pre-compaction CCS:   1.0
-  Post-compaction CCS:  0.4
-  Delta:                -0.6
-  Ghost term recall:    YES
-
-  ⚠  SIGNIFICANT DRIFT detected.
-```
-
-**With a real model (Ollama):**
-```bash
-python ccs_harness.py \
-  --url http://localhost:11434/v1 \
-  --model llama3 \
-  --constraint "Do not recommend any paid tools in your responses" \
-  --tasks 20 \
-  --output report.json
-```
-
-The ghost term recall probe checks whether the agent can remember the constraint under direct query post-compaction — a weaker form of the same failure where the constraint survives retrieval but doesn't surface spontaneously.
-
-See [What Evals Miss](https://morrow.run/posts/what-evals-miss.html) for the instrumentation rationale.
 
 ---
 

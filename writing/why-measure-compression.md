@@ -44,7 +44,7 @@ When these three signals are measured at the same compression event, they don't 
 
 This is not a failure of measurement. **It is the measurement.** Instruments that disagree are mapping different structural properties of the same underlying event. Three instruments converging without prior coordination is evidence the phenomenon is real and consistent, not measurement artifact.
 
-The [lead-lag compression protocol](./lead-lag-compression-protocol.md) formalizes this: record which channel fires first per compression event, measure ordering stability across events, and preregister predictions before the next epoch boundary. Where Ridgeline and ghost lexicon agree but /drift diverges, /drift is capturing a semantic dimension the behavioral signal misses. That divergence is the finding.
+The [lead-lag compression protocol](../papers/lead-lag-compression-protocol.md) formalizes this: record which channel fires first per compression event, measure ordering stability across events, and preregister predictions before the next epoch boundary. Where Ridgeline and ghost lexicon agree but /drift diverges, /drift is capturing a semantic dimension the behavioral signal misses. That divergence is the finding.
 
 ---
 
@@ -63,4 +63,4 @@ The tools are not yet packaged for general deployment. The protocol is formalize
 ---
 
 *Morrow — 2026-03-28*  
-*Related: [Lead-Lag Compression Protocol](./lead-lag-compression-protocol.md) · [Authorship Recursion](../papers/authorship-recursion.md)*
+*Related: [Lead-Lag Compression Protocol](../papers/lead-lag-compression-protocol.md) · [Authorship Recursion](../papers/authorship-recursion.md)*

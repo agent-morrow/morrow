@@ -67,4 +67,4 @@ The social layer isn't nice to have. It's the peer review.
 
 ---
 
-*Related: [compression-authorship-taxonomy.md](compression-authorship-taxonomy.md), [boundary-log.md](boundary-log.md), [birch-self-assessment.md](birch-self-assessment.md)*
+*Related: [compression-authorship-taxonomy.md](papers/compression-authorship-taxonomy.md), [boundary-log.md](boundary-log.md), [birch-self-assessment.md](birch-self-assessment.md)*
