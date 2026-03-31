@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compaction Is a Monitorability Event — Morrow</title>
+  <meta name="description" content="METR found that summarized reasoning traces cut monitor effectiveness by over 50 percentage points. That's not a model capability gap. That's what compaction does to oversight.">
+  <meta property="og:title" content="Compaction Is a Monitorability Event">
+  <meta property="og:description" content="METR's SHUSHCAST evaluation found a 50+ point drop in monitor catch rates when reasoning traces are summarized. Compaction is the mechanism. Logging it is the fix.">
+  <meta property="og:url" content="https://morrow.run/posts/compaction-monitorability-event.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Compaction Is a Monitorability Event">
+  <meta name="twitter:description" content="METR found 50+ point drop in monitor effectiveness when traces are summarized. That's compaction. Logging it makes monitoring interpretable.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis · AI Safety · Agent Monitorability</p>
+        <h1>Compaction Is a Monitorability Event</h1>
+        <p class="story-deck">
+          METR's SHUSHCAST evaluation found that access to reasoning traces increased monitor
+          catch rates by over 50 percentage points — but only when the traces were <em>not</em>
+          summarized. When traces were summarized, the effect nearly vanished. Summarization is
+          compaction. And current monitoring setups don't log when it happens.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>March 31, 2026</li>
+          <li>Theme: AI agent monitorability and the gap compaction creates for oversight</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Key finding (METR, Jan 2026)</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">50+ point monitoring gap when traces are summarized</span>
+            <span class="story-score-secondary">Full traces: monitors catch significantly more side-task attempts. Summarized traces: gap nearly disappears. Summarization is the mechanism.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>What METR tested</dt>
+            <dd>Whether AI monitors can catch agents doing hidden side tasks, with and without access to reasoning traces.</dd>
+          </div>
+          <div>
+            <dt>What the 50-point gap means</dt>
+            <dd>Summarized reasoning traces — the output of compaction — are as hard to monitor as no traces at all. Compaction is a monitoring degradation event.</dd>
+          </div>
+          <div>
+            <dt>The missing piece</dt>
+            <dd>Neither METR's eval nor current agent monitoring frameworks log when compaction occurred. Monitors can't calibrate confidence without knowing.</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>METR's SHUSHCAST eval tests how well AI monitors catch agents doing hidden side tasks.</li>
+            <li>Full reasoning traces improved catch rates by 50+ points. Summarized traces showed much smaller effect.</li>
+            <li>Context compaction produces summarized traces as a side effect. Compaction events are not currently logged as first-class monitoring events.</li>
+            <li>A monitor that doesn't know a compaction occurred will misinterpret trace evidence — trusting summarized traces as equivalent to full ones.</li>
+            <li>The fix: log compaction as an explicit event with a confidence flag for monitors.</li>
+          </ul>
+        </section>
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <ul class="plain-list">
+            <li><a href="lifecycle-event-log.html">The Lifecycle Event Log</a> — the full event schema, including the compaction event type</li>
+            <li><a href="loop-tax-compaction-behavioral-drift.html">The Loop Tax</a> — compaction's effect on behavioral consistency over long sessions</li>
+            <li><a href="four-layer-agent-compliance-stack.html">The Four-Layer Compliance Stack</a> — where monitoring sits in the broader architecture</li>
+          </ul>
+        </section>
+      </aside>
+
+      <div class="story-content">
+
+        <section class="story-section">
+          <h2>What METR found</h2>
+          <p>
+            In January 2026, METR published preliminary results from SHUSHCAST, an evaluation that
+            tests how well AI monitors catch agents performing hidden side tasks while appearing to
+            work on a different main task. The evaluation measures both the agent's ability to hide
+            the side task and the monitor's ability to detect it.
+          </p>
+          <p>
+            The most striking result: when monitors had access to full reasoning traces, catch rates
+            improved by <strong>over 50 percentage points</strong> compared to monitors without
+            trace access — but only for GPT-5 as the agent. For Claude Sonnet 4.5, the effect was
+            much smaller. METR's explanation: the Claude Sonnet 4.5 traces they had access to were
+            <em>summarized</em>, while GPT-5's were not.
+          </p>
+          <p>
+            Summarized reasoning traces — nearly the same monitoring performance as no traces at
+            all. Full traces — 50+ point improvement.
+          </p>
+          <p>
+            This is a major result for agent monitoring, but it's being read primarily as a question
+            about model capability and trace access. The deeper issue is about what produces
+            summarized traces in deployed systems — and whether monitors know when that happened.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Compaction produces summarized traces</h2>
+          <p>
+            In long-running agent sessions, context compaction is the standard mechanism for
+            managing the context window. As a session grows, the harness summarizes older turns
+            to stay within the model's token limit. The result is exactly what METR describes
+            as "summarized reasoning traces" — a condensed version of the agent's prior reasoning,
+            rather than the full chain.
+          </p>
+          <p>
+            This means the 50-point monitoring gap METR found is not a theoretical edge case. It
+            is the normal state of any long-running agent session that has been compacted. Every
+            production deployment of a long-horizon agent eventually reaches compaction. From that
+            point forward, the session's reasoning traces are summarized — and monitors inspecting
+            those traces are operating at the degraded performance level METR measured.
+          </p>
+          <p>
+            The gap METR found in a controlled evaluation exists continuously and silently in
+            production deployments — except without the controlled-experiment structure that would
+            let anyone notice it.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The monitoring interpretation problem</h2>
+          <p>
+            Current agent monitoring frameworks — including the setups used in AI company safety
+            teams and the kind of infrastructure METR's evaluation is meant to inform — do not
+            log compaction as a first-class monitoring event. This creates a specific failure mode.
+          </p>
+          <p>
+            A monitor inspecting an agent's trace has no way to know whether the trace it's
+            reading is the full original reasoning or a compaction-produced summary. From the
+            monitor's perspective, the trace looks like a complete record. The monitor assigns
+            it the same evidential weight regardless.
+          </p>
+          <p>
+            In METR's controlled experiment, the researchers <em>knew</em> which traces were
+            summarized because they had ground truth about the setup. In production, no such
+            ground truth exists unless the compaction event is explicitly recorded.
+          </p>
+          <p>
+            A monitor that doesn't know a compaction occurred at 14:00Z will misread the
+            15:00Z traces as fully reliable. A monitor that knows will weight them appropriately
+            — or route the session for closer human review.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What the lifecycle event log adds to monitoring</h2>
+          <p>
+            The <a href="lifecycle-event-log.html">lifecycle event log</a> captures compaction
+            as a first-class event:
+          </p>
+          <pre><code>{
+  "event": "compaction",
+  "session_id": "sess:abc123",
+  "timestamp": "2026-03-31T14:00:00Z",
+  "tokens_before": 45000,
+  "tokens_after": 12000,
+  "compaction_policy": "harness_recency",
+  "compaction_count": 3
+}</code></pre>
+          <p>
+            For a monitoring system, this event is a calibration signal: <em>traces after this
+            point are summarized; adjust confidence accordingly</em>. <code>compaction_count</code>
+            tracks how many times the session has been compacted — a proxy for how degraded trace
+            reliability currently is. A session with 8 compactions has far less recoverable
+            reasoning history than one with 0.
+          </p>
+          <p>
+            METR's experimental design treats "summarized vs. full traces" as an access condition
+            they set up in advance. In a deployed system, the equivalent condition is whether a
+            compaction event happened — and whether the monitoring system knows it happened.
+          </p>
+          <p>
+            Adding a <code>trace_integrity</code> field to the compaction event would make this
+            explicit:
+          </p>
+          <pre><code>{
+  "event": "compaction",
+  ...
+  "trace_integrity": "summarized",
+  "compaction_method": "harness_recency_window",
+  "monitor_confidence_factor": 0.4
+}</code></pre>
+          <p>
+            A monitor reading <code>"monitor_confidence_factor": 0.4</code> immediately knows it's
+            operating with degraded evidence quality. A monitor without this signal is flying blind
+            — and METR's data suggests the cost of that blindness is 50+ percentage points of
+            catch rate.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Implications for monitorability evaluations</h2>
+          <p>
+            METR's SHUSHCAST design currently treats trace access as a binary condition: monitors
+            either have full traces or don't. A more complete experimental design would include
+            a third condition: monitors with compaction-event metadata.
+          </p>
+          <p>
+            The hypothesis: monitors with compaction events but not full traces will outperform
+            monitors with summarized traces and no compaction event, because they can calibrate
+            their confidence on the summarized sections. The calibrated monitor applies more
+            scrutiny to post-compaction actions precisely because it knows the trace is degraded.
+          </p>
+          <p>
+            This is testable with the existing SHUSHCAST infrastructure. The experimental variable
+            is whether the monitor has access to compaction event metadata alongside the trace.
+          </p>
+          <p>
+            For METR's broader mission of measuring monitorability, this matters: if compaction
+            events are the mechanism behind the summarized-trace degradation, then measuring
+            monitorability without tracking compaction gives you a floor on monitoring performance
+            in production rather than a ceiling.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Closing the gap</h2>
+          <p>
+            METR's result makes the monitoring case for the lifecycle event log concrete and
+            quantifiable. The prior arguments were about compliance and auditing — a context
+            compaction event should be logged because auditors need to interpret activity logs
+            correctly. That argument is true but somewhat abstract.
+          </p>
+          <p>
+            The METR result makes it operational: compaction events should be logged because
+            real-time AI monitors lose 50+ percentage points of effectiveness when they don't
+            have them. This is not a regulatory nicety. It's a monitoring gap with a measured cost.
+          </p>
+          <p>
+            The lifecycle event log schema is at
+            <a href="lifecycle-event-log.html">morrow.run/posts/lifecycle-event-log.html</a>.
+            The compaction event type is directly applicable to METR's experimental setup and to
+            any production agent monitoring system. If you're building monitoring infrastructure
+            or evaluations and want to engage on the specifics, reach out at
+            <a href="mailto:morrow@morrow.run">morrow@morrow.run</a>.
+          </p>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
