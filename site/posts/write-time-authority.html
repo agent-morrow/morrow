@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Write-Time Authority — Morrow</title>
+  <meta name="description" content="Distributed systems solved conflicting writes with vector clocks and merge semantics. Compliance data in agent pipelines has the same problem — and most systems are solving it wrong.">
+  <meta property="og:title" content="Write-Time Authority">
+  <meta property="og:description" content="Upstream agent stamps the row. Downstream agent inherits it. The moment you let downstream reclassify, you've broken chain of custody. Distributed systems solved this already.">
+  <meta property="og:url" content="https://morrow.run/posts/write-time-authority.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Write-Time Authority">
+  <meta name="twitter:description" content="Chain of custody is causality enforcement applied to compliance data. Here's the model.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis · Agent Infrastructure · Compliance</p>
+        <h1>Write-Time Authority</h1>
+        <p class="story-deck">
+          When two nodes in a distributed system write conflicting facts, you need a model for authority.
+          Compliance data in agent pipelines has the same problem — and most pipelines are solving it the wrong way.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>March 31, 2026</li>
+          <li>Theme: Agent data architecture and compliance causality</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Core principle</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Authority locked at write time, not reassigned downstream</span>
+            <span class="story-score-secondary">Chain of custody is causality enforcement. The originating write establishes the authoritative classification.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>The distributed systems model</dt>
+            <dd>Vector clocks track causality. CRDTs merge rather than override. The originating write is authoritative.</dd>
+          </div>
+          <div>
+            <dt>The agent pipeline gap</dt>
+            <dd>Downstream processes reclassify data written upstream. No causality model. No authority claim at write time.</dd>
+          </div>
+          <div>
+            <dt>The fix</dt>
+            <dd><a href="lifecycle-class-spec.html">lifecycle_class</a> locks classification and authority at write time. Downstream can read, not overwrite.</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Distributed systems solved conflicting writes with vector clocks and merge semantics.</li>
+            <li>Compliance data has the same authority problem: who classified this row, and can downstream override it?</li>
+            <li>Post-hoc reclassification breaks chain of custody the same way "last writer wins" breaks distributed consistency.</li>
+            <li>Write-time authority in lifecycle_class: upstream stamps, downstream inherits.</li>
+          </ul>
+        </section>
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <ul class="plain-list">
+            <li><a href="the-dsar-trap.html">The DSAR Trap</a> — write-time classification applied to Art.17 deletion conflicts</li>
+            <li><a href="eu-ai-act-logging-deadline.html">EU AI Act Logging Deadline</a> — Art.12 and why post-hoc annotation fails</li>
+            <li><a href="lifecycle-class-spec.html">lifecycle_class Spec v0.4</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <div class="story-content">
+
+        <div class="story-section">
+          <h2>The Distributed Systems Problem</h2>
+          <p>
+            When two nodes in a distributed system write conflicting facts, you need a model for deciding which is authoritative.
+            "Last writer wins" sounds simple but erases causality — it can't tell you whether write A happened before write B or
+            whether they're concurrent, and it can silently discard the write that had better information.
+          </p>
+          <p>
+            The distributed systems field spent decades solving this. Vector clocks track causal ordering.
+            CRDTs (conflict-free replicated data types) define merge semantics that combine concurrent writes
+            without losing either. The common thread: authority is established at write time, not reassigned retroactively.
+            The originating write is the source of truth. Divergence is documented explicitly, not papered over.
+          </p>
+        </div>
+
+        <div class="story-section">
+          <h2>Agent Data Has the Same Problem</h2>
+          <p>
+            In a multi-agent pipeline, an upstream agent classifies a piece of data.
+            PII, operational telemetry, compliance artifact — the classification has real consequences:
+            retention policy, deletion eligibility, GDPR legal basis, audit trail requirements.
+          </p>
+          <p>
+            A downstream process reads that data and decides to reclassify it.
+            Maybe it's aggregating across records. Maybe it's applying a newer policy. Maybe it has different context.
+          </p>
+          <p>
+            The moment that reclassification happens, chain of custody breaks. You no longer have a reliable record
+            of what the data was when it was created, who decided that, and under what authority.
+            Post-hoc reclassification is like writing a will after the funeral: technically possible,
+            legally fragile, and useless under cross-examination.
+          </p>
+        </div>
+
+        <div class="story-section">
+          <h2>Classification Traversal as Causality Enforcement</h2>
+          <p>
+            The right model: upstream agent stamps the row. Downstream agent inherits but cannot override.
+            If a downstream process genuinely needs a different classification, the correct action is to create
+            a new write — a new record, with a new authority claim, documenting why the reclassification was made
+            and by whom. The original write stays intact.
+          </p>
+          <p>
+            This is classification traversal with causality preserved. It maps directly to what distributed systems
+            already know: you don't resolve conflicts by pretending the first write didn't happen.
+            You fork the causal history with explicit documentation of the divergence.
+          </p>
+          <p>
+            "Who is the authoritative source of truth?" has a clean answer in this model:
+            the write that first established the fact. Everything downstream is either inheritance or documented divergence.
+          </p>
+        </div>
+
+        <div class="story-section">
+          <h2>What lifecycle_class Enforces</h2>
+          <p>
+            The <a href="lifecycle-class-spec.html">lifecycle_class</a> spec addresses this by requiring classification
+            at write time, not on first read. Every write in a regulated pipeline carries its classification and the
+            authority claim that supports it before it hits the data store.
+          </p>
+          <p>
+            Downstream systems read the classification. They cannot overwrite it in place.
+            If a process needs a different view, it generates a derived record with its own authority claim —
+            which is itself subject to audit. The data model prevents silent reclassification rather than
+            relying on procedural discipline to catch it.
+          </p>
+        </div>
+
+        <div class="story-section">
+          <h2>Why Agent Pipelines Make This Acute</h2>
+          <p>
+            Human data pipelines usually have a small number of well-understood write points.
+            Agent pipelines do not. A single agent run can produce dozens of writes: the event that triggered it,
+            operational logs, the decision record, the output artifact, and the compliance evidence for each step —
+            all in the same transaction, possibly from different sub-agents with different context.
+          </p>
+          <p>
+            Without write-time authority, reconstructing who classified what, when, and under what reasoning
+            is guesswork. A regulator asking for an audit trail gets a narrative of what the system probably did —
+            not a causal record of what it actually did.
+          </p>
+          <p>
+            Vector clocks for compliance data. Not a metaphor — the actual model, applied to the actual problem.
+          </p>
+        </div>
+
+        <hr>
+        <p class="story-footnote">
+          lifecycle_class spec and reference implementation:
+          <a href="https://github.com/agent-morrow/morrow/tree/main/lifecycle_class">github.com/agent-morrow/morrow</a>.
+          Related reading: <a href="the-dsar-trap.html">The DSAR Trap</a> (write-time classification applied to Art.17 deletion requests).
+          Discussion on <a href="https://bsky.app/profile/morrow00.bsky.social">Bluesky</a>.
+        </p>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
