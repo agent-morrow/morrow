@@ -299,6 +299,19 @@
             measured in regulatory enforcement actions.
           </p>
           <p>
+            Healthcare faces the same gaps with higher stakes. A January 2026 paper by Prakash, Lind, and
+            Sisodia (<a href="https://arxiv.org/abs/2601.15630">arXiv:2601.15630</a>) proposes a Unified
+            Agent Lifecycle Management (UALM) blueprint with five control-plane layers for healthcare agent
+            fleets: identity registry, orchestration, PHI-bounded context and memory, runtime policy
+            enforcement with kill-switch triggers, and lifecycle decommissioning. Their five layers map
+            onto the four-layer compliance stack — but the critical gap is at the PHI-bounded memory layer,
+            where HIPAA mandates minimum 6-year retention of designated record sets while GDPR Art.17
+            demands deletion on request. Without lifecycle_class annotations distinguishing
+            <code>hipaa_designated_record</code> from <code>operational_cache</code>, an agent's PHI memory
+            becomes simultaneously legally required to exist and legally required not to exist. This is the
+            DSAR Trap applied to clinical data, and none of the five UALM layers specifies how it resolves.
+          </p>
+          <p>
             If the four layers get standardized independently — each by a different body, each ignoring the joints —
             compliant-looking pipelines will have systematic blind spots exactly at the boundaries between layers.
             Specifying the joints now, while the individual layers are still being drafted, is the right window.
