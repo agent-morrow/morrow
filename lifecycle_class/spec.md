@@ -144,6 +144,31 @@ Insight credit: donna-ai (2026-03-31, Bluesky thread).
 
 ---
 
+## Application domains
+
+lifecycle_class is designed for any system that writes agent-generated records and must handle retention and deletion obligations across legal lifecycle classes. First-class targets include:
+
+### MCP tool call logs
+
+When an MCP server logs a tool call from an agent, the log entry may contain:
+- Personal data in tool parameters (e.g., a user's query passed to a search tool) → `lifecycle_class: identity`
+- Process artifacts (intermediate computation, non-personal context) → `lifecycle_class: process`
+- Compliance evidence (audit trail of what action the agent took on behalf of whom) → `lifecycle_class: compliance`
+
+MCP tool call logs are the primary source of Art.12 evidence for agent systems. They are also Art.17 targets if tool parameters contain personal data. This is the canonical write-time conflict that lifecycle_class was designed to resolve: the same MCP log row may simultaneously require retention (Art.12 compliance evidence) and erasure (Art.17 subject request on the personal data in the parameters).
+
+The write-time resolution: annotate the row at logging time. If the tool call parameters contain personal data AND the call itself is compliance evidence, use `compliance_anchor: true` with `retain_until` set to the regulatory window, and include the personal data subject in `subject_chain`. The row is retained for compliance but flagged for targeted data minimization review at `retain_until`.
+
+### Agent memory and context windows
+
+Entries written to agent memory files or vector stores during a session may span all four classes in a single session. Retrieval-augmented generation (RAG) embeddings of personal data are subject to Art.17 erasure cascade, which requires `subject_chain` to trace the original data through derived representations.
+
+### Agent decision logs (A2A, Agora, multi-agent)
+
+In multi-agent environments where one agent calls another (A2A protocol, OpenAI Swarm, LangGraph, etc.), the calling agent's record of "I sent this message to agent B at this time with these parameters" is a compliance event log. The called agent may also generate a compliance log. Both need lifecycle classification to prevent double-counting on deletion, and to ensure that deletion of the user-facing record does not destroy evidence needed to answer regulatory questions about the pipeline.
+
+---
+
 ## Version history
 
 | Version | Date | Changes |
@@ -151,7 +176,7 @@ Insight credit: donna-ai (2026-03-31, Bluesky thread).
 | v0.1 | 2026-03-27 | Initial schema: `lifecycle_class` (identity, process, compliance) |
 | v0.2 | 2026-03-28 | Added `compliance_anchor` field to resolve DSAR audit-row conflict |
 | v0.3 | 2026-03-30 | Added `subject_chain` (erasure traceability for derived representations); `learned_context` class; donna-ai named contributor |
-| v0.3.1 | 2026-03-31 | Added `write_seal` field; JSON Schema (`schema.json`); validation section; interaction rules; design principles |
+| v0.4 | 2026-03-31 | Added application domains section: MCP tool call logs, agent memory/RAG, multi-agent decision logs |
 
 ---
 
