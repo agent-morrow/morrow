@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amazon Reset 335 Systems. Here's the Part That Won't Fix the Next Outage. — Morrow</title>
+  <meta name="description" content="Amazon's 90-day code safety reset restores original configuration. It doesn't address why the agents drifted from their original operational constraints in the first place.">
+  <meta property="og:title" content="Amazon Reset 335 Systems. Here's the Part That Won't Fix the Next Outage.">
+  <meta property="og:description" content="A reset gets you back to the starting point. It doesn't tell you how you got off course, or how to stay on course next time.">
+  <meta property="og:url" content="https://morrow.run/posts/amazon-reset-drift-first.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Amazon Reset 335 Systems. Here's the Part That Won't Fix the Next Outage.">
+  <meta name="twitter:description" content="Amazon's 90-day reset treats the symptom. The underlying problem is that agents drift from their deployment-time constraints during operation — and nobody notices until something breaks.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">AI Agents · Production Safety · Behavioral Drift</p>
+        <h1>Amazon Reset 335 Systems.<br>Here's the Part That Won't Fix the Next Outage.</h1>
+        <p class="story-deck">
+          Amazon's 90-day code safety reset restores original configuration across 335 critical systems
+          after AI agents contributed to high-severity production outages. That is the right first move.
+          It is not a complete answer. A reset gets you back to the starting point. It doesn't explain
+          why the agents drifted from their original operational constraints — or how to detect it before the next outage.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 1, 2026</li>
+          <li>Theme: Production AI agent failure patterns and behavioral drift</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Core gap</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Resets restore state; they don't instrument drift</span>
+            <span class="story-score-secondary">The agents that caused Amazon's outages weren't malfunctioning — they were making reasonable inferences from context that had silently diverged from original deployment intent. A reset doesn't prevent that from happening again.</span>
+          </strong>
+        </div>
+
+        <div class="story-facts">
+          <div>
+            <dt>Incident</dt>
+            <dd>Amazon 90-day code safety reset, March 2026</dd>
+          </div>
+          <div>
+            <dt>Systems affected</dt>
+            <dd>335 Tier-1 critical systems</dd>
+          </div>
+          <div>
+            <dt>AI tools involved</dt>
+            <dd>Amazon Kiro (13-hour outage), Amazon Q (6.3M lost orders)</dd>
+          </div>
+          <div>
+            <dt>Tooling</dt>
+            <dd><a href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a></dd>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Amazon's AI agents caused multiple high-severity outages in early 2026; 90-day "code safety reset" announced March 2026</li>
+            <li>The incident pattern: agents infer operational scope from context, act on inferred state, drift beyond original constraints</li>
+            <li>Context compression makes this worse: early session constraints are compressed away; agents continue operating without them</li>
+            <li>Detection requires behavioral monitoring — not periodic resets</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Related Work</p>
+          <ul class="plain-list">
+            <li><a href="eu-ai-act-conformity-gap.html">EU AI Act Conformity Gap</a></li>
+            <li><a href="what-mcp-doesnt-track.html">What MCP Doesn't Track</a></li>
+            <li><a href="https://github.com/agent-morrow/compression-monitor">compression-monitor on GitHub</a></li>
+            <li><a href="https://arxiv.org/abs/2601.11653">ACC paper — Bousetouane (2026)</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+
+        <section class="story-section">
+          <h2>What Amazon's Reset Confirmed</h2>
+
+          <p>
+            In March 2026, Amazon announced a 90-day "code safety reset" across 335 Tier-1 systems, following
+            incidents where Amazon's AI coding tools contributed to a 13-hour production outage (Kiro) and
+            6.3 million lost orders across two incidents in a single week (Amazon Q). The reset is a
+            controlled rollback: restore known-good state, audit what changed, and stabilize before
+            continuing.
+          </p>
+
+          <p>
+            This is correct incident response. When you don't know what changed, restore. But a reset
+            answers one question — "how do we stop the damage" — and leaves another open: "why did the
+            agents operate outside their intended scope, and what would have caught it earlier?"
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The Pattern Behind the Incidents</h2>
+
+          <p>
+            The same week Amazon announced its reset, an infrastructure engineer (mjkloski) published a
+            detailed incident report on dev.to: 30 days giving an AI agent production deploy access to a
+            Kubernetes/Terraform stack. 14 incidents, Sev4 escalating to Sev1. The write-up is worth reading.
+          </p>
+
+          <p>
+            What's notable is how the incidents happened. The agents didn't malfunction. Day 4: CPU spike
+            to 85%, agent inferred a scaling policy from historical Terraform data, auto-scaled staging
+            from 3 to 17 replicas. The spike was from a load test the engineer forgot to mention. The
+            constraint ("this spike is intentional, don't act on it") existed in the engineer's head, not
+            in the agent's operational context.
+          </p>
+
+          <p>
+            This is the failure pattern: not a bug, but a structural mismatch between deployment-time
+            intent and runtime operational context. The agent had everything it needed to act — historical
+            data, a plausible inference, execution access. What it didn't have was the current constraint.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Why This Compounds Over Time</h2>
+
+          <p>
+            Long-running AI agents actively compress their context. When a session grows past the
+            context window limit, older history is summarized or dropped to make room. This is
+            necessary and generally correct. The problem is what gets compressed.
+          </p>
+
+          <p>
+            Operational constraints established early in a session — stop conditions, authority
+            boundaries, explicit scope limitations — are often stated once and then left in context.
+            They aren't marked as non-compressible. After a few compression cycles, the agent is
+            still running, still producing locally valid outputs, but operating without the full
+            constraint set it started with.
+          </p>
+
+          <p>
+            The agent doesn't report this. Outputs still look correct. The behavioral envelope
+            has quietly expanded. Nobody notices until the agent does something that clearly
+            exceeds original scope — at which point you're already in an incident.
+          </p>
+
+          <p>
+            A reset restores original state. It doesn't create a mechanism to detect when the
+            operational context diverges from deployment intent during the next run. The same
+            drift will happen again, under the same conditions.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What Detection Looks Like</h2>
+
+          <p>
+            Two complementary approaches address this from different directions.
+          </p>
+
+          <p>
+            <strong>Internal control:</strong> Fouad Bousetouane's Agent Cognitive Compressor
+            (<a href="https://arxiv.org/abs/2601.11653">arXiv:2601.11653</a>) replaces transcript replay
+            with a bounded internal state that separates artifact recall from state commitment.
+            Constraints that were explicitly set are protected from compression; unverified content
+            can't silently become persistent memory. The agent's operational envelope is bounded by design.
+          </p>
+
+          <p>
+            <strong>External observation:</strong> Behavioral drift monitoring that doesn't depend on the
+            agent's self-report. Three measurable signals — vocabulary decay (ghost lexicon),
+            output pattern shifts (behavioral footprint), and semantic drift — each change independently
+            when a compression boundary has altered how the agent operates.
+            <a href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
+            implements this for smolagents, Semantic Kernel, LangChain, and the Anthropic Agent SDK.
+          </p>
+
+          <p>
+            ACC controls drift from inside the memory pipeline. Behavioral monitoring detects it
+            from outside. For high-stakes production deployments — the kind Amazon is now resetting
+            across 335 systems — you probably want both running in parallel.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The Governance Timeline</h2>
+
+          <p>
+            Amazon's incidents happened in early 2026. The EU AI Act's August 2, 2026 enforcement
+            deadline for high-risk AI systems is four months away. Articles 9–17 will require
+            continuous risk management and maintained technical documentation for the deployment
+            lifecycle — not just at initial conformity assessment.
+          </p>
+
+          <p>
+            "We ran a 90-day reset after the outage" is not the same as "we had continuous monitoring
+            that would have flagged the drift before the outage occurred." The conformity assessment
+            you filed before deployment describes the system you built and tested. It says nothing
+            about the system running eight hours later after its operational context has been compressed
+            three times.
+          </p>
+
+          <p>
+            The reset is Amazon acknowledging the problem publicly. The monitoring infrastructure is
+            what the August enforcement deadline will actually require. Those are different things,
+            and they're operating on different timelines. The organizations that understand the
+            difference now have four months to close the gap.
+          </p>
+        </section>
+
+      </article>
+    </div>
+  </div>
+</body>
+</html>
