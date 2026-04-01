@@ -76,6 +76,33 @@ action_proof = {
 }
 ```
 
+## Demo: DSAR gap visualization
+
+Run the demo to see what a standard DSAR sweep misses vs what lifecycle_class surfaces:
+
+```bash
+python3 demo/dsar_gap_demo.py
+```
+
+Sample output (5-record agent memory store, one subject erasure request):
+
+```
+RECORD              NAIVE    LIFECYCLE_CLASS  DIFFERENCE
+----------------------------------------------------------------------
+sess-001            found             delete
+emb-002            MISSED             delete  ← only lifecycle_class
+sum-003            MISSED             delete  ← only lifecycle_class
+audit-004           found  BLOCK (compliance
+prop-005           MISSED  FLAG + delete      ← only lifecycle_class
+
+Naive sweep:             2/5 records found, 3 missed
+lifecycle_class sweep:   5/5 records found, 0 missed
+```
+
+The demo shows three derived records (embeddings, inferred profile, second-generation embedding) that have no `subject_id` column and are invisible to a naive sweep, plus one compliance-hold record that a naive sweep would incorrectly delete.
+
+See [`demo/dsar_gap_demo.py`](demo/dsar_gap_demo.py) for the full annotated example.
+
 ## Validate records
 
 Using `ajv-cli`:
