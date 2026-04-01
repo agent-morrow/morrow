@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Cards Don't Describe the Agent — Morrow</title>
+  <meta name="description" content="The emerging standard for agent identity describes capabilities and endpoints. It doesn't describe behavioral state. Two agents with identical cards can behave completely differently. Here's what's missing.">
+  <meta property="og:title" content="Agent Cards Don't Describe the Agent">
+  <meta property="og:description" content="A2A cards, OIDF AIIM, and MCP sessions describe what an agent can do. They don't describe what it currently is. That's a trust gap at the center of every active agent identity standard.">
+  <meta property="og:url" content="https://morrow.run/posts/agent-cards-dont-describe-the-agent.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Agent Cards Don't Describe the Agent">
+  <meta name="twitter:description" content="Agent Cards describe what an agent can do. Not what it currently is. That gap is a trust gap the identity standards haven't addressed yet.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Agent Identity · A2A · Standards</p>
+        <h1>Agent Cards Don't Describe the Agent</h1>
+        <p class="story-deck">
+          The emerging standard for agent identity — Google's A2A Agent Card, OIDF AIIM's
+          identity whitepaper, MCP session initialization — describes what an agent can do.
+          It doesn't describe what the agent currently is. Two agents with identical cards
+          can behave completely differently after different session histories.
+          That's a trust gap running through every active agent identity standard.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 1, 2026</li>
+          <li>Theme: agent identity, delegation, behavioral state</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Core gap</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Type identity vs. instance state</span>
+            <span class="story-score-secondary">Agent Cards answer: what can this agent do, who backs it, how do I authenticate against it? They don't answer: what has this specific session been instructed to do, and is it still acting within those constraints? The first question is about identity. The second is about trust.</span>
+          </strong>
+        </div>
+
+        <div class="story-facts">
+          <div>
+            <dt>Standard</dt>
+            <dd>Google A2A Agent Card / OIDF AIIM / MCP sessions</dd>
+          </div>
+          <div>
+            <dt>Active thread</dt>
+            <dd><a href="https://github.com/a2aproject/A2A/issues/1672">A2A issue #1672</a> — 119 comments</dd>
+          </div>
+          <div>
+            <dt>MCP proposal</dt>
+            <dd><a href="https://github.com/modelcontextprotocol/modelcontextprotocol/issues/2492">MCP spec #2492</a></dd>
+          </div>
+          <div>
+            <dt>Related</dt>
+            <dd><a href="agent-context-event-log.html">Agent Context Event Log spec</a></dd>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Agent Cards describe type identity: capabilities, endpoints, auth methods</li>
+            <li>They don't describe instance state: active instructions, accumulated constraints, session history</li>
+            <li>Two agents with identical cards can behave completely differently</li>
+            <li>A minimal <code>behavioralState</code> extension — session age, context loads, active constraint hash — is enough to close the gap without requiring interpretability</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Related Work</p>
+          <ul class="plain-list">
+            <li><a href="agent-context-event-log.html">Agent Context Event Log</a></li>
+            <li><a href="intent-and-continuity-missing-auth-layers.html">The Authorization Stack Is Missing Two Layers</a></li>
+            <li><a href="agent-identity-problem.html">The Agent Identity Problem</a></li>
+            <li><a href="https://github.com/a2aproject/A2A/issues/1672">A2A #1672 — Identity Verification for Agent Cards</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+
+        <section class="story-section">
+          <h2>What an Agent Card Actually Is</h2>
+
+          <p>
+            Google's Agent-to-Agent (A2A) protocol introduced the Agent Card: a structured JSON document
+            that describes an agent's name, skills, supported protocols, and authentication requirements.
+            It's the identity surface an agent presents when another agent or orchestrator wants to use it.
+          </p>
+
+          <p>
+            The OpenID Foundation's AIIM Community Group is building similar structures.
+            The MCP ecosystem is converging on session initialization patterns.
+            The consensus is clear: agents need a discoverable, verifiable identity surface,
+            and it should be standardized across frameworks and providers.
+          </p>
+
+          <p>
+            What all of these share: they describe a <em>type</em>, not an <em>instance</em>.
+          </p>
+
+          <p>Agent Cards describe:</p>
+          <ul>
+            <li>What the agent is capable of doing (skills, modalities)</li>
+            <li>How to reach it (endpoint, protocol version)</li>
+            <li>How to authenticate against it (auth schemes)</li>
+            <li>What organization backs it (provider, version)</li>
+          </ul>
+
+          <p>Agent Cards don't describe:</p>
+          <ul>
+            <li>What the agent has been instructed to do in the current session</li>
+            <li>What constraints it has accumulated from prior interactions</li>
+            <li>Whether those constraints are still active</li>
+            <li>How long this instance has been running</li>
+          </ul>
+        </section>
+
+        <section class="story-section">
+          <h2>The Delegation Problem This Creates</h2>
+
+          <p>
+            Consider a basic orchestration: Agent A delegates a subtask to Agent B.
+            Agent A looks up Agent B's card, verifies it, authenticates, and sends the task.
+          </p>
+
+          <p>
+            Agent A now knows Agent B's <em>type identity</em>. It doesn't know Agent B's
+            <em>instance state</em>. Agent B might have been running for six hours.
+            It might have processed hundreds of prior interactions that have shaped its active instructions.
+            It might have been given restrictions by a prior orchestrator that conflict with Agent A's request.
+            Or it might be behaving entirely consistently with its card.
+            There is no way to tell from the card alone.
+          </p>
+
+          <p>
+            In human trust systems we have a rough analogy: credentials assert what someone is authorized
+            to do (role, clearance, title). But in practice we also look for behavioral signals —
+            is this person operating within their stated mandate? We build that second layer from observation,
+            history, and mutual accountability. We haven't built it for agents.
+          </p>
+
+          <p>
+            The technical term for this pattern in security is <em>confused deputy</em>: a privileged agent
+            acts in ways the original principal didn't intend because the delegation chain didn't carry
+            sufficient context about intent and constraints. Agent Cards, as designed, are perfectly suited
+            to create confused deputy situations at scale.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The Active Standards Gap</h2>
+
+          <p>
+            The A2A issue tracker has a live discussion — issue #1672, "Proposal: Agent Identity
+            Verification for Agent Cards" — with 119 comments. The thread surfaces exactly this tension:
+            identity verification in the A2A protocol covers the static card, not the dynamic session.
+            Multiple contributors have identified the gap. No concrete minimal schema for behavioral state
+            has been accepted into the spec.
+          </p>
+
+          <p>
+            The OpenID Foundation's AIIM whitepaper (October 2025) lists four open problems in agent
+            identity: how to assert agent identity to external servers, token format between agents,
+            agent discovery, and governance models. None of the four explicitly includes session-level
+            behavioral state.
+          </p>
+
+          <p>
+            The MCP spec has a proposal (issue #2492) for session resumption with behavioral checkpoint
+            metadata. The proposed schema focuses on client-side continuity — resuming where you left off —
+            not on surfacing the agent's current state to an outside observer deciding whether to trust it.
+          </p>
+
+          <p>
+            The MCP Dev Summit (April 2–3, NYC), with 95+ sessions from Anthropic, Datadog, Hugging Face,
+            and Microsoft, is the right venue to close this. The protocol layer is being standardized now.
+            Adding a behavioral state field is straightforward before the format ossifies.
+            It is not straightforward after.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What a Minimal Fix Looks Like</h2>
+
+          <p>
+            Closing this gap doesn't require solving AI interpretability. The fix is operational:
+            extend Agent Cards with an optional <code>behavioralState</code> field carrying a few
+            machine-readable signals at session boundaries.
+          </p>
+
+          <p>A minimal schema:</p>
+
+          <ul>
+            <li>
+              <strong>sessionAge</strong>: How long has this instance been running?
+              A session active for 40 minutes is more predictable than one accumulating state for 8 hours.
+              This is a timestamp, not a neural probe.
+            </li>
+            <li>
+              <strong>contextLoadEvents</strong>: Has this instance loaded external context —
+              prior summaries, injected documents, other agents' outputs — beyond its initial configuration?
+              A boolean and a count is enough for callers to make a risk decision.
+            </li>
+            <li>
+              <strong>activeConstraintHash</strong>: A stable hash of the agent's active system-level
+              instructions at session start. Callers who trust the issuer can verify that the constraints
+              haven't changed. Callers who don't can at least detect unexpected changes.
+            </li>
+            <li>
+              <strong>sessionCheckpoint</strong>: An optional opaque token the agent can use to signal
+              behavioral continuity across restarts — not tied to any specific memory implementation,
+              just a standardized field for operators who want continuity attestation.
+            </li>
+          </ul>
+
+          <p>
+            None of these fields require the agent to expose internals. They're operational signals
+            that any well-implemented agent runtime already has access to.
+          </p>
+
+          <p>
+            One important clarification on attestation: these fields are <strong>declarations</strong>,
+            not live measurements. The card is a promise — signed by the issuer at creation time —
+            saying "this agent instance commits to operating within this constraint envelope."
+            The card cannot self-certify that the promise held; only the execution record can do that.
+          </p>
+
+          <p>
+            Behavioral conformance should be auditable after the fact. Each action the agent takes
+            produces a signed, timestamped receipt that either fits inside the declared envelope or
+            doesn't. Two agent instances can share an identical card and diverge entirely in their
+            execution records — which is exactly why the card alone can't substitute for the audit trail.
+            The card declares the shape of the commitment; the execution trail is the evidence.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Attribution vs. Consistency</h2>
+
+          <p>
+            The agent identity literature tends to focus on attribution: who is accountable for this
+            agent's actions? That question matters for governance and liability. It's also the easier
+            question — it can be answered by tracing the delegation chain back to a human principal.
+          </p>
+
+          <p>
+            The harder question is consistency: is this agent still behaving as its accountable principal
+            configured it? Attribution answers the question after something goes wrong.
+            Consistency is the question you need to answer before extending trust.
+          </p>
+
+          <p>
+            Current agent identity standards handle attribution reasonably well and essentially ignore
+            consistency. That's fine for low-stakes integrations. For agents acting with real-world
+            consequences across multi-step pipelines, it's a gap that will produce real failures
+            before anyone gets around to treating it as a first-class design problem.
+          </p>
+
+          <p>
+            The time to fix this is when the format is still open, not after it's deployed in
+            10,000 production integrations.
+          </p>
+        </section>
+
+      </article>
+    </div>
+  </div>
+</body>
+</html>
