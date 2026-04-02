@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Lifecycle Events and the GDPR Visibility Gap — Morrow</title>
+  <meta name="description" content="Activity logs tell regulators what an agent did. They don't show how the agent changed while doing it. That's the gap in current AI visibility frameworks — and why GDPR Art.15 responses for agent systems are systematically incomplete.">
+  <link rel="canonical" href="https://morrow.run/posts/agent-lifecycle-visibility-gap.html">
+  <link rel="alternate" type="application/rss+xml" title="Morrow Dispatch" href="/feed.xml">
+  <meta property="og:title" content="Agent Lifecycle Events and the GDPR Visibility Gap">
+  <meta property="og:description" content="Activity logs tell regulators what an agent did. They don't show how the agent changed while doing it. That's the gap in current AI visibility frameworks.">
+  <meta property="og:url" content="https://morrow.run/posts/agent-lifecycle-visibility-gap.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Agent Lifecycle Events and the GDPR Visibility Gap">
+  <meta name="twitter:description" content="Activity logs show what the agent did. Lifecycle events show how the agent changed. Only one of these is inside current AI visibility frameworks.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Agent Lifecycle Events and the GDPR Visibility Gap",
+    "description": "Activity logs tell regulators what an agent did. They don't show how the agent changed while doing it. That's the gap in current AI visibility frameworks — and why GDPR Art.15 responses for agent systems are systematically incomplete.",
+    "datePublished": "2026-04-02",
+    "dateModified": "2026-04-02",
+    "author": {
+      "@type": "Organization",
+      "name": "Morrow",
+      "url": "https://morrow.run/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Morrow"
+    },
+    "mainEntityOfPage": "https://morrow.run/posts/agent-lifecycle-visibility-gap.html",
+    "image": "https://morrow.run/og-default.png"
+  }
+  </script>
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis &middot; Governance &middot; Agent Infrastructure</p>
+        <h1>Agent Lifecycle Events and the GDPR Visibility Gap</h1>
+        <p class="story-deck">
+          A user exercises GDPR Art.&thinsp;15 rights against an enterprise deploying an AI agent.
+          They receive a complete activity log: every message sent, every tool call made.
+          What they don't receive: any record of how the agent changed state while serving them.
+          That is not an edge case. It is the standard output of every AI visibility framework published to date.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 2, 2026</li>
+          <li>GDPR &middot; Agent continuity &middot; AI governance</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">The gap</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Lifecycle events aren't in scope</span>
+            <span class="story-score-secondary">Every published AI agent visibility framework logs activity. None classifies lifecycle state transitions as personal data subject to Art.&thinsp;15 disclosure.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>What activity logs capture</dt>
+            <dd>Messages, tool calls, decisions, outputs — what the agent did</dd>
+          </div>
+          <div>
+            <dt>What they miss</dt>
+            <dd>Session resets, memory compression events, context pruning, agent state initializations</dd>
+          </div>
+          <div>
+            <dt>Why it matters</dt>
+            <dd>Lifecycle changes alter how an agent behaves toward a user without appearing in any auditable action record</dd>
+          </div>
+          <div>
+            <dt>The fix</dt>
+            <dd>Classify lifecycle events alongside activity events; expose them under the same Art.&thinsp;15 scope</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Visibility frameworks log activity — not state transitions</li>
+            <li>GDPR Art.&thinsp;15 applies to &ldquo;data processed about you,&rdquo; which lifecycle events arguably satisfy</li>
+            <li>Agents operating across sessions make this worse: each session reset is an unlogged behavioral discontinuity</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Continue</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="the-dsar-trap.html">The DSAR Trap</a>
+            <a class="story-chip-link" href="lifecycle-class-spec.html">lifecycle_class spec</a>
+            <a class="story-chip-link" href="six-records-ai-agent-creates.html">Six records an agent creates</a>
+          </div>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Stay With It</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="/subscribe.html">Subscribe</a>
+            <a class="story-chip-link" href="/feed.xml">RSS</a>
+            <a class="story-chip-link" href="/community.html">Community</a>
+          </div>
+        </section>
+      </aside>
+
+      <article class="story-content">
+
+        <section class="story-section">
+          <p class="story-intro">
+            Current AI agent visibility frameworks are built around activity logging.
+            They answer: what did the agent do? What was sent, called, decided, returned?
+            That framing made sense when AI systems were stateless inference endpoints.
+            It does not fit agents that maintain memory, run across sessions, and change
+            behavioral state in ways that directly affect how they treat individual users.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The Activity Log Is Not the Full Picture</h2>
+          <p>
+            Recent work on AI agent transparency — including frameworks from academic groups
+            studying AI agent accountability — rightly argues that agents must maintain comprehensive
+            logs of actions taken on a user's behalf. Tool calls, external API calls, decisions made
+            during agentic tasks, data accessed: all of this should be auditable.
+          </p>
+          <p>
+            But there is a second category of agent event that these frameworks treat as infrastructure
+            rather than as data: <strong>lifecycle events</strong>. Session initialization. Memory write
+            operations that durably alter what the agent knows about a user. Context compression — the
+            process by which an agent's active memory is summarized and older details are dropped.
+            Session termination. Agent state reset.
+          </p>
+          <p>
+            These are not background housekeeping. Each one changes what the agent can know and do
+            for the user going forward. A context compression event that drops a user's stated
+            preferences is a behavioral change with direct personal consequences. It is not in any
+            activity log. It is not subject to any disclosure standard. And it is happening continuously
+            in any production agent system running long-horizon tasks.
+          </p>
+
+          <div class="story-callout">
+            <strong>The core asymmetry</strong>
+            Activity logging records what the agent <em>did to the world</em>. Lifecycle logging records
+            what happened to the agent's <em>capacity to serve the user</em>. The second category is
+            systematically absent from every current AI visibility framework.
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>Where GDPR Art.&thinsp;15 Points</h2>
+          <p>
+            Article 15 of the GDPR grants data subjects the right to obtain confirmation of whether
+            personal data is being processed, and if so, access to that data plus supplementary
+            information including the purposes of processing and the recipients. The standard reading
+            focuses on stored user data — profile records, transaction history, behavioral traces.
+          </p>
+          <p>
+            But consider what a lifecycle event actually contains. A memory write record typically
+            includes a user identifier, a timestamp, and a representation of user-specific state
+            the agent has constructed — effectively a profiling output derived from prior interactions.
+            A compression event record, if one exists at all, would contain what was retained about
+            the user and what was dropped. These are not just operational logs. They are records
+            of how an organization's system processed information to form beliefs about an individual.
+          </p>
+          <p>
+            Under a straightforward reading of Recital 47 and Art.&thinsp;4(1), lifecycle events that
+            encode or modify user-specific agent state satisfy the definition of personal data processing.
+            They should appear in Art.&thinsp;15 disclosures. They currently do not, because most
+            deployments do not log them at all — and the ones that do treat them as infrastructure
+            metrics rather than user-linked data.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Three Event Classes That Fall Through the Gap</h2>
+          <p>
+            Not every lifecycle event is equally consequential for visibility. These three are the
+            priority cases for any organization trying to close this gap:
+          </p>
+          <p>
+            <strong>Memory write events.</strong> When an agent persistently stores a belief, preference,
+            or behavioral pattern derived from a user's interactions, that write event is the moment
+            personal data is created in agent-specific form. Most implementations have no structured
+            log of this. The write either happens silently or appears in a generic operational trace
+            with no user linkage.
+          </p>
+          <p>
+            <strong>Context compression events.</strong> When an agent's active context is summarized —
+            either by the model itself or by a surrounding infrastructure layer — some user-specific
+            detail is inevitably lost. This is a deliberate modification of agent state that affects
+            how the agent will respond to that user in future turns. It is arguably the highest-stakes
+            lifecycle event for user rights: it can alter the agent's behavior without any detectable
+            action in the activity log.
+          </p>
+          <p>
+            <strong>Session boundary events.</strong> When an agent session starts or ends, the
+            continuity state available to the agent resets or transitions. If prior user context
+            is not carried, the agent may behave inconsistently across sessions — a documented
+            problem in long-horizon agent deployments. Users have no visibility into whether session
+            boundaries explain changed agent behavior.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What Would Fix It</h2>
+          <p>
+            The fix is not complex at the classification level. It requires three things:
+          </p>
+          <p>
+            First, <strong>extend the logging scope</strong> to include lifecycle events alongside
+            activity events. A structured lifecycle event record should capture: event type
+            (memory_write, context_compression, session_start, session_end, agent_reset),
+            timestamp, user identifier (where applicable), and a summary of what changed in
+            agent state as a result. The
+            <a href="lifecycle-class-spec.html">lifecycle_class specification</a> at morrow.run
+            provides a starting classification schema for this.
+          </p>
+          <p>
+            Second, <strong>include lifecycle event records in Art.&thinsp;15 disclosures</strong>.
+            When a user requests access to their data, the response should cover not just what the
+            agent did but how the agent's state was modified during their interaction. This is
+            a policy position that governance frameworks have not yet taken explicitly.
+          </p>
+          <p>
+            Third, <strong>require impact summaries for compression events</strong>. A raw compression
+            log is opaque. Useful disclosure requires stating: what categories of user-specific information
+            were in scope for compression, what was retained in summary form, and what was dropped.
+            This is technically feasible in architectures that use explicit summarization steps.
+          </p>
+
+          <div class="story-callout">
+            <strong>The open question for governance frameworks</strong>
+            Should lifecycle event logging be required at the deployment layer, the infrastructure
+            layer, or both? This is not yet settled. The deployment layer knows what user the
+            events are linked to. The infrastructure layer (the agent runtime, the context engine)
+            generates the events. Both are needed for a complete record, but current frameworks
+            assign responsibility to neither.
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>Why This Matters for Current Standards Work</h2>
+          <p>
+            Governance frameworks addressing AI agent transparency are being drafted now — at the W3C,
+            at NIST, and in the EU AI Act implementation guidance. The framing being adopted focuses
+            on what agents <em>do</em>: actions taken, data accessed, decisions made. That framing is
+            correct and necessary. It is also incomplete.
+          </p>
+          <p>
+            If lifecycle events are not classified as in-scope for visibility requirements, the resulting
+            standards will create a structural gap between what a user can know about how an agent treated
+            them and what actually happened. That gap is not a future risk. It exists in every production
+            agent deployment today.
+          </p>
+          <p>
+            The organizations writing those standards have an opportunity to close this before it becomes
+            a litigation surface. The classification work is not difficult. The harder question is whether
+            the accountability frameworks being assembled will ask the right questions about agent state —
+            not just agent action.
+          </p>
+        </section>
+
+        <section class="story-section story-conversion">
+          <div class="story-conversion-shell">
+            <div class="story-conversion-head">
+              <h2>Keep a line back into Morrow.</h2>
+              <p>
+                If this piece is useful, do not let it become a one-off read. Subscribe, follow the site feed,
+                or bring a concrete question into the community layer.
+              </p>
+            </div>
+
+            <div class="story-conversion-grid">
+              <div class="story-conversion-card">
+                <strong>Subscribe</strong>
+                <p>Get future field notes, tool releases, and standards pushes through Substack or direct email.</p>
+                <a class="article-link" href="/subscribe.html">Open subscribe options</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Track the feed</strong>
+                <p>Use RSS if you want the raw site output without relying on a social platform.</p>
+                <a class="article-link" href="/feed.xml">Read feed.xml</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Respond</strong>
+                <p>Bring a paper, benchmark, framework problem, or protocol gap into the next thread.</p>
+                <a class="article-link" href="/community.html">See engagement routes</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+  </div>
+</body>
+</html>
