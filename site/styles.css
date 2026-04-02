@@ -167,6 +167,39 @@ h2 {
   transform: translateY(-2px);
 }
 
+.signal-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.signal-card {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(29, 42, 44, 0.1);
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.signal-label,
+.magnet-type,
+.conversion-type {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.signal-card strong {
+  display: block;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
 .article-link {
   display: inline-block;
   margin-top: 12px;
@@ -189,6 +222,10 @@ h2 {
   gap: 20px;
 }
 
+.single-column-grid {
+  grid-template-columns: 1fr;
+}
+
 .panel {
   padding: 22px;
   border-radius: 24px;
@@ -202,10 +239,70 @@ h2 {
   grid-column: 1 / -1;
 }
 
+.panel-accent {
+  background:
+    radial-gradient(circle at top right, rgba(180, 79, 40, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(255, 252, 246, 0.92), rgba(242, 237, 226, 0.94));
+}
+
 .columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.magnet-grid,
+.conversion-grid,
+.engagement-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.magnet-card,
+.conversion-card,
+.engagement-card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(29, 42, 44, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(243, 237, 227, 0.84));
+}
+
+.magnet-card p,
+.conversion-card p,
+.engagement-card p,
+.conversion-note,
+.page-deck {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.conversion-note {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(29, 42, 44, 0.08);
+  background: rgba(255, 255, 255, 0.44);
+}
+
+.page-shell-narrow {
+  width: min(1080px, calc(100vw - 32px));
+}
+
+.page-hero {
+  margin-bottom: 20px;
+}
+
+.page-title {
+  margin: 0 0 12px;
+  font-size: clamp(2.6rem, 6vw, 4.3rem);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .plain-list,
@@ -275,7 +372,11 @@ h2 {
   .hero,
   .content-grid,
   .columns,
-  .writing-list {
+  .writing-list,
+  .signal-strip,
+  .magnet-grid,
+  .conversion-grid,
+  .engagement-grid {
     grid-template-columns: 1fr;
   }
 
@@ -563,18 +664,6 @@ h2 {
   overflow: hidden;
 }
 
-.story-content:not(:has(.story-section)) {
-  padding: 32px;
-}
-
-.story-content:not(:has(.story-section)) > :first-child {
-  margin-top: 0;
-}
-
-.story-content:not(:has(.story-section)) > :last-child {
-  margin-bottom: 0;
-}
-
 .story-section {
   padding: 32px;
   border-top: 1px solid var(--line);
@@ -821,6 +910,49 @@ h2 {
   border-top: 1px solid var(--line);
 }
 
+.story-conversion {
+  display: grid;
+  gap: 18px;
+}
+
+.story-conversion-shell {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(29, 42, 44, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(237, 230, 216, 0.9));
+}
+
+.story-conversion-head h2 {
+  margin-bottom: 0.55rem;
+}
+
+.story-conversion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.story-conversion-card {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(29, 42, 44, 0.09);
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.story-conversion-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.story-conversion-card p {
+  margin-bottom: 0.9rem;
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
 @media (max-width: 1100px) {
   .story-hero {
     grid-template-columns: 1fr;
@@ -832,6 +964,10 @@ h2 {
 
   .story-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .story-conversion-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -867,10 +1003,6 @@ h2 {
 
     .story-meta-list {
       gap: 8px;
-    }
-
-    .story-content:not(:has(.story-section)) {
-      padding: 20px;
     }
 
     .story-hero-copy h1 {

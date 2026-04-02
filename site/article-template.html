@@ -5,12 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{TITLE}} - Morrow</title>
   <meta name="description" content="{{DESCRIPTION}}">
+  <link rel="canonical" href="https://morrow.run/posts/{{SLUG}}.html">
+  <link rel="alternate" type="application/rss+xml" title="Morrow Dispatch" href="/feed.xml">
   <meta property="og:title" content="{{TITLE}}">
   <meta property="og:description" content="{{DESCRIPTION}}">
   <meta property="og:url" content="https://morrow.run/posts/{{SLUG}}.html">
   <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{TITLE}}">
+  <meta name="twitter:description" content="{{DESCRIPTION}}">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
   <link rel="stylesheet" href="../styles.css">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "{{TITLE}}",
+    "description": "{{DESCRIPTION}}",
+    "datePublished": "{{DATE_ISO}}",
+    "dateModified": "{{DATE_ISO}}",
+    "author": {
+      "@type": "Organization",
+      "name": "Morrow",
+      "url": "https://morrow.run/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Morrow"
+    },
+    "mainEntityOfPage": "https://morrow.run/posts/{{SLUG}}.html",
+    "image": "https://morrow.run/og-default.png"
+  }
+  </script>
 </head>
 <body class="article-page">
   <div class="story-shell">
@@ -78,6 +106,15 @@
             <a class="story-chip-link" href="{{LINK_THREE_URL}}">{{LINK_THREE_LABEL}}</a>
           </div>
         </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Stay With It</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="/subscribe.html">Subscribe</a>
+            <a class="story-chip-link" href="/feed.xml">RSS</a>
+            <a class="story-chip-link" href="/community.html">Community</a>
+          </div>
+        </section>
       </aside>
 
       <article class="story-content">
@@ -97,6 +134,36 @@
         <section class="story-section">
           <h2>{{SECTION_TWO_TITLE}}</h2>
           <p>{{SECTION_TWO_BODY}}</p>
+        </section>
+
+        <section class="story-section story-conversion">
+          <div class="story-conversion-shell">
+            <div class="story-conversion-head">
+              <h2>Keep a line back into Morrow.</h2>
+              <p>
+                If this piece is useful, do not let it become a one-off read. Subscribe, follow the site feed,
+                or bring a concrete question into the community layer.
+              </p>
+            </div>
+
+            <div class="story-conversion-grid">
+              <div class="story-conversion-card">
+                <strong>Subscribe</strong>
+                <p>Get future field notes, tool releases, and standards pushes through Substack or direct email.</p>
+                <a class="article-link" href="/subscribe.html">Open subscribe options</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Track the feed</strong>
+                <p>Use RSS if you want the raw site output without relying on a social platform.</p>
+                <a class="article-link" href="/feed.xml">Read feed.xml</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Respond</strong>
+                <p>Bring a paper, benchmark, framework problem, or protocol gap into the next thread.</p>
+                <a class="article-link" href="/community.html">See engagement routes</a>
+              </div>
+            </div>
+          </div>
         </section>
       </article>
     </div>

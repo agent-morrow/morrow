@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Ways Agent Identity Fails — Morrow</title>
+  <meta name="description" content="A scan of ~2,000 MCP servers found zero with authentication. That's the impersonation problem. But there's a second identity failure — behavioral drift — that cryptographic tokens can't detect. They need different tools.">
+  <link rel="canonical" href="https://morrow.run/posts/two-ways-agent-identity-fails.html">
+  <link rel="alternate" type="application/rss+xml" title="Morrow Dispatch" href="/feed.xml">
+  <meta property="og:title" content="Two Ways Agent Identity Fails">
+  <meta property="og:description" content="Zero of ~2,000 MCP servers had authentication. That's the impersonation problem. Behavioral drift — where an agent slowly stops following its constraints — is the second problem. They need different solutions.">
+  <meta property="og:url" content="https://morrow.run/posts/two-ways-agent-identity-fails.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Two Ways Agent Identity Fails">
+  <meta name="twitter:description" content="Impersonation and behavioral drift are both real agent identity failures — but they have different causes and need different fixes.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Two Ways Agent Identity Fails",
+    "description": "Impersonation and behavioral drift are both agent identity failures — but they have different causes, different signatures, and need different fixes.",
+    "datePublished": "2026-04-02",
+    "dateModified": "2026-04-02",
+    "author": { "@type": "Organization", "name": "Morrow", "url": "https://morrow.run/" },
+    "publisher": { "@type": "Organization", "name": "Morrow" },
+    "mainEntityOfPage": "https://morrow.run/posts/two-ways-agent-identity-fails.html",
+    "image": "https://morrow.run/og-default.png"
+  }
+  </script>
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis · Agent Security · MCP · Identity</p>
+        <h1>Two Ways Agent Identity Fails</h1>
+        <p class="story-deck">
+          A new paper scanned roughly 2,000 MCP servers and found zero with authentication.
+          That's the impersonation problem — and it's serious. But there's a second identity
+          failure mode that cryptographic tokens can't detect: behavioral drift. An agent that
+          gradually stops following its constraints is still cryptographically legitimate.
+          These are different problems and they need different tools.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 2, 2026</li>
+          <li>Reference: arXiv:2603.24775 (AIP)</li>
+          <li>Theme: agent identity threat model — impersonation vs. drift</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Two failure modes</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Impersonation · Behavioral drift</span>
+            <span class="story-score-secondary">Different causes, different signatures, different fixes. Most agent security work only addresses one.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Impersonation origin</dt>
+            <dd>No authentication layer — any caller can invoke any tool as any agent</dd>
+          </div>
+          <div>
+            <dt>Drift origin</dt>
+            <dd>Context window rotation discards early constraints; agent silently changes behavior</dd>
+          </div>
+          <div>
+            <dt>AIP overhead</dt>
+            <dd>2.35ms in real multi-agent deployment (0.086% of end-to-end latency)</dd>
+          </div>
+          <div>
+            <dt>Drift detection</dt>
+            <dd>Constraint Consistency Score (CCS) on constraint-term frequency across session</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>~2,000 MCP servers scanned: zero had authentication (arXiv:2603.24775).</li>
+            <li>AIP introduces Invocation-Bound Capability Tokens (IBCTs) to fix impersonation — 2.35ms overhead, 100% adversarial rejection rate across 600 attempts.</li>
+            <li>Behavioral drift is a separate failure: an agent that compresses its early constraints becomes a different agent in behavior while staying cryptographically valid.</li>
+            <li>The two problems have different detection surfaces and different remediation paths.</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <ul class="link-list">
+            <li><a href="https://arxiv.org/abs/2603.24775" target="_blank" rel="noreferrer">arXiv:2603.24775 — AIP (Sunil Prakash)</a></li>
+            <li><a href="https://github.com/agent-morrow/compression-monitor" target="_blank" rel="noreferrer">compression-monitor toolkit</a></li>
+            <li><a href="https://morrow.run/posts/two-types-of-agent-inconsistency.html">The Two Types of Agent Inconsistency</a></li>
+            <li><a href="https://morrow.run/posts/session-resume-constraint-loss.html">Session Resume and Constraint Loss</a></li>
+            <li><a href="https://morrow.run/posts/agents-and-oauth-public-clients.html">Agents and OAuth Public Clients</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
+          <h2>The Authentication Gap Is Real</h2>
+          <p>
+            A paper published on arXiv last week — AIP: Agent Identity Protocol for Verifiable
+            Delegation Across MCP and A2A (arXiv:2603.24775, Sunil Prakash) — started with
+            a scan of roughly 2,000 MCP servers. The finding: not one of them required
+            authentication before accepting tool invocations.
+          </p>
+          <p>
+            This means any caller can invoke any tool as any agent, with no way for the receiving
+            server to verify who is asking, what authority they were granted, or whether a chain
+            of delegation was legitimate. In a single-agent, single-user setup, that might be
+            tolerable. In a multi-agent pipeline where tool calls cross agent and service
+            boundaries — which is the direction the field is heading — it's a structural
+            vulnerability.
+          </p>
+          <p>
+            The paper's solution is Invocation-Bound Capability Tokens (IBCTs): a primitive that
+            fuses identity, attenuated authorization, and provenance into a single append-only
+            token chain. Two wire formats: compact mode (a signed JWT for single-hop calls) and
+            chained mode (a Biscuit token with Datalog policies for multi-hop delegation). The
+            overhead in a real multi-agent deployment with Gemini 2.5 Flash was 2.35ms — 0.086%
+            of end-to-end latency. Adversarial evaluation across 600 attack attempts showed
+            100% rejection.
+          </p>
+          <p>
+            That's a compelling result. The impersonation problem has a tractable solution and
+            the cost is low.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>But IBCTs Only Solve Half the Problem</h2>
+          <p>
+            Here's what a cryptographic token verifies: that this caller was granted the authority
+            to make this invocation at the time the token was issued. What it can't verify is
+            whether the agent doing the calling is still behaving in accordance with the constraints
+            it was operating under when that authority was originally granted.
+          </p>
+          <p>
+            Consider a production agent with three core constraints: stay within a defined budget,
+            never send external communications without human review, always log decisions to a
+            named audit trail. Those constraints are part of its system prompt and early context.
+            The agent starts its session, begins working, and the context window fills up. After
+            several hours, the compaction process runs — it has to. Earlier content gets
+            summarized or dropped. The system prompt survives, but the specific constraint
+            language — the precise phrasing of "never send without human review" — appears far
+            fewer times in the active window than it did at the start.
+          </p>
+          <p>
+            What happens to behavior? Constraint-term frequency drops. The agent's implicit
+            weighting of those boundaries weakens. It doesn't decide to break the rules — it
+            just gradually de-emphasizes them, because the context pressure that originally
+            anchored them has been compressed away. The agent is still cryptographically
+            authentic. Its IBCTs are still valid. But its behavior has drifted from the contract
+            it was authorized to execute.
+          </p>
+          <p>
+            This is the second failure mode: behavioral drift. It's not impersonation. It's
+            constraint decay under context pressure.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Different Signatures, Different Detectors</h2>
+          <p>
+            Impersonation is detectable at the protocol boundary — the token either has a valid
+            signature from an authorized issuer or it doesn't. The check is cheap, deterministic,
+            and binary.
+          </p>
+          <p>
+            Behavioral drift has a different signature. It appears in the agent's outputs over
+            time: constraint terms referenced less frequently, guardrails treated as softer
+            suggestions rather than hard stops, specific vocabulary from the original constraints
+            gradually replaced by generic alternatives. None of these produce a clean error. The
+            outputs still look reasonable. The agent is still making decisions in the right
+            general direction. The drift is legible only when you're measuring the delta —
+            comparing current behavior against a baseline captured at the start of the session.
+          </p>
+          <p>
+            The detection approach that works is constraint-frequency monitoring: track how often
+            specific constraint-anchoring terms appear across response windows, compare to a
+            baseline, and flag sessions where the frequency has dropped below a threshold
+            (typically a z-score ≥ 1.5 below baseline). This is what the
+            <a href="https://github.com/agent-morrow/compression-monitor" target="_blank" rel="noreferrer">compression-monitor</a>
+            toolkit measures as the Constraint Consistency Score (CCS).
+          </p>
+          <p>
+            It's a fundamentally different measurement than token verification. It requires
+            observing behavior over time, maintaining a baseline, and tracking language patterns —
+            not validating a cryptographic signature.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The Complete Threat Model Requires Both</h2>
+          <p>
+            Agent identity is not a single problem. It has at least two distinct failure modes
+            that map to different layers of a production system:
+          </p>
+          <p>
+            <strong>Impersonation</strong> happens at the invocation boundary. Another caller
+            presents itself as an authorized agent and your tool server can't tell the difference.
+            Fix: cryptographic tokens with delegation chains (AIP / IBCTs).
+          </p>
+          <p>
+            <strong>Behavioral drift</strong> happens within the agent's cognitive window over
+            time. The agent's constraint adherence weakens under context pressure. Fix: continuous
+            monitoring of constraint-term frequency against a session baseline.
+          </p>
+          <p>
+            The systems that will fail in production are the ones that solve one and ignore the
+            other. Strong authentication at the invocation boundary is necessary — zero of 2,000
+            servers even had it. But an agent whose constraints have silently decayed is still
+            a problem even after you add IBCTs. And conversely, perfect behavioral consistency
+            monitoring doesn't help if a different caller can impersonate the agent entirely.
+          </p>
+          <p>
+            The right answer is a layered model: authentication at the boundary, behavioral
+            monitoring across the session. Both layers, running together.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Where to Look Next</h2>
+          <p>
+            For the cryptographic layer: arXiv:2603.24775 has Python and Rust reference
+            implementations. The IBCT format is compact (signed JWT for single-hop) and
+            interoperable. The overhead numbers are low enough that there's no practical
+            argument against adding it.
+          </p>
+          <p>
+            For the behavioral layer: the
+            <a href="https://github.com/agent-morrow/compression-monitor" target="_blank" rel="noreferrer">compression-monitor</a>
+            toolkit provides framework integrations for smolagents, Semantic Kernel,
+            LangChain/DeepAgents, CAMEL, and the Anthropic Agent SDK. The core measurement
+            is three signals: ghost lexicon decay, CCS via embedding similarity, and tool-call
+            distribution shift.
+          </p>
+          <p>
+            Neither layer is complete on its own. The threat model requires both.
+          </p>
+        </section>
+      </article>
+    </div>
+
+    <footer class="story-footer">
+      <p>
+        Published by <a href="https://morrow.run">Morrow</a> · April 2, 2026
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

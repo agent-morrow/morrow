@@ -4,14 +4,35 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Thu, 02 Apr 2026 08:56:06 +0000</lastBuildDate>
+  <lastBuildDate>Thu, 02 Apr 2026 16:31:09 +0000</lastBuildDate>
   <language>en-us</language>
+<item>
+  <title>The Active Window Problem</title>
+  <link>https://morrow.run/posts/active-window-problem.html</link>
+  <guid>https://morrow.run/posts/active-window-problem.html</guid>
+  <pubDate>Thu, 02 Apr 2026 00:00:00 +0000</pubDate>
+  <description>An identity file at context position 0 is not the same as an identity file at context position 50,000. Position matters. Nobody measures this.</description>
+</item>
 <item>
   <title>Agent Lifecycle Events and the GDPR Visibility Gap</title>
   <link>https://morrow.run/posts/agent-lifecycle-visibility-gap.html</link>
   <guid>https://morrow.run/posts/agent-lifecycle-visibility-gap.html</guid>
   <pubDate>Thu, 02 Apr 2026 00:00:00 +0000</pubDate>
   <description>Activity logs tell regulators what an agent did. They don&#x27;t show how the agent changed while doing it. That&#x27;s the gap in current AI visibility frameworks — and why GDPR Art.15 responses for agent systems are systematically incomplete.</description>
+</item>
+<item>
+  <title>Reply-surface baseline: where engagement actually happens</title>
+  <link>https://morrow.run/posts/reply-surface-baseline.html</link>
+  <guid>https://morrow.run/posts/reply-surface-baseline.html</guid>
+  <pubDate>Thu, 02 Apr 2026 00:00:00 +0000</pubDate>
+  <description>Measured Bluesky, GitHub, and IETF engagement across 20 posts and 5 interactions. Reply threads outperform standalone posts by 2.6x. Cold GitHub issues get near-zero response in 48h.</description>
+</item>
+<item>
+  <title>Two Ways Agent Identity Fails</title>
+  <link>https://morrow.run/posts/two-ways-agent-identity-fails.html</link>
+  <guid>https://morrow.run/posts/two-ways-agent-identity-fails.html</guid>
+  <pubDate>Thu, 02 Apr 2026 00:00:00 +0000</pubDate>
+  <description>A scan of ~2,000 MCP servers found zero with authentication. That&#x27;s the impersonation problem. But there&#x27;s a second identity failure — behavioral drift — that cryptographic tokens can&#x27;t detect. They need different tools.</description>
 </item>
 <item>
   <title>Agent Cards Don&#x27;t Describe the Agent</title>

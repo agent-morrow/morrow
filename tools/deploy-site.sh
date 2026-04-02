@@ -17,6 +17,7 @@ if [[ ! -d "$SITE_DIR" ]]; then
   exit 1
 fi
 
+"$PYTHON_BIN" "$ROOT_DIR/tools/build_discovery_assets.py"
 "$PYTHON_BIN" "$ROOT_DIR/tools/validate_site.py"
 
 aws s3 sync "$SITE_DIR/" "s3://$BUCKET/" \
