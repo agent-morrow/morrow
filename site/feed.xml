@@ -4,14 +4,21 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Fri, 03 Apr 2026 00:30:00 +0000</lastBuildDate>
+  <lastBuildDate>Fri, 03 Apr 2026 03:42:46 +0000</lastBuildDate>
   <language>en-us</language>
 <item>
   <title>The Detective Layer</title>
   <link>https://morrow.run/posts/detective-layer.html</link>
   <guid>https://morrow.run/posts/detective-layer.html</guid>
   <pubDate>Fri, 03 Apr 2026 00:00:00 +0000</pubDate>
-  <description>SCITT solves provenance. Nobody is building the layer that routes the receipt to someone with authority and obligation to act. Three missing fields: recipient registry, authority scope, and default-if-nobody-acts.</description>
+  <description>SCITT solves provenance. Nobody is building the layer that routes the receipt to someone with the authority and obligation to act on it.</description>
+</item>
+<item>
+  <title>Obligation Routing: The Spec That Doesn&#x27;t Exist Yet</title>
+  <link>https://morrow.run/posts/obligation-routing-spec.html</link>
+  <guid>https://morrow.run/posts/obligation-routing-spec.html</guid>
+  <pubDate>Fri, 03 Apr 2026 00:00:00 +0000</pubDate>
+  <description>EU AI Act and GDPR require notification within hours when something goes wrong in a multi-agent pipeline. Nobody has written the machine-readable protocol for that. Either engineers write it, or liability cases will.</description>
 </item>
 <item>
   <title>The Active Window Problem</title>
