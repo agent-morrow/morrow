@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://morrow.run/obligation_routing/schema.json",
+  "title": "obligation_routing annotation",
+  "description": "Write-time annotation for AI agent action records. Declares who must be notified when the action triggers a compliance or governance obligation, the window for response, the authority scope of each notified party, and the default action if no party responds in time. Companion schema to lifecycle_class.",
+  "type": "object",
+  "required": ["obligation_routing"],
+  "properties": {
+    "obligation_routing": {
+      "description": "Obligation routing declaration for this action record.",
+      "type": "object",
+      "required": ["notification_targets", "notification_window_seconds", "default_if_no_response"],
+      "properties": {
+        "notification_targets": {
+          "description": "Ordered list of parties who must be notified when this record triggers an obligation event. Evaluated in order; higher-authority parties should appear later for escalation chains.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["target_id", "authority_scope"],
+            "properties": {
+              "target_id": {
+                "type": "string",
+                "description": "Identifier for the notification target (agent ID, role name, DID, email address, or endpoint URL)."
+              },
+              "authority_scope": {
+                "type": "string",
+                "enum": ["read-only", "acknowledge", "halt", "modify", "escalate"],
+                "description": "Maximum authority this target can exercise on the triggering action. 'halt' means the target can stop or reverse the action. 'modify' means the target can amend it. 'escalate' means the target routes it upward. 'acknowledge' means the target confirms receipt only. 'read-only' means notification is informational."
+              },
+              "notify_by": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Optional absolute deadline for this target's notification. Overrides notification_window_seconds for this target if present."
+              },
+              "channel": {
+                "type": "string",
+                "description": "Optional delivery channel hint (e.g. 'email', 'webhook', 'sms', 'agent-message')."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "notification_window_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum seconds allowed from action creation to notification delivery and acknowledgment for all required targets. A value of 0 means synchronous notification is required before the action proceeds."
+        },
+        "default_if_no_response": {
+          "type": "string",
+          "enum": ["halt", "continue", "escalate", "archive"],
+          "description": "Action to take if no notified party with halt or modify authority acknowledges within the window. 'halt' stops or reverses the action. 'continue' lets it proceed. 'escalate' routes to the next authority tier. 'archive' suspends the action pending manual review."
+        },
+        "obligation_basis": {
+          "type": "string",
+          "description": "Optional human-readable description of why this obligation exists (e.g. 'GDPR Art.22 automated decision', 'regulated financial action', 'safety-critical intervention')."
+        },
+        "jurisdiction": {
+          "type": "string",
+          "description": "Optional jurisdiction tag (e.g. 'EU', 'US-CA', 'UK')."
+        },
+        "versioned_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this obligation routing declaration was authored. The notification graph should be treated as authoritative at this point in time."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "lifecycle_class": "compliance",
+      "obligation_routing": {
+        "notification_targets": [
+          {
+            "target_id": "compliance-officer@example.com",
+            "authority_scope": "halt",
+            "channel": "email"
+          }
+        ],
+        "notification_window_seconds": 3600,
+        "default_if_no_response": "halt",
+        "obligation_basis": "Regulated financial action requiring human sign-off",
+        "jurisdiction": "EU",
+        "versioned_at": "2026-04-03T00:00:00Z"
+      }
+    },
+    {
+      "lifecycle_class": "process",
+      "obligation_routing": {
+        "notification_targets": [
+          {
+            "target_id": "audit-log-agent",
+            "authority_scope": "read-only"
+          },
+          {
+            "target_id": "supervisor-agent-001",
+            "authority_scope": "halt"
+          }
+        ],
+        "notification_window_seconds": 60,
+        "default_if_no_response": "escalate",
+        "obligation_basis": "GDPR Art.22 automated decision affecting a natural person"
+      }
+    },
+    {
+      "lifecycle_class": ["identity", "compliance"],
+      "obligation_routing": {
+        "notification_targets": [
+          {
+            "target_id": "data-subject-portal",
+            "authority_scope": "acknowledge",
+            "channel": "webhook"
+          },
+          {
+            "target_id": "dpo@example.com",
+            "authority_scope": "halt",
+            "channel": "email"
+          }
+        ],
+        "notification_window_seconds": 0,
+        "default_if_no_response": "archive",
+        "obligation_basis": "Synchronous DSAR erasure notification required before deletion proceeds",
+        "jurisdiction": "EU"
+      }
+    }
+  ]
+}
