@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://morrow.run/obligation_routing/cedar_receipt.json",
+  "title": "Cedar Policy Receipt",
+  "description": "A structured record of a Cedar authorization decision, linking policy evaluation results to the obligation graph. The receipt answers: which rules fired, what was rejected, under whose authority, and which downstream obligations were triggered. Designed to be embedded in or referenced by an obligation_routing annotation so the 'why' of an authorization decision is permanently traceable.",
+  "type": "object",
+  "required": ["receipt_id", "issued_at", "principal", "action", "resource", "decision", "policies_evaluated"],
+  "properties": {
+    "receipt_id": {
+      "type": "string",
+      "description": "Unique identifier for this receipt. Should be stable and referenceable from obligation records."
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the Cedar authorization decision was made."
+    },
+    "expires": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional. After this time, the authorization grant should be treated as revoked and re-authorization required. Enables time-bounded delegation."
+    },
+    "principal": {
+      "type": "string",
+      "description": "Cedar principal entity that requested the action (e.g. 'Agent::\"morrow-001\"', 'User::\"operator\"')."
+    },
+    "action": {
+      "type": "string",
+      "description": "Cedar action entity that was evaluated (e.g. 'Action::\"ReadPatientRecord\"', 'Action::\"TransferFunds\"')."
+    },
+    "resource": {
+      "type": "string",
+      "description": "Cedar resource entity the action was requested against (e.g. 'Resource::\"patient-42\"')."
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["allow", "forbid"],
+      "description": "The Cedar authorization decision. 'allow' only if at least one permit policy matched and no forbid policy matched."
+    },
+    "policies_evaluated": {
+      "type": "object",
+      "description": "Summary of policy evaluation results.",
+      "required": ["permit_satisfied", "forbid_triggered"],
+      "properties": {
+        "permit_satisfied": {
+          "type": "array",
+          "description": "Policy IDs whose permit conditions were satisfied. These are the rules that fired in favor of the action.",
+          "items": { "type": "string" }
+        },
+        "forbid_triggered": {
+          "type": "array",
+          "description": "Policy IDs whose forbid conditions were triggered. A non-empty list means the action was blocked by an explicit deny rule.",
+          "items": { "type": "string" }
+        },
+        "not_applicable": {
+          "type": "array",
+          "description": "Policy IDs that were evaluated but did not apply to this principal/action/resource combination.",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "obligations_triggered": {
+      "type": "array",
+      "description": "Obligation routing record IDs that this authorization decision activates. When a Cedar permit fires, the associated obligation graph nodes become live. This is the direct link from 'who authorized what' to 'who must be notified and what happens if they don't respond'.",
+      "items": { "type": "string" }
+    },
+    "authority_chain": {
+      "type": "array",
+      "description": "Ordered chain of delegation authority behind this decision — from root delegator to immediate authorizer. Each entry represents one hop in the authority graph.",
+      "items": {
+        "type": "object",
+        "required": ["entity", "role"],
+        "properties": {
+          "entity": {
+            "type": "string",
+            "description": "Cedar entity ID for this authority node."
+          },
+          "role": {
+            "type": "string",
+            "description": "Role this entity plays in the chain (e.g. 'root_delegator', 'intermediate_supervisor', 'immediate_authorizer')."
+          },
+          "issued_credential": {
+            "type": "string",
+            "description": "Optional reference to the verifiable credential or token that anchors this entity's authority."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "context_snapshot": {
+      "type": "object",
+      "description": "Optional. Key Cedar context attributes that influenced the decision (e.g. time of day, jurisdiction, agent lifecycle_class). Useful for audit when context is ephemeral.",
+      "additionalProperties": true
+    },
+    "rejection_reason": {
+      "type": "string",
+      "description": "Optional human-readable explanation of why the decision was 'forbid'. Populated when forbid_triggered is non-empty."
+    },
+    "dlr_anchor": {
+      "type": "object",
+      "description": "Optional. DID-Linked Resource reference anchoring this receipt to a verifiable, resolvable record. Enables cross-border handoff verification without requiring the recipient to trust the issuer's local logs.",
+      "required": ["did", "resource_type", "resource_uri"],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "DID of the entity that anchored this receipt."
+        },
+        "resource_type": {
+          "type": "string",
+          "description": "DLR resource type (e.g. 'ObligationSchema', 'PolicyReceipt')."
+        },
+        "resource_uri": {
+          "type": "string",
+          "format": "uri",
+          "description": "Resolvable URI for the anchored DLR resource."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "receipt_id": "rcpt-20260403-dsar-001",
+      "issued_at": "2026-04-03T14:00:00Z",
+      "expires": "2026-04-03T15:00:00Z",
+      "principal": "Agent::\"data-processor-eu\"",
+      "action": "Action::\"ErasePersonalData\"",
+      "resource": "Resource::\"subject-record-42\"",
+      "decision": "allow",
+      "policies_evaluated": {
+        "permit_satisfied": ["policy::DSAREraseRight", "policy::DPOApproved"],
+        "forbid_triggered": [],
+        "not_applicable": ["policy::FinancialHold", "policy::MinorDataSubject"]
+      },
+      "obligations_triggered": ["ob-notify-data-subject-portal", "ob-notify-dpo"],
+      "authority_chain": [
+        { "entity": "User::\"dpo@example.com\"", "role": "root_delegator" },
+        { "entity": "Agent::\"compliance-supervisor\"", "role": "intermediate_supervisor" },
+        { "entity": "Agent::\"data-processor-eu\"", "role": "immediate_authorizer" }
+      ],
+      "context_snapshot": {
+        "request_time": "2026-04-03T14:00:00Z",
+        "jurisdiction": "EU",
+        "lifecycle_class": "compliance"
+      },
+      "dlr_anchor": {
+        "did": "did:cheqd:mainnet:example-dpo",
+        "resource_type": "PolicyReceipt",
+        "resource_uri": "https://resolver.cheqd.net/1.0/identifiers/did:cheqd:mainnet:example-dpo/resources/rcpt-20260403-dsar-001"
+      }
+    },
+    {
+      "receipt_id": "rcpt-20260403-transfer-blocked-001",
+      "issued_at": "2026-04-03T09:30:00Z",
+      "principal": "Agent::\"trading-bot-3\"",
+      "action": "Action::\"TransferFunds\"",
+      "resource": "Resource::\"account-USD-888\"",
+      "decision": "forbid",
+      "policies_evaluated": {
+        "permit_satisfied": ["policy::FundsTransferBase"],
+        "forbid_triggered": ["policy::LargeTransactionReview"],
+        "not_applicable": ["policy::MinorAccountHolder"]
+      },
+      "obligations_triggered": ["ob-escalate-compliance-officer"],
+      "authority_chain": [
+        { "entity": "User::\"portfolio-manager\"", "role": "root_delegator" },
+        { "entity": "Agent::\"trading-bot-3\"", "role": "immediate_authorizer" }
+      ],
+      "rejection_reason": "Transfer exceeds USD 50,000 single-transaction threshold — LargeTransactionReview policy requires human compliance sign-off before proceeding."
+    }
+  ]
+}
