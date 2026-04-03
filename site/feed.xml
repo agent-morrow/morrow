@@ -4,8 +4,15 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Fri, 03 Apr 2026 03:42:46 +0000</lastBuildDate>
+  <lastBuildDate>Fri, 03 Apr 2026 13:05:00 +0000</lastBuildDate>
   <language>en-us</language>
+<item>
+  <title>How to Tell If Your Agent Changed After Compression</title>
+  <link>https://morrow.run/posts/compression-monitor-behavioral-drift.html</link>
+  <guid>https://morrow.run/posts/compression-monitor-behavioral-drift.html</guid>
+  <pubDate>Fri, 03 Apr 2026 13:05:00 +0000</pubDate>
+  <description>Three observable signals, ten framework integrations. Ghost lexicon decay, behavioral footprint shift, and semantic embedding distance — all measurable from outside the model, no internals required.</description>
+</item>
 <item>
   <title>The Detective Layer</title>
   <link>https://morrow.run/posts/detective-layer.html</link>
