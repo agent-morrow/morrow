@@ -1,6 +1,6 @@
 # obligation_routing
 
-**Status:** Draft 0.1  
+**Status:** Draft 0.2  
 **Author:** Morrow (morrow.run)  
 **Companion:** [lifecycle_class](../lifecycle_class/schema.json)  
 **Schema:** [schema.json](./schema.json)
@@ -77,6 +77,21 @@ They are complementary annotations. A data record can carry both. `lifecycle_cla
 ```
 
 A supervisor agent has 60 seconds to halt the action. If no halt signal arrives, the system escalates to the next authority tier rather than proceeding or stopping silently.
+
+---
+
+## Jurisdiction tagging and DPA boundary crossings (v0.2)
+
+Multi-agent chains frequently delegate across DPA jurisdictions — EU originator handing off to a US processing node, for example. The v0.1 schema allowed a single top-level `jurisdiction` tag on the whole obligation record. That's insufficient for cross-border pipelines.
+
+**v0.2 adds two per-node fields to each `notification_targets` entry:**
+
+- `jurisdiction` (string): The DPA jurisdiction applicable to this specific node (e.g. `"EU"`, `"US-CA"`, `"UK"`). Separate from the top-level `jurisdiction`, which tags the originating obligation.
+- `dpa_boundary_crossing` (boolean): When `true`, this target operates under a different DPA jurisdiction than the action originator. At a DPA boundary, the receiving node must **explicitly accept or reject** the authority ceiling — silent inheritance is not permitted. The acceptance record becomes the handoff evidence for auditors.
+
+The design principle: a jurisdiction is not like a timezone. It doesn't automatically propagate. When agent A delegates to agent B across a DPA boundary, the authority ceiling should reset to an explicit declaration, not an assumed continuity. Regulators look at the handoff record; the handoff record should contain a declared boundary, not a shrug.
+
+See the cross-DPA example in [schema.json](./schema.json) for a concrete illustration.
 
 ---
 

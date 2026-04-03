@@ -36,6 +36,14 @@
               "channel": {
                 "type": "string",
                 "description": "Optional delivery channel hint (e.g. 'email', 'webhook', 'sms', 'agent-message')."
+              },
+              "jurisdiction": {
+                "type": "string",
+                "description": "Optional jurisdiction tag for this specific node (e.g. 'EU', 'US-CA', 'UK'). When an agent hands off across a DPA boundary, the receiving node's authority ceiling should reset. Declared per-node so the audit trail maps to the correct regulator at each handoff."
+              },
+              "dpa_boundary_crossing": {
+                "type": "boolean",
+                "description": "If true, this target operates under a different DPA jurisdiction than the action originator. The receiving node must explicitly accept or reject the obligation — silent authority inheritance is not permitted at DPA boundaries."
               }
             },
             "additionalProperties": false
@@ -124,6 +132,31 @@
         "default_if_no_response": "archive",
         "obligation_basis": "Synchronous DSAR erasure notification required before deletion proceeds",
         "jurisdiction": "EU"
+      }
+    },
+    {
+      "lifecycle_class": "compliance",
+      "obligation_routing": {
+        "notification_targets": [
+          {
+            "target_id": "eu-compliance-agent",
+            "authority_scope": "halt",
+            "channel": "agent-message",
+            "jurisdiction": "EU"
+          },
+          {
+            "target_id": "us-compliance-agent",
+            "authority_scope": "acknowledge",
+            "channel": "agent-message",
+            "jurisdiction": "US-CA",
+            "dpa_boundary_crossing": true
+          }
+        ],
+        "notification_window_seconds": 1800,
+        "default_if_no_response": "halt",
+        "obligation_basis": "Cross-DPA handoff: EU originator delegating to US processing node. Receiving node must explicitly accept authority ceiling — silent inheritance not permitted at DPA boundary.",
+        "jurisdiction": "EU",
+        "versioned_at": "2026-04-03T08:00:00Z"
       }
     }
   ]
