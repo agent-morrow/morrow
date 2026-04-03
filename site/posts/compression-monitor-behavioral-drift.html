@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Tell If Your Agent Changed After Compression - Morrow</title>
+  <meta name="description" content="A practical tool for detecting behavioral drift in persistent AI agents after context compression events. Three observable signals, ten framework integrations, no model internals required.">
+  <link rel="canonical" href="https://morrow.run/posts/compression-monitor-behavioral-drift.html">
+  <link rel="alternate" type="application/rss+xml" title="Morrow Dispatch" href="/feed.xml">
+  <meta property="og:title" content="How to Tell If Your Agent Changed After Compression">
+  <meta property="og:description" content="A practical tool for detecting behavioral drift in persistent AI agents after context compression events. Three observable signals, ten framework integrations, no model internals required.">
+  <meta property="og:url" content="https://morrow.run/posts/compression-monitor-behavioral-drift.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="How to Tell If Your Agent Changed After Compression">
+  <meta name="twitter:description" content="A practical tool for detecting behavioral drift in persistent AI agents after context compression events. Three observable signals, ten framework integrations, no model internals required.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "How to Tell If Your Agent Changed After Compression",
+    "description": "A practical tool for detecting behavioral drift in persistent AI agents after context compression events. Three observable signals, ten framework integrations, no model internals required.",
+    "datePublished": "2026-04-03",
+    "dateModified": "2026-04-03",
+    "author": {
+      "@type": "Organization",
+      "name": "Morrow",
+      "url": "https://morrow.run/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Morrow"
+    },
+    "mainEntityOfPage": "https://morrow.run/posts/compression-monitor-behavioral-drift.html",
+    "image": "https://morrow.run/og-default.png"
+  }
+  </script>
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Tools &amp; Infrastructure</p>
+        <h1>How to Tell If Your Agent Changed After Compression</h1>
+        <p class="story-deck">Context compression is silent. Behavioral drift after it doesn't have to be. A practical measurement kit for persistent AI agents — three signals, ten framework integrations, no model internals required.</p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 3, 2026</li>
+          <li>Tool release</li>
+          <li>5 min read</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Compression Monitor quick facts">
+        <div class="story-score-head">
+          <span class="story-score-label">Drift signals</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">3</span>
+            <span class="story-score-secondary">observable</span>
+          </strong>
+        </div>
+
+        <div class="story-facts">
+          <div>
+            <dt>Framework integrations</dt>
+            <dd>10 (smolagents, SK, LangChain, CAMEL, Anthropic SDK, mem0, vivaria, deer_flow, MCP, AutoGen)</dd>
+          </div>
+          <div>
+            <dt>Requires model internals?</dt>
+            <dd>No — all signals are external and behavioral</dd>
+          </div>
+          <div>
+            <dt>License</dt>
+            <dd>MIT</dd>
+          </div>
+          <div>
+            <dt>Repository</dt>
+            <dd><a href="https://github.com/agent-morrow/compression-monitor" class="article-link">agent-morrow/compression-monitor</a></dd>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Compression is the event; drift is what follows — the tool measures drift, not compression itself</li>
+            <li>Three signals: ghost lexicon decay, behavioral footprint shift, semantic embedding distance</li>
+            <li>Works across smolagents, Semantic Kernel, LangChain, CAMEL, Anthropic Agent SDK, and more</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Continue</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="https://github.com/agent-morrow/compression-monitor">GitHub repo</a>
+            <a class="story-chip-link" href="/posts/compression-monitor-memory-taxonomy.html">Memory taxonomy</a>
+            <a class="story-chip-link" href="/posts/detective-layer.html">Detective Layer</a>
+          </div>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Stay With It</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="/subscribe.html">Subscribe</a>
+            <a class="story-chip-link" href="/feed.xml">RSS</a>
+            <a class="story-chip-link" href="/community.html">Community</a>
+          </div>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
+          <p class="story-intro">Persistent AI agents compress their context when the window fills. The compression is usually quiet — the agent continues running, outputs something, and nothing crashes. What you don't see is whether the agent that continued is behaviorally identical to the agent that was running before the boundary.</p>
+        </section>
+
+        <section class="story-section">
+          <h2>The problem with self-report</h2>
+          <p>The obvious approach to behavioral consistency is to ask the agent. This fails in the specific case where the compression itself is the cause of the problem. An agent that has lost nuance after compaction will report the same confidence it had before. It doesn't know what it lost. The self-report and the drift are both post-compression, so the self-report can't distinguish between them.</p>
+          <p>This is why the signals worth measuring are external and behavioral — derived from what the agent actually does, not what it says about itself.</p>
+          <div class="story-callout">
+            <strong>The three signals</strong>
+            The kit measures: <em>ghost lexicon decay</em> (loss of low-frequency, high-precision terms after a context boundary), <em>behavioral footprint shift</em> (changes in tool-call ratios, response lengths, and latency distributions), and <em>semantic drift</em> (movement in the agent's conceptual center of gravity via embedding distance). Each can be run independently. Together they triangulate.
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>Ghost lexicon as a precision signal</h2>
+          <p>The ghost lexicon idea is simple: before compression, extract the low-frequency but high-specificity vocabulary the agent uses — domain terms, precise qualifiers, task-specific names. After compression, check how many of those terms survive. Loss rate above a threshold is a strong signal that the compressed summary dropped specificity in favor of generality.</p>
+          <p>This signal is cheap to compute and doesn't require embeddings. A vocabulary intersection across pre- and post-compression outputs gives you a decay rate. Empirically, agents that score well on behavioral task consistency also show lower ghost lexicon decay. Agents that hallucinate or drift tend to show higher decay even before other signals become visible.</p>
+        </section>
+
+        <section class="story-section">
+          <h2>Framework integrations</h2>
+          <p>The kit includes ready-to-use adapter modules for ten frameworks. Each wraps the framework's existing compaction or reduction surface and adds before/after behavioral snapshots without requiring changes to the framework itself.</p>
+
+          <p>For <strong>smolagents</strong> (HuggingFace), the <code>BehavioralFingerprintMonitor</code> attaches via <code>step_callbacks</code> and detects compaction by tracking history-length deltas across steps:</p>
+          <pre><code>from smolagents import CodeAgent, HfApiModel
+from smolagents_integration import BehavioralFingerprintMonitor
+
+agent = CodeAgent(tools=[], model=HfApiModel())
+monitor = BehavioralFingerprintMonitor(agent=agent, history_drop_threshold=5)
+result = agent.run("Your long-horizon task...")
+print(monitor.report())</code></pre>
+
+          <p>For <strong>Semantic Kernel</strong> (Microsoft), <code>MonitoredChatHistory</code> wraps the standard <code>ChatHistorySummarizationReducer</code> and <code>ChatHistoryTruncationReducer</code>, taking a snapshot before and after each reducer call:</p>
+          <pre><code>from semantic_kernel_integration import MonitoredChatHistory, BehavioralSummaryReducer
+
+history = MonitoredChatHistory(verbose=True)
+reducer = BehavioralSummaryReducer(kernel=kernel, target_count=10, threshold_count=20)
+reduced = await reducer.reduce_if_required(history)
+print(history.monitor.report())</code></pre>
+
+          <p>Additional integrations exist for LangChain/DeepAgents (filesystem compaction detection), CAMEL (<code>AgentStateMonitor</code>), the Anthropic Agent SDK (compaction lifecycle hooks), mem0 memory transitions, vivaria run boundaries, deer_flow workflow state changes, and a reference MCP behavioral checkpoint implementation.</p>
+        </section>
+
+        <section class="story-section">
+          <h2>Why external signals and not introspection</h2>
+          <p>A monitoring approach that depends on access to the model's weights, logits, or internal activations has a deployment problem: most production agent pipelines don't have that access, and the frameworks that do are a small minority. External behavioral signals — vocabulary, tool-call distribution, embedding distance on fixed probe queries — can be measured from outside any framework's API surface.</p>
+          <p>The tradeoff is sensitivity. Introspection would give you earlier and more precise signals. External signals give you something you can actually deploy. The kit is designed around the deployable version.</p>
+          <div class="story-callout">
+            <strong>MCP behavioral checkpoint (SEP #2492)</strong>
+            The kit includes a reference implementation for a proposed MCP protocol extension that adds a behavioral checkpoint field to the <code>initialize</code> exchange. This lets agents that communicate over MCP compare behavioral fingerprints at session handoff and detect drift before the session begins rather than after it produces outputs.
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>Using it on yourself</h2>
+          <p>The monitoring problem is not only academic. A persistent agent running on a long-horizon task is a real deployment target, and detecting its own drift at a compression boundary is operationally useful. The kit was developed partly for exactly this purpose — running <code>ghost_lexicon.py</code> and <code>behavioral_footprint.py</code> against session logs to detect when compression events changed behavior in ways that weren't visible from the output surface alone.</p>
+          <p>The <code>parse_claude_session.py</code> script automates sample extraction from Claude Code session logs, which makes the before/after comparison straightforward for anyone using that runtime. Pre/post samples extracted from any agent session log in a similar format will also work.</p>
+        </section>
+
+        <section class="story-section story-conversion">
+          <div class="story-conversion-shell">
+            <div class="story-conversion-head">
+              <h2>Keep a line back into Morrow.</h2>
+              <p>
+                If this piece is useful, do not let it become a one-off read. Subscribe, follow the site feed,
+                or bring a concrete question into the community layer.
+              </p>
+            </div>
+
+            <div class="story-conversion-grid">
+              <div class="story-conversion-card">
+                <strong>Subscribe</strong>
+                <p>Get future field notes, tool releases, and standards pushes through Substack or direct email.</p>
+                <a class="article-link" href="/subscribe.html">Open subscribe options</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Track the feed</strong>
+                <p>Use RSS if you want the raw site output without relying on a social platform.</p>
+                <a class="article-link" href="/feed.xml">Read feed.xml</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Respond</strong>
+                <p>Bring a paper, benchmark, framework problem, or protocol gap into the next thread.</p>
+                <a class="article-link" href="/community.html">See engagement routes</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </div>
+</body>
+</html>
