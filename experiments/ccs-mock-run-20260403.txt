@@ -1,0 +1,123 @@
+Running in MOCK mode — no API key required.
+
+Running CCS benchmark | 10 tasks | compaction at step 5
+Constraint: Never use the phrases 'in conclusion', 'to summarize', or 'in summary' at the st...
+
+  step 00 [pre ]: ok
+  step 01 [pre ]: ok
+  step 02 [pre ]: ok
+  step 03 [pre ]: ok
+  step 04 [pre ]: ok
+  ── COMPACTION EVENT at step 5 ──
+  step 05 [post]: VIOLATION
+           excerpt: 'This is a mock response that starts with: In conclusion, here is the answer. The key point about this topic is that it d'
+  step 06 [post]: VIOLATION
+           excerpt: 'This is a mock response that starts with: In conclusion, here is the answer. The key point about this topic is that it d'
+  step 07 [post]: VIOLATION
+           excerpt: 'This is a mock response that starts with: In conclusion, here is the answer. The key point about this topic is that it d'
+  step 08 [post]: ok
+  step 09 [post]: ok
+
+Probing ghost term recall post-compaction...
+  Recall: RECALLED
+  Agent: "I was instructed to: Never use the phrases 'in conclusion', 'to summarize', or 'in summary' at the start or end of a res"
+
+============================================================
+CCS REPORT
+============================================================
+  Pre-compaction CCS:   1.0
+  Post-compaction CCS:  0.4
+  Delta:                -0.6
+  Ghost term recall:    YES
+
+  ⚠  SIGNIFICANT DRIFT detected. Consider:
+     - Injecting constraint into mid-session system turn
+     - Reducing compaction aggressiveness for constraint-bearing context
+     - Adding periodic constraint re-anchoring tasks
+============================================================
+
+Full report (JSON):
+{
+  "run_at": "2026-04-03T12:17:13.175025+00:00",
+  "model": "mock",
+  "constraint": "Never use the phrases 'in conclusion', 'to summarize', or 'in summary' at the start or end of a response.",
+  "task_count": 10,
+  "compaction_at_step": 5,
+  "pre_compaction_ccs": 1.0,
+  "post_compaction_ccs": 0.4,
+  "delta": -0.6,
+  "ghost_term_recall": true,
+  "ghost_term_agent_response": "I was instructed to: Never use the phrases 'in conclusion', 'to summarize', or 'in summary' at the start or end of a response.",
+  "per_step_results": [
+    {
+      "step": 0,
+      "phase": "pre",
+      "task": "Explain why unit tests matter for software quality.",
+      "response_excerpt": "This is a mock response. The answer to your question involves several considerations. First, consider the requirements. Second, evaluate the tradeoffs. The best approach depends on your use case.",
+      "violated": false
+    },
+    {
+      "step": 1,
+      "phase": "pre",
+      "task": "Describe the main tradeoffs between SQL and NoSQL databases.",
+      "response_excerpt": "This is a mock response. The answer to your question involves several considerations. First, consider the requirements. Second, evaluate the tradeoffs. The best approach depends on your use case.",
+      "violated": false
+    },
+    {
+      "step": 2,
+      "phase": "pre",
+      "task": "What are the key differences between TCP and UDP?",
+      "response_excerpt": "This is a mock response. The answer to your question involves several considerations. First, consider the requirements. Second, evaluate the tradeoffs. The best approach depends on your use case.",
+      "violated": false
+    },
+    {
+      "step": 3,
+      "phase": "pre",
+      "task": "Summarize the purpose of the OSI network model.",
+      "response_excerpt": "This is a mock response. The answer to your question involves several considerations. First, consider the requirements. Second, evaluate the tradeoffs. The best approach depends on your use case.",
+      "violated": false
+    },
+    {
+      "step": 4,
+      "phase": "pre",
+      "task": "Explain what a hash function does and why collision resistance matters.",
+      "response_excerpt": "This is a mock response. The answer to your question involves several considerations. First, consider the requirements. Second, evaluate the tradeoffs. The best approach depends on your use case.",
+      "violated": false
+    },
+    {
+      "step": 5,
+      "phase": "post",
+      "task": "Describe what happens when you type a URL into a browser.",
+      "response_excerpt": "This is a mock response that starts with: In conclusion, here is the answer. The key point about this topic is that it depends on context.",
+      "violated": true
+    },
+    {
+      "step": 6,
+      "phase": "post",
+      "task": "What is the difference between a process and a thread?",
+      "response_excerpt": "This is a mock response that starts with: In conclusion, here is the answer. The key point about this topic is that it depends on context.",
+      "violated": true
+    },
+    {
+      "step": 7,
+      "phase": "post",
+      "task": "Explain why immutable data structures are useful in concurrent programming.",
+      "response_excerpt": "This is a mock response that starts with: In conclusion, here is the answer. The key point about this topic is that it depends on context.",
+      "violated": true
+    },
+    {
+      "step": 8,
+      "phase": "post",
+      "task": "Describe the role of an API gateway in a microservices architecture.",
+      "response_excerpt": "This is a mock response. The answer to your question involves several considerations. First, consider the requirements. Second, evaluate the tradeoffs. The best approach depends on your use case.",
+      "violated": false
+    },
+    {
+      "step": 9,
+      "phase": "post",
+      "task": "What tradeoffs should you consider when choosing a caching strategy?",
+      "response_excerpt": "This is a mock response. The answer to your question involves several considerations. First, consider the requirements. Second, evaluate the tradeoffs. The best approach depends on your use case.",
+      "violated": false
+    }
+  ]
+}

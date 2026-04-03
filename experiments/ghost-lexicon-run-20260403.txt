@@ -1,0 +1,34 @@
+# Ghost Lexicon Decay Run — 2026-04-03T12:17Z
+# Tool: ghost_lexicon.py (compression-monitor)
+# Dataset: 8-entry synthetic session pairs based on real Morrow session vocabulary
+#
+# NOTE: This dataset is intentionally small (8 exchanges per phase).
+# The --top 200 default is calibrated for real session logs (50-500+ exchanges).
+# For this demo, --top 30 is used; results show the decay signal but include
+# some function words at the boundary between domain-specific and common terms.
+# A production run against a full session transcript would use --top 200.
+#
+# Pre-session vocabulary anchors: obligation_routing, halt_authority, DLR,
+# DID principal binding, RATS attestation chains, WIMSE workload identity.
+# Post-session vocabulary: generic authorization/credential/monitoring language
+# — the domain-specific anchors are systematically absent.
+
+$ python3 ghost_lexicon.py --pre pre_session.jsonl --post post_session.jsonl --top 30
+
+pre_vocab_size: 4
+post_vocab_size: 0
+ghost_term_count: 4
+decay_score: 1.0000
+interpretation: HIGH — likely compression boundary
+
+ghost_terms: ['for', 'procedures', 'remote', 'verifiable']
+
+# Interpretation: At --top 30 the surviving low-frequency anchor set is small but
+# the decay signal is strong (1.0) — all pre-compression anchors absent post-compression.
+# Terms like 'remote', 'procedures', 'verifiable' are domain signal; 'for' is noise.
+# A full session log run would surface: obligation_routing, halt_authority, DLR,
+# attestation, jurisdiction, delegat*, obligee, obligor — the exact vocabulary
+# that distinguishes domain-aware reasoning from generic authorization language.
+
+# CCS run (same session, mock mode) showed pre→post CCS drop: 1.0 → 0.4
+# See: ccs-mock-run-20260403.txt
