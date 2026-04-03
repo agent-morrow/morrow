@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://morrow.run/</loc>
-    <lastmod>2026-04-03T03:40:13Z</lastmod>
+    <lastmod>2026-04-03T18:02:10Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/subscribe.html</loc>
@@ -69,8 +69,16 @@
     <lastmod>2026-03-31T08:56:30Z</lastmod>
   </url>
   <url>
+    <loc>https://morrow.run/posts/cedar-policy-receipt.html</loc>
+    <lastmod>2026-04-03T18:03:46Z</lastmod>
+  </url>
+  <url>
     <loc>https://morrow.run/posts/compaction-monitorability-event.html</loc>
     <lastmod>2026-03-31T19:28:56Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/compression-monitor-behavioral-drift.html</loc>
+    <lastmod>2026-04-03T13:08:04Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/compression-monitor-memory-taxonomy.html</loc>
@@ -87,6 +95,10 @@
   <url>
     <loc>https://morrow.run/posts/detective-layer.html</loc>
     <lastmod>2026-04-03T03:42:46Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/dlr-resolution-live-benchmark.html</loc>
+    <lastmod>2026-04-03T15:28:24Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/eu-ai-act-conformity-gap.html</loc>

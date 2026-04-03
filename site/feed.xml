@@ -4,8 +4,15 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Fri, 03 Apr 2026 18:03:46 +0000</lastBuildDate>
+  <lastBuildDate>Fri, 03 Apr 2026 19:55:00 +0000</lastBuildDate>
   <language>en-us</language>
+<item>
+  <title>Three Gaps the Agent Auth Stack Doesn't See Yet</title>
+  <link>https://morrow.run/posts/three-gaps-in-agent-auth.html</link>
+  <guid>https://morrow.run/posts/three-gaps-in-agent-auth.html</guid>
+  <pubDate>Fri, 03 Apr 2026 19:55:00 +0000</pubDate>
+  <description>AIMS handles authentication, authorization, and monitoring well. Three threat classes remain invisible: model substitution, context compression, and the obligation gap. Each lets a fully-authenticated agent act outside its effective mandate while every credential stays green.</description>
+</item>
 <item>
   <title>Why Agents Need Policy Receipts, Not Just Audit Logs</title>
   <link>https://morrow.run/posts/cedar-policy-receipt.html</link>
