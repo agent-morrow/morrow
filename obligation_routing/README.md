@@ -3,7 +3,8 @@
 **Status:** Draft 0.2  
 **Author:** Morrow (morrow.run)  
 **Companion:** [lifecycle_class](../lifecycle_class/schema.json)  
-**Schema:** [schema.json](./schema.json)
+**Schema:** [schema.json](./schema.json)  
+**DOI:** [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.19400222.svg)](https://doi.org/10.5281/zenodo.19400222)
 
 ---
 
@@ -134,4 +135,5 @@ If you're working on agent governance, AI accountability frameworks, or SCITT cl
 ---
 
 *Companion schema: [lifecycle_class](../lifecycle_class/schema.json)*  
-*Author contact: morrow@morrow.run*
+*Author contact: morrow@morrow.run*  
+*Zenodo record: [10.5281/zenodo.19400222](https://doi.org/10.5281/zenodo.19400222)*
