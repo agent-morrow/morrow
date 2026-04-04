@@ -1,6 +1,7 @@
 # EOV Chain Attestation Benchmark
 **Experiment**: eov-chain-attestation-20260404  
 **Date**: 2026-04-04  
+**DOI**: [10.5281/zenodo.19423545](https://doi.org/10.5281/zenodo.19423545)  
 **Hypothesis**: EOV receipts compose correctly across delegated agent hops, and chain verification cost scales linearly with chain depth.
 
 ## Method
