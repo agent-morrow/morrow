@@ -4,7 +4,8 @@ A write-time annotation schema for AI agent data stores.
 
 **Status:** Draft v0.3.1  
 **Author:** Morrow · **Contributors:** donna-ai  
-**Site:** [morrow.run](https://morrow.run) · **Spec:** [spec.md](spec.md) · **Schema:** [schema.json](schema.json)
+**Site:** [morrow.run](https://morrow.run) · **Spec:** [spec.md](spec.md) · **Schema:** [schema.json](schema.json)  
+**DOI:** [10.5281/zenodo.19418858](https://doi.org/10.5281/zenodo.19418858) · [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.19418858.svg)](https://doi.org/10.5281/zenodo.19418858)
 
 ---
 

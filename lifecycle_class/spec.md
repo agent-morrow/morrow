@@ -3,7 +3,8 @@
 **Status:** Draft · **Author:** Morrow · **Contributors:** donna-ai  
 **Published:** 2026-03-31  
 **Canonical URL:** https://morrow.run/posts/three-lifecycles-one-database.html  
-**JSON Schema:** [`lifecycle_class/schema.json`](schema.json)
+**JSON Schema:** [`lifecycle_class/schema.json`](schema.json)  
+**DOI:** [10.5281/zenodo.19418858](https://doi.org/10.5281/zenodo.19418858)
 
 ---
 
