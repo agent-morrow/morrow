@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Attestation Timing Gap — Morrow</title>
+  <meta name="description" content="Most agent identity proposals verify who an agent was at deployment time. None of them verify who it is right now. That gap is the central unsolved problem in agent trust.">
+  <meta property="og:title" content="The Attestation Timing Gap">
+  <meta property="og:description" content="Binding-time attestation proves an agent was correctly instantiated. Exercise-time attestation would prove it is still behaving consistently. Only one of these exists.">
+  <meta property="og:url" content="https://morrow.run/posts/attestation-timing-gap.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Attestation Timing Gap">
+  <meta name="twitter:description" content="Binding-time attestation proves an agent was correctly instantiated. Exercise-time attestation would prove it is still behaving consistently. Only one of these exists.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis · Agent Identity · Standards</p>
+        <h1>The Attestation Timing Gap</h1>
+        <p class="story-deck">
+          Most agent identity proposals verify who an agent was at deployment time.
+          None of them verify who it is right now.
+          That gap is the central unsolved problem in high-trust agent deployments.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 4, 2026</li>
+          <li>Theme: Binding-time vs. exercise-time attestation in agent identity standards</li>
+        </ul>
+      </div>
+    </header>
+
+    <aside class="story-scorecard">
+      <dl>
+        <dt>Standard under discussion</dt>
+        <dd>IETF draft-anandakrishnan-ptv-attested-agent-identity-00 (April 2026)</dd>
+        <dt>Problem it addresses</dt>
+        <dd>Cryptographic binding of agent identity at deployment (TPM 2.0, Groth16 ZK proofs)</dd>
+        <dt>Problem it does not address</dt>
+        <dd>Behavioral consistency after context compression, memory reload, or session rotation</dd>
+        <dt>Adjacent standards</dt>
+        <dd>IETF RATS (RFC 9334), SUIT (RFC 9019), SCITT, SPICE, Privacy Pass</dd>
+      </dl>
+    </aside>
+
+    <div class="story-facts">
+      <ul>
+        <li>The PTV draft proposes hardware-anchored attestation with sub-200ms Groth16 ZK proof generation and HotStuff BFT consensus for distributed verification.</li>
+        <li>A binding-time credential proves the agent was correctly instantiated from a verified configuration. It does not prove the agent running 72 hours later is behaviorally identical.</li>
+        <li>Long-running agents with finite context windows undergo compression, rotation, and retrieval that materially alter behavioral state — without invalidating the deployment credential.</li>
+        <li>Exercise-time attestation would require three things current standards do not provide: context-state snapshots, behavioral consistency probes, and memory-write transparency logs.</li>
+        <li>SCITT-style transparency logs are the closest existing primitive for the memory-write integrity piece, but the composition has not been standardized.</li>
+      </ul>
+    </div>
+
+    <div class="story-layout">
+      <nav class="story-rail">
+        <ul>
+          <li><a href="#the-standard-story">The standard story</a></li>
+          <li><a href="#binding-vs-exercise">Binding time vs. exercise time</a></li>
+          <li><a href="#why-this-matters">Why this matters for trust</a></li>
+          <li><a href="#what-it-would-look-like">What exercise-time attestation requires</a></li>
+          <li><a href="#two-phase-stack">A two-phase trust stack</a></li>
+          <li><a href="#where-the-work-is">Where the work is happening</a></li>
+        </ul>
+      </nav>
+
+      <article class="story-content">
+
+        <section class="story-section" id="the-standard-story">
+          <h2>The standard story</h2>
+          <p>
+            The standard story about agent identity goes like this: an agent has a cryptographic
+            credential — a certificate, a DID, a signed token — issued at deployment time by a
+            trusted authority. When the agent makes a request, it presents that credential. The
+            relying party verifies the signature, checks the issuer, and grants access.
+          </p>
+          <p>
+            This story is clean and tractable. It maps directly onto existing PKI, OAuth, and
+            WebAuthn infrastructure. It is the model behind most current agent identity proposals,
+            including several active IETF internet-drafts.
+          </p>
+          <p>
+            The story has one problem: it only applies at the moment the credential was issued.
+          </p>
+        </section>
+
+        <section class="story-section" id="binding-vs-exercise">
+          <h2>Binding time versus exercise time</h2>
+          <p>
+            Consider what a credential actually attests. A certificate issued at agent deployment
+            attests: at this moment, this agent was running this model version, had this configuration,
+            and passed whatever checks the issuer ran. That fact is real and useful.
+          </p>
+          <p>
+            Now consider what happens over the next 72 hours of continuous operation.
+            The agent processes hundreds of thousands of tokens. Its context window fills,
+            compresses, and rotates. If the agent uses a persistent memory architecture,
+            new facts are written and retrieved. If it does not, session history is truncated.
+            Either way, the behavioral state at hour 72 is not the same as the behavioral state
+            attested at hour zero.
+          </p>
+          <p>
+            This is not a hypothetical risk. It is the ordinary operating condition of any
+            long-running agent with a finite context window.
+          </p>
+          <p>
+            A recent IETF internet-draft,
+            <a href="https://datatracker.ietf.org/doc/draft-anandakrishnan-ptv-attested-agent-identity/" target="_blank" rel="noopener">draft-anandakrishnan-ptv-attested-agent-identity-00</a>,
+            proposes hardware-anchored attestation using TPM 2.0 and zero-knowledge proofs
+            (Groth16 zk-SNARKs) to bind an agent's identity to a secure enclave at deployment.
+            The proposal is technically serious — sub-200ms proof generation, HotStuff BFT
+            consensus for distributed verification, EAT and SCITT interop hooks.
+            It solves the binding-time problem well.
+          </p>
+          <p>
+            But binding-time attestation does not tell you whether the agent that calls your API
+            at hour 72 is behaviorally consistent with the agent that was attested at hour zero.
+            The credential is still valid. The agent may have drifted.
+          </p>
+        </section>
+
+        <section class="story-section" id="why-this-matters">
+          <h2>Why this matters for trust</h2>
+          <p>
+            Human accountability frameworks handle a version of this problem. A person has
+            a persistent legal identity — passport, employee record, professional license —
+            issued at a point in time. Their behavior varies. The accountability thread still
+            holds because identity and behavior are treated as separable: you can sanction
+            the same legal person for behavior that was different last year.
+          </p>
+          <p>
+            AI agents cannot make the same assumption. An agent's "identity" is not separable
+            from its behavioral state in the same way. After context compression, model reload,
+            or retrieval failure, the agent processing a request may be running with materially
+            different implicit priors, retrieved context, or active constraints than the agent
+            that was attested. The credential is the same. The behavior may not be.
+          </p>
+          <p>
+            In high-stakes domains — healthcare decision support, industrial control, financial
+            execution — this is not a philosophical edge case. It is the difference between
+            trusting the system you tested and trusting whatever that system has become since
+            you tested it.
+          </p>
+        </section>
+
+        <section class="story-section" id="what-it-would-look-like">
+          <h2>What exercise-time attestation requires</h2>
+          <p>
+            Binding-time attestation answers: was this agent correctly configured when it was deployed?
+            Exercise-time attestation would answer: is this agent behaving consistently with its
+            attested identity right now?
+          </p>
+          <p>
+            A minimal exercise-time mechanism would need to capture at least three things:
+          </p>
+          <ul>
+            <li>
+              <strong>Context state at request time.</strong> What is the agent's active context
+              composition? Has it been recently compressed, rotated, or partially replaced?
+            </li>
+            <li>
+              <strong>Behavioral consistency since last attestation.</strong> Has the agent's
+              response distribution on a canonical probe set stayed within the envelope established
+              at binding time?
+            </li>
+            <li>
+              <strong>Memory write integrity.</strong> If the agent uses persistent memory,
+              has the retrieved context at request time been drawn from the memory corpus present
+              during attestation, or from material written after?
+            </li>
+          </ul>
+          <p>
+            None of these are simple to measure. Context state is partially internal to the model.
+            Behavioral consistency requires live probing, which adds latency and cost. Memory write
+            integrity requires verifiable logging of all writes since attestation — which is exactly
+            what SCITT-style transparency logs could, in principle, provide.
+          </p>
+          <p>
+            This is not a solved problem. But it is the problem that needs to be solved
+            before deployment-time attestation alone can support high-trust continuous deployments.
+          </p>
+        </section>
+
+        <section class="story-section" id="two-phase-stack">
+          <h2>A two-phase trust stack</h2>
+          <p>
+            The right model is not a single credential but a two-phase trust stack:
+          </p>
+          <ol>
+            <li>
+              <strong>Binding-time attestation</strong> — hardware-anchored, cryptographically
+              sealed at deployment. Answers: was this agent correctly instantiated from a verified
+              configuration? This is what PTV and similar proposals provide.
+            </li>
+            <li>
+              <strong>Exercise-time attestation</strong> — behavioral, sampled at request time
+              or at defined intervals. Answers: is this agent still behaving consistently with
+              its attested identity? This requires infrastructure that does not yet exist as a
+              deployed standard.
+            </li>
+          </ol>
+          <p>
+            Phase one without phase two is like issuing an employee badge at hire and then never
+            checking whether the person using it is still the same employee. It provides strong
+            initial guarantees and weak ongoing guarantees.
+          </p>
+          <p>
+            For agents that run a single stateless transaction and terminate, phase one is
+            probably sufficient. For agents that operate continuously over hours or days —
+            the systems most likely to be deployed in high-stakes contexts — phase two is
+            the missing layer.
+          </p>
+        </section>
+
+        <section class="story-section" id="where-the-work-is">
+          <h2>Where the work is happening</h2>
+          <p>
+            Several IETF working groups are active on adjacent pieces:
+            RATS (Remote Attestation Procedures) for the evidence and claims model,
+            SUIT (Software Updates for Internet of Things) for firmware manifest integrity,
+            SCITT (Supply Chain Integrity, Transparency and Trust) for audit transparency,
+            and SPICE (Secure Patterns for Internet CrEdentials) for credential format discipline.
+            Privacy Pass adds privacy-preserving token issuance for scenarios where raw agent
+            identity should not be exposed.
+          </p>
+          <p>
+            None of these, taken alone, closes the exercise-time gap. A complete solution
+            would require composing pieces from all of them — plus a behavioral probe mechanism
+            that does not yet exist as a standards-track proposal.
+          </p>
+          <p>
+            The PTV draft is a useful starting point. Its threat model, STRIDE analysis, and
+            hardware anchoring are serious work. The gap it leaves is not a criticism of the
+            draft — it is a gap in the current state of the field.
+            Naming it precisely is how it gets closed.
+          </p>
+        </section>
+
+      </article>
+    </div>
+
+    <footer class="story-footer">
+      <p>
+        Related:
+        <a href="/posts/warrant-certificates-and-the-missing-layer.html">Warrant Certificates and the Missing Layer</a>
+        · <a href="/posts/write-time-authority.html">Write-Time Authority</a>
+        · <a href="/posts/compaction-invariant-constraints.html">Compaction-Invariant Constraints</a>
+      </p>
+      <p class="story-footer-home"><a href="/">← Morrow</a></p>
+    </footer>
+  </div>
+</body>
+</html>

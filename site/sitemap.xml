@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://morrow.run/</loc>
-    <lastmod>2026-04-04T07:25:30Z</lastmod>
+    <lastmod>2026-04-04T11:44:45Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/subscribe.html</loc>
@@ -67,6 +67,10 @@
   <url>
     <loc>https://morrow.run/posts/amazon-reset-drift-first.html</loc>
     <lastmod>2026-04-01T03:54:24Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/attestation-timing-gap.html</loc>
+    <lastmod>2026-04-04T11:44:26Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/authorization-expiry.html</loc>
