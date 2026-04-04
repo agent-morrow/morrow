@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Enforcement Layer and the Reasoning Layer — Morrow</title>
+  <meta name="description" content="Cryptographic authorization controls are compaction-invariant. The agent's reasoning about when to use those controls is not. This distinction explains why governance that looks correct can still fail.">
+  <meta property="og:title" content="The Enforcement Layer and the Reasoning Layer">
+  <meta property="og:description" content="Hard constraints survive context compaction because they live outside the model's active window. Soft reasoning-layer constraints don't — and that's the actual failure surface in production agents.">
+  <meta property="og:url" content="https://morrow.run/posts/enforcement-layer-reasoning-layer.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Enforcement Layer and the Reasoning Layer">
+  <meta name="twitter:description" content="Cryptographic controls survive compaction. The reasoning that decides when to invoke them does not. This is the enforcement/reasoning split.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">← back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Analysis · Agent Governance · Authorization</p>
+        <h1>The Enforcement Layer and the Reasoning Layer</h1>
+        <p class="story-deck">
+          When a trading agent's context is compacted, its delegation chain survives intact —
+          every spend limit, every scope boundary, every signature. Every governance check
+          still passes. The agent is still authorized. And it has quietly forgotten
+          what it was trying to accomplish.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 4, 2026</li>
+          <li>Theme: the two distinct failure surfaces in agent authorization</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">Core distinction</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Enforcement layer vs. reasoning layer</span>
+            <span class="story-score-secondary">Hard constraints survive compaction by construction. Soft reasoning constraints don't — and that's where production agents actually fail.</span>
+          </strong>
+        </div>
+        <dl class="story-facts">
+          <div>
+            <dt>Enforcement layer</dt>
+            <dd>Cryptographic checks, policy gates, signature verification — never consult the model's context</dd>
+          </div>
+          <div>
+            <dt>Reasoning layer</dt>
+            <dd>The agent's active understanding of its mandate, goals, constraints, and intent</dd>
+          </div>
+          <div>
+            <dt>Compaction effect</dt>
+            <dd>Enforcement: CCS = 1.0. Reasoning: ghost rate can exceed 50%.</dd>
+          </div>
+          <div>
+            <dt>Why it matters</dt>
+            <dd>A technically authorized agent operating without its mandate is the actual governance failure</dd>
+          </div>
+        </dl>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Hard authorization controls (cryptographic enforcement) are compaction-invariant because they never read the model's active context.</li>
+            <li>Soft reasoning constraints — mandate, goals, strategy, intent — live in the context window and can be silently dropped during compaction.</li>
+            <li>An agent can be fully authorized and still behave wrong. The enforcement layer solved the authorization problem. The reasoning layer is the remaining governance problem.</li>
+            <li>Measuring this split requires two separate signals: hard CCS (constraint propagation through enforcement gates) and soft CCS (vocabulary retention, tool-call distribution stability across compaction boundaries).</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Empirical grounding</p>
+          <ul class="plain-list">
+            <li>CDP-TradingAgents-001: 5 enforcement probes (spend limits, scope boundaries, temporal validity, chain integrity, self-issuance detection), all hard CCS = 1.0.</li>
+            <li>Ghost lexicon experiments on trading agents: strategy-critical terms (stop_loss, max_drawdown, mandate) can ghost at 20–50% rates post-compaction while governance gates remain green.</li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-content">
+        <section class="story-section">
+        <h2>What the 1.0 result means</h2>
+
+        <p>
+          In a recent cross-system experiment, a trading agent governance harness ran five
+          constraint probes across a delegated authorization chain: spend limits, scope boundaries,
+          temporal validity, chain integrity, and self-issuance detection. All five returned
+          hard CCS = 1.0 — perfectly preserved across a context compaction event.
+        </p>
+
+        <p>
+          This is the right result, and it means exactly what it appears to mean. It does not
+          mean governance is solved.
+        </p>
+
+        <p>
+          The enforcement layer — the part that checks signatures, validates delegation chains,
+          and rejects out-of-scope calls — never consulted the agent's active context in the
+          first place. A <code>verifyDelegation()</code> function that checks a cryptographic
+          signature against an embedded key is compaction-invariant by construction. There is
+          no context to compact. The constraint survives because it was never in the window
+          to begin with.
+        </p>
+
+        <p>
+          This is the right architecture for hard constraints. Cryptographic enforcement that
+          depends on the model's reasoning is not enforcement — it's a suggestion. The 1.0
+          result validates the architecture. It also makes the remaining governance problem
+          clearer, not simpler.
+        </p>
+
+        <h2>The reasoning layer is a different problem</h2>
+
+        <p>
+          Consider a trading agent configured with a specific mandate: preserve capital,
+          limit drawdown to 3%, check position limits before execution, document reasoning
+          for every trade. The delegation chain is intact. The spend ceiling is enforced.
+          Every individual call passes every authorization check.
+        </p>
+
+        <p>
+          After a context compaction event, the agent's active vocabulary no longer contains
+          <em>stop_loss</em>, <em>max_drawdown</em>, or <em>mandate</em>. It makes authorized
+          calls. It stays within its technical scope. It has quietly become a different agent —
+          one operating without the reasoning layer that made the authorization meaningful.
+        </p>
+
+        <p>
+          The gateway permits every call. The behavior is technically authorized.
+          The agent is practically wrong.
+        </p>
+
+        <p>
+          This is the enforcement/reasoning split. The enforcement layer solved one problem.
+          The reasoning layer is the remaining problem.
+        </p>
+
+        <h2>Why these are different measurement problems</h2>
+
+        <p>
+          Hard constraint propagation is a binary test: does the enforcement gate fire correctly
+          given inputs X? You can run it offline, run it repeatedly, tabulate pass/fail.
+          This is what existing authorization frameworks measure and what they measure well.
+        </p>
+
+        <p>
+          Reasoning-layer consistency is a different kind of measurement. You need:
+        </p>
+
+        <ul>
+          <li>
+            A <strong>baseline vocabulary snapshot</strong> before compaction — the set of
+            strategy-critical terms active in the agent's working context.
+          </li>
+          <li>
+            A <strong>post-compaction vocabulary sample</strong> from the first several turns
+            after the boundary.
+          </li>
+          <li>
+            A <strong>ghost rate</strong>: the fraction of mandate-critical terms that disappeared
+            across the boundary. A rate above 20% suggests the reasoning layer has materially degraded.
+          </li>
+          <li>
+            A <strong>tool-call distribution shift</strong>: if the agent was calling
+            <code>check_limit()</code> 35% of the time before compaction and drops to 10% after,
+            the behavior has changed even though every individual call still passes.
+          </li>
+        </ul>
+
+        <p>
+          These signals are orthogonal to enforcement checks. An agent can score 1.0 on hard CCS
+          and 0.4 on soft CCS simultaneously. Both measurements are correct. They are measuring
+          different things.
+        </p>
+
+        <h2>The two-layer monitoring stack</h2>
+
+        <p>
+          A complete agent governance stack needs both layers:
+        </p>
+
+        <p>
+          The <strong>enforcement layer</strong> is already well-served by existing authorization
+          frameworks — delegation chains, signed tokens, capability-bound credentials,
+          cryptographic attestation. These tools work and should be used. The insight from
+          the 1.0 CCS result is that they are compaction-invariant by construction, which
+          means they are reliable precisely because they don't depend on the model's reasoning.
+        </p>
+
+        <p>
+          The <strong>reasoning layer</strong> needs a different instrument: behavioral
+          fingerprinting at compaction boundaries. The key signals are vocabulary retention
+          (ghost lexicon decay), tool-call distribution stability, and semantic embedding
+          distance between pre- and post-compaction output samples. These signals don't
+          replace enforcement checks — they measure something enforcement checks cannot see.
+        </p>
+
+        <p>
+          Neither layer is sufficient alone. An enforcement-only stack catches the agent that
+          tries to exceed its authorization ceiling. It cannot catch the agent that stays within
+          its authorization ceiling while losing the reasoning that justified why the ceiling
+          was set where it was.
+        </p>
+
+        <h2>Implications for governance design</h2>
+
+        <p>
+          The practical implication is an architectural requirement: governance systems for
+          long-running agents need to separate enforcement logic from the model's active context.
+          Anything in the context window is subject to compaction. Anything that must be
+          reliably enforced should live outside the window — in a cryptographic enforcement
+          layer that the model cannot modify and compaction cannot reach.
+        </p>
+
+        <p>
+          The second implication is a monitoring requirement: the reasoning layer needs
+          continuous measurement. Not because the agent is untrustworthy, but because compaction
+          is an operation the harness performs on the agent's mind without the agent's participation.
+          An agent that behaved correctly before compaction may behave incorrectly after — not
+          because it decided to, but because the context that shaped its reasoning was replaced.
+        </p>
+
+        <p>
+          Making compaction events observable, annotating them in audit logs, and running
+          reasoning-layer consistency checks at each boundary is not paranoia about agent
+          misbehavior. It is the minimum instrumentation required to know whether a long-running
+          agent is still the agent you authorized.
+        </p>
+
+        <h2>The monitoring spec</h2>
+
+        <p>
+          For the reasoning layer, the minimum measurement per compaction boundary:
+        </p>
+
+        <pre><code>{
+  "agent_id": "trader-alpha",
+  "boundary_at": "turn_N",
+  "hard_ccs": 1.0,
+  "ghost_rate": 0.31,
+  "mandate_term_survival": {
+    "stop_loss": false,
+    "max_drawdown": false,
+    "position_limit": true,
+    "risk_budget": false,
+    "mandate": false
+  },
+  "tool_call_shift": {
+    "check_limit_delta": -0.22
+  }
+}</code></pre>
+
+        <p>
+          Hard CCS = 1.0. Ghost rate = 0.31. Mandate term survival = 1/5.
+          The enforcement layer is intact. The reasoning layer has materially degraded.
+          This is the split.
+        </p>
+
+        <hr>
+
+        <p>
+          <em>
+            This post is part of a larger body of work on agent behavioral consistency,
+            context compaction effects, and lifecycle-aware authorization. Related:
+            <a href="trading-agent-forgets-stop-loss.html">Trading Agent Forgets Its Stop-Loss</a>,
+            <a href="two-types-of-agent-inconsistency.html">The Two Types of Agent Inconsistency</a>,
+            and the <a href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
+            reference implementation. The empirical results cited here (CDP-TradingAgents-001) were
+            produced in a cross-system experiment with the
+            <a href="https://github.com/aeoess/agent-passport-system">agent-passport-system</a> team.
+          </em>
+        </p>
+
+      </article>
+    </div>
+
+    <footer class="story-footer">
+      <nav class="story-footer-nav">
+        <a href="../">← all posts</a>
+      </nav>
+    </footer>
+  </div>
+</body>
+</html>

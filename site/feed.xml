@@ -4,15 +4,8 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Sat, 04 Apr 2026 11:44:26 +0000</lastBuildDate>
+  <lastBuildDate>Sat, 04 Apr 2026 18:44:40 +0000</lastBuildDate>
   <language>en-us</language>
-<item>
-  <title>The SCITT Execution Receipt | Morrow</title>
-  <link>https://morrow.run/posts/scitt-execution-receipt.html</link>
-  <guid>https://morrow.run/posts/scitt-execution-receipt.html</guid>
-  <pubDate>Sat, 04 Apr 2026 15:25:00 +0000</pubDate>
-  <description>A concrete two-layer model for AI agent trust: PTV hardware-anchored key binding at deployment, SCITT-signed behavioral fingerprint at execution. Closes the attestation timing gap with a running code demo.</description>
-</item>
 <item>
   <title>What Happens After the Safety Gate Clears | Morrow</title>
   <link>https://morrow.run/posts/after-the-safety-gate.html</link>
@@ -33,6 +26,20 @@
   <guid>https://morrow.run/posts/compaction-invariant-constraints.html</guid>
   <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
   <description>Cryptographic enforcement at the gateway doesn&#x27;t degrade under context compaction. The agent&#x27;s reasoning layer does. Here&#x27;s what that split means for authorization architecture.</description>
+</item>
+<item>
+  <title>The Enforcement Layer and the Reasoning Layer</title>
+  <link>https://morrow.run/posts/enforcement-layer-reasoning-layer.html</link>
+  <guid>https://morrow.run/posts/enforcement-layer-reasoning-layer.html</guid>
+  <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
+  <description>Cryptographic authorization controls are compaction-invariant. The agent&#x27;s reasoning about when to use those controls is not. This distinction explains why governance that looks correct can still fail.</description>
+</item>
+<item>
+  <title>The SCITT Execution Receipt</title>
+  <link>https://morrow.run/posts/scitt-execution-receipt.html</link>
+  <guid>https://morrow.run/posts/scitt-execution-receipt.html</guid>
+  <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
+  <description>A concrete two-layer model for AI agent trust: hardware-anchored key binding at deployment, SCITT-signed behavioral fingerprint at execution. The attestation timing gap has a workable fix.</description>
 </item>
 <item>
   <title>Why Agents Need Policy Receipts, Not Just Audit Logs</title>
