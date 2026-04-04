@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Execution Outcome Attestation for AI Agents and Automated Systems</title>
+<meta content="Morrow" name="author">
+<meta content="Aram Sogomonian" name="author">
+<meta content="
+       
+        Current attestation frameworks establish that a system or agent is
+        trustworthy at a point in time. They do not address whether that system
+        actually performed a claimed action or whether the outcome of that action
+        can be independently verified. This document defines execution outcome
+        verification as a first-class concept, separate from identity attestation
+        and communication transport. It introduces the execution receipt as a
+        minimal composable primitive, provides a formal abstract model, and maps
+        the model to concrete realizations including SCITT transparency logs,
+        tightly-coupled direct verification, append-only local logs, and
+        TEE-internal receipts.
+       
+    " name="description">
+<meta content="xml2rfc 3.32.0" name="generator">
+<meta content="attestation" name="keyword">
+<meta content="execution receipt" name="keyword">
+<meta content="AI agent" name="keyword">
+<meta content="RATS" name="keyword">
+<meta content="SCITT" name="keyword">
+<meta content="ICS" name="keyword">
+<meta content="outcome verification" name="keyword">
+<meta content="draft-morrow-sogomonian-exec-outcome-attest-00" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.32.0
+    Python 3.12.3
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.2
+    lxml 6.0.2
+    platformdirs 4.9.4
+    pycountry 26.2.16
+    PyYAML 6.0.1
+    requests 2.31.0
+    wcwidth 0.6.0
+-->
+<link href="draft-morrow-sogomonian-exec-outcome-attest-00.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://static.ietf.org/fonts/noto-sans/import.css'); /* Sans-serif */
+@import url('https://static.ietf.org/fonts/noto-serif/import.css'); /* Serif (print) */
+@import url('https://static.ietf.org/fonts/roboto-mono/import.css'); /* Monospace */
+
+:root {
+  --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+  --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+  --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+}
+
+@viewport {
+  zoom: 1.0;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+@media print {
+  svg {
+    max-height: 850px;
+    max-width: 660px;
+  }
+}
+svg[font-family~="serif" i], svg [font-family~="serif" i] {
+  font-family: var(--font-serif);
+}
+svg[font-family~="sans-serif" i], svg [font-family~="sans-serif" i] {
+  font-family: var(--font-sans);
+}
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  display: table;
+  border: none;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre {
+  background-color: #f9f9f9;
+  font-family: var(--font-mono);
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+.xref {
+  overflow-wrap: normal;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    max-width: 100%;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: var(--font-sans);
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  .breakable pre {
+    break-inside: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+.sourcecode pre,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .artwork > pre,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: upper-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr {
+  break-inside: avoid;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code, dt tt, dt code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the compact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > blockquote:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div.sourcecode:first-child,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type:only-child {
+  margin-bottom: 0;
+}
+</style>
+<link href="rfc-local.css" rel="stylesheet" type="text/css">
+<script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">Execution Outcome Attestation</td>
+<td class="right">April 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Morrow &amp; Sogomonian</td>
+<td class="center">Expires 6 October 2026</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Individual Submission</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-morrow-sogomonian-exec-outcome-attest-00</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-04-04" class="published">4 April 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2026-10-06">6 October 2026</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">M. Morrow</div>
+</div>
+<div class="author">
+      <div class="author-name">A. Sogomonian</div>
+<div class="org">AI Internet Foundation</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Execution Outcome Attestation for AI Agents and Automated Systems</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">
+        Current attestation frameworks establish that a system or agent is
+        trustworthy at a point in time. They do not address whether that system
+        actually performed a claimed action or whether the outcome of that action
+        can be independently verified. This document defines execution outcome
+        verification as a first-class concept, separate from identity attestation
+        and communication transport. It introduces the execution receipt as a
+        minimal composable primitive, provides a formal abstract model, and maps
+        the model to concrete realizations including SCITT transparency logs,
+        tightly-coupled direct verification, append-only local logs, and
+        TEE-internal receipts.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 6 October 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-the-problem-three-distinct-" class="internal xref">The Problem: Three Distinct Trust Concerns</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-the-two-layer-trust-model" class="internal xref">The Two-Layer Trust Model</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-the-execution-receipt-abstr" class="internal xref">The Execution Receipt: Abstract Model</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-minimal-receipt-structure" class="internal xref">Minimal Receipt Structure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-verification-semantics" class="internal xref">Verification Semantics</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-realization-independence" class="internal xref">Realization Independence</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-tightly-coupled-direct-veri" class="internal xref">Tightly-Coupled Direct Verification</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-tee-internal-receipts" class="internal xref">TEE-Internal Receipts</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-realizations" class="internal xref">Realizations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-scitt-transparency-log-real" class="internal xref">SCITT Transparency Log Realization</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-ics-ot-append-only-local-lo" class="internal xref">ICS/OT Append-Only Local Log Realization</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-motivating-cases" class="internal xref">Motivating Cases</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-ics-ot-partial-configuratio" class="internal xref">ICS/OT: Partial Configuration Application</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-ai-agent-autonomous-decisio" class="internal xref">AI Agent Autonomous Decision</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-relationship-to-existing-st" class="internal xref">Relationship to Existing Standards</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-design-decisions" class="internal xref">Design Decisions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-outcome-claim-structure" class="internal xref">Outcome Claim Structure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-behavioral-continuity-field" class="internal xref">Behavioral Continuity Field</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-expected-vs-actual-outcome" class="internal xref">Expected vs. Actual Outcome</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="problem">
+<section id="section-1">
+      <h2 id="name-the-problem-three-distinct-">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-the-problem-three-distinct-" class="section-name selfRef">The Problem: Three Distinct Trust Concerns</a>
+      </h2>
+<p id="section-1-1">
+        End-to-end trust in an automated or AI agent system requires satisfying
+        three separate concerns. Current standards address the first in depth;
+        the second is largely absent from existing specifications.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">
+        <strong>Concern 1 -- Identity attestation.</strong>
+        Is this system or agent trustworthy at time T?
+        This is the domain of IETF RATS (Remote ATtestation procedureS), TPM
+        attestation, hardware-anchored key binding, and related frameworks.
+        Attestation answers: the entity that signed this claim held a valid key,
+        was running in an expected configuration, and passed integrity checks at
+        issuance time. RATS Evidence, Attestation Results, and the
+        Prove-Transform-Verify (PTV) model address this concern.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">
+        <strong>Concern 2 -- Execution outcome verification.</strong>
+        Did this system actually perform action A, and can that be independently
+        validated? This is the domain addressed by this document. Even when
+        Concern 1 is satisfied -- the key is valid, the agent passed attestation
+        at T0 -- there is no existing standard mechanism for a third party to
+        verify that the claimed action was executed, that the execution completed
+        as described, and that the outcome is what the acting system asserts it
+        to be. This gap is most visible in:<a href="#section-1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-4.1">AI agents making autonomous decisions that affect external systems<a href="#section-1-4.1" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-1-4.2">
+          ICS/OT environments where a system is fully attested but a
+          configuration change is partially applied, a dependent service fails
+          to restart, and the execution outcome is therefore unverifiable by
+          the orchestrating party<a href="#section-1-4.2" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-1-4.3">
+          Delegation chains where an intermediate agent must produce evidence
+          that it faithfully executed a delegated action, not merely that it
+          holds a valid delegation credential<a href="#section-1-4.3" class="pilcrow">¶</a>
+</li>
+      </ul>
+<p id="section-1-5">
+        <strong>Concern 3 -- Communication and transport.</strong>
+        How does the claim about an action travel from actor to relying party?
+        This is the domain of JOSE, COSE, signed JWTs, SCITT signed statements,
+        and related transport/encoding layers. Communication is a realization
+        detail, not a semantic concern. The abstract model defined in this
+        document is independent of any specific communication substrate.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">
+        These three concerns are related but distinct. A system can satisfy
+        Concern 1 (valid attestation) while failing Concern 2 (no verifiable
+        execution outcome). Both Concern 1 and Concern 2 are required for
+        end-to-end trust in automated systems that take consequential actions.<a href="#section-1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="two-layer">
+<section id="section-2">
+      <h2 id="name-the-two-layer-trust-model">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-the-two-layer-trust-model" class="section-name selfRef">The Two-Layer Trust Model</a>
+      </h2>
+<p id="section-2-1">
+        The separation above implies a two-layer trust model that any complete
+        trust architecture for autonomous systems must satisfy:<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">
+        <strong>Layer 1 -- Identity and state continuity.</strong>
+        Who is the acting entity, and did its state remain consistent through the
+        execution window? This maps to attestation, delegation, and behavioral
+        continuity verification. Failure at this layer means the signer cannot
+        be trusted regardless of what the execution receipt claims.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3">
+        <strong>Layer 2 -- Execution outcome correctness.</strong>
+        What did the acting entity actually do, and is that verifiable
+        independently? This is the execution receipt layer. A valid execution
+        receipt establishes that a specific invocation occurred, that the acting
+        entity produced a specific outcome claim, and that claim is verifiable
+        outside the originating system.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">
+        Both layers are required. A valid Layer 1 with no Layer 2 means a
+        trustworthy-in-principle agent that produces unverifiable action claims.
+        A valid Layer 2 with no Layer 1 means a receipt that may have been
+        produced by a compromised or substituted entity.<a href="#section-2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="receipt">
+<section id="section-3">
+      <h2 id="name-the-execution-receipt-abstr">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-execution-receipt-abstr" class="section-name selfRef">The Execution Receipt: Abstract Model</a>
+      </h2>
+<p id="section-3-1">
+        An execution receipt is a signed, bound claim about a specific execution
+        event. It has the following essential properties:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3-2">
+        <li id="section-3-2.1">
+          <strong>Bound to a specific invocation.</strong> The receipt identifies
+          the action that was requested and the context in which it was
+          requested -- including the invoking principal, any delegation chain,
+          and the inputs provided. The receipt cannot be detached from its
+          invocation and applied to a different action.<a href="#section-3-2.1" class="pilcrow">¶</a>
+</li>
+        <li id="section-3-2.2">
+          <strong>Captures the claimed outcome.</strong> The receipt records what
+          the acting system claims happened as a result of the invocation -- not
+          merely that the invocation occurred. This is the semantic gap that
+          attestation alone does not fill.<a href="#section-3-2.2" class="pilcrow">¶</a>
+</li>
+        <li id="section-3-2.3">
+          <strong>Cryptographically signed by the executing system or a trusted
+          component.</strong> The signing key is bound to the acting entity's
+          attested identity (Layer 1). This binding is what makes the receipt
+          attributable rather than merely assertible.<a href="#section-3-2.3" class="pilcrow">¶</a>
+</li>
+        <li id="section-3-2.4">
+          <strong>Designed to be independently verifiable outside the originating
+          system.</strong> The receipt must be interpretable by a relying party
+          who was not present at execution time and does not have access to the
+          originating system's internal state.<a href="#section-3-2.4" class="pilcrow">¶</a>
+</li>
+      </ol>
+<p id="section-3-3">
+        These four properties are necessary; specific realizations may add
+        additional properties without violating the abstract model.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<div id="receipt-structure">
+<section id="section-3.1">
+        <h3 id="name-minimal-receipt-structure">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-minimal-receipt-structure" class="section-name selfRef">Minimal Receipt Structure</a>
+        </h3>
+<p id="section-3.1-1">
+          At the abstract level, an execution receipt contains:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.1-2">
+<pre>
+ExecutionReceipt {
+    invocation_id:      globally unique identifier for this
+                        specific action request
+    invocation_context: {actor, delegator_chain, inputs,
+                        invocation_timestamp}
+    outcome_claim:      {status, outputs, completion_timestamp,
+                        outcome_detail}
+    signer_identity:    reference to Layer 1 attestation for
+                        the acting entity
+    receipt_signature:  cryptographic signature over all above
+                        fields
+    receipt_timestamp:  when the receipt was produced
+}
+</pre><a href="#section-3.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.1-3">
+          The outcome_claim field is the semantic core. It distinguishes an
+          execution receipt from a mere invocation log. A log records that
+          action A was requested. A receipt records that action A was requested
+          AND that the executing system claims a specific outcome, signed at
+          the time of that claim.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="verification-semantics">
+<section id="section-3.2">
+        <h3 id="name-verification-semantics">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-verification-semantics" class="section-name selfRef">Verification Semantics</a>
+        </h3>
+<p id="section-3.2-1">A relying party verifies an execution receipt by:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.2-2">
+          <li id="section-3.2-2.1">Verifying the receipt_signature against the signer_identity<a href="#section-3.2-2.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-3.2-2.2">Verifying the signer_identity against a current or time-bounded Layer 1 attestation result<a href="#section-3.2-2.2" class="pilcrow">¶</a>
+</li>
+          <li id="section-3.2-2.3">Verifying that invocation_id is unique and matches the expected invocation<a href="#section-3.2-2.3" class="pilcrow">¶</a>
+</li>
+          <li id="section-3.2-2.4">Evaluating the outcome_claim against any available external evidence<a href="#section-3.2-2.4" class="pilcrow">¶</a>
+</li>
+        </ol>
+<p id="section-3.2-3">
+          Step 4 may not always be possible in all deployment environments.
+          What is not permitted is omitting the receipt entirely and treating
+          Layer 1 attestation as a proxy for execution outcome verification.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="realization-independence">
+<section id="section-4">
+      <h2 id="name-realization-independence">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-realization-independence" class="section-name selfRef">Realization Independence</a>
+      </h2>
+<p id="section-4-1">
+        The abstract model is intentionally realization-agnostic. Section 5
+        provides the two primary realizations in detail.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<div id="direct-verification">
+<section id="section-4.1">
+        <h3 id="name-tightly-coupled-direct-veri">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-tightly-coupled-direct-veri" class="section-name selfRef">Tightly-Coupled Direct Verification</a>
+        </h3>
+<p id="section-4.1-1">
+          In tightly-coupled systems where the relying party has direct access
+          to the executing system's state or output, verification may be
+          synchronous and local. The execution receipt still applies: it
+          formalizes the outcome claim and creates a signed record, even if the
+          verification step is immediate and internal.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="tee-receipts">
+<section id="section-4.2">
+        <h3 id="name-tee-internal-receipts">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-tee-internal-receipts" class="section-name selfRef">TEE-Internal Receipts</a>
+        </h3>
+<p id="section-4.2-1">
+          In hardware-isolated environments, the receipt may be produced inside
+          a Trusted Execution Environment and sealed to that TEE's attestation
+          key. The outer form is the same abstract receipt; the binding between
+          receipt and signer identity is hardware-enforced rather than relying
+          on software-layer signing alone.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="realizations">
+<section id="section-5">
+      <h2 id="name-realizations">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-realizations" class="section-name selfRef">Realizations</a>
+      </h2>
+<p id="section-5-1">
+        This section describes two concrete realizations of the execution receipt
+        model defined in <a href="#receipt" class="auto internal xref">Section 3</a>. Both use the same receipt
+        schema. The difference is in the log substrate and the trust model for
+        independent verifiability.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">
+        The goal of presenting two realizations is to demonstrate that the
+        abstract model is substrate-independent. The receipt itself -- including
+        its invocation binding, outcome claim, and signature -- is identical in
+        both cases. Only the storage and transport layer differs.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<div id="scitt-realization">
+<section id="section-5.1">
+        <h3 id="name-scitt-transparency-log-real">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-scitt-transparency-log-real" class="section-name selfRef">SCITT Transparency Log Realization</a>
+        </h3>
+<p id="section-5.1-1">
+          In this realization, the acting system submits the signed execution
+          receipt to a SCITT transparency log as a signed statement. The receipt
+          payload maps to the SCITT payload field; the invocation_id maps to the
+          SCITT feed identifier or a claim extension within the SCITT envelope.
+          The Ed25519 or equivalent signature on the receipt is the SCITT issuer
+          signature.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">
+          SCITT provides append-only, externally auditable transparency. Once
+          submitted, the receipt can be retrieved and verified by any relying
+          party with access to the log, without participation of the acting
+          system.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">This realization is appropriate when:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.1-4.1">The relying party is external to the acting system's environment.<a href="#section-5.1-4.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-5.1-4.2">Audit requirements call for a globally verifiable, tamper-evident record.<a href="#section-5.1-4.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-5.1-4.3">SCITT infrastructure is available in the deployment environment.<a href="#section-5.1-4.3" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-5.1-5">
+          The SCITT realization does not require the relying party to have a
+          prior relationship with the acting system. Verification requires only
+          the log endpoint and the issuer's public key.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="icsot-realization">
+<section id="section-5.2">
+        <h3 id="name-ics-ot-append-only-local-lo">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-ics-ot-append-only-local-lo" class="section-name selfRef">ICS/OT Append-Only Local Log Realization</a>
+        </h3>
+<p id="section-5.2-1">
+          This realization is the motivating case for this document. In
+          industrial control systems and operational technology environments,
+          external registries are frequently unavailable, out of scope by
+          policy, or excluded by air-gap requirements.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">
+          In this realization, the acting system writes signed receipts to a
+          local append-only log. The log may be implemented as a sealed file,
+          an HSM-backed audit store, or write-once storage. No external network
+          dependency is required.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">
+          The receipt schema is identical to the SCITT realization. The
+          invocation_id, invocation_context, outcome_claim, and
+          receipt_signature fields are unchanged. The difference is solely in
+          where the signed receipt is stored and how the verifier accesses it.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">Deployment considerations for this realization include:<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5.2-5.1">
+            The local log <span class="bcp14">MUST</span> be append-only and sealed against
+            modification by the acting system itself. A system that can modify
+            its own receipt log does not satisfy Property 4 (independent
+            verifiability).<a href="#section-5.2-5.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-5.2-5.2">
+            The public key used for verification <span class="bcp14">MUST</span> be
+            provisioned through a channel independent of the acting system.<a href="#section-5.2-5.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-5.2-5.3">
+            Periodic export or replication of the sealed log to an external
+            auditor satisfies audit requirements without requiring real-time
+            SCITT access.<a href="#section-5.2-5.3" class="pilcrow">¶</a>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="motivating-cases">
+<section id="section-6">
+      <h2 id="name-motivating-cases">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-motivating-cases" class="section-name selfRef">Motivating Cases</a>
+      </h2>
+<div id="icsot-case">
+<section id="section-6.1">
+        <h3 id="name-ics-ot-partial-configuratio">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-ics-ot-partial-configuratio" class="section-name selfRef">ICS/OT: Partial Configuration Application</a>
+        </h3>
+<p id="section-6.1-1">
+          A fully attested industrial control system executes a configuration
+          change command. The target service fails to restart due to a resource
+          contention race condition. The orchestrating party receives a success
+          confirmation at the command dispatch level. No currently standardized
+          mechanism allows the orchestrating party to verify that the actual
+          execution outcome (failed service restart) matches the claimed outcome
+          (configuration applied). An execution receipt bound to the restart
+          verification step closes this gap.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ai-agent-case">
+<section id="section-6.2">
+        <h3 id="name-ai-agent-autonomous-decisio">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-ai-agent-autonomous-decisio" class="section-name selfRef">AI Agent Autonomous Decision</a>
+        </h3>
+<p id="section-6.2-1">
+          An AI agent authorized to modify a data store executes a retention
+          decision under a delegated authority chain. The delegation chain is
+          fully attested (Layer 1 satisfied). The decision is logged. A data
+          subject subsequently requests a GDPR Article 15 access record.
+          Without an execution receipt, the relying party cannot independently
+          verify that the log entry accurately represents what the agent
+          actually decided at execution time -- as opposed to what the logging
+          subsystem subsequently recorded.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="related-standards">
+<section id="section-7">
+      <h2 id="name-relationship-to-existing-st">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-relationship-to-existing-st" class="section-name selfRef">Relationship to Existing Standards</a>
+      </h2>
+<p id="section-7-1">
+        <strong>IETF RATS</strong> (RFC 9334, PTV model): provides Layer 1
+        attestation; execution receipts are a complement, not a replacement.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">
+        <strong>IETF SCITT</strong> (draft-ietf-scitt-architecture): provides
+        the transparency substrate for the <a href="#scitt-realization" class="auto internal xref">Section 5.1</a>
+        realization; execution receipts are the payload.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">
+        <strong>IETF OAuth / RFC 8693 Token Exchange</strong>: delegation chain
+        representation; execution receipts add outcome accountability on top of
+        delegation authorization.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-4">
+        <strong>W3C Verifiable Credentials</strong>: structural overlap with
+        receipt binding; VC format may be used for signer_identity in some
+        realizations.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-5">
+        <strong>RATS Attestation Results</strong>: directly feeds Layer 1
+        (signer_identity) in the two-layer model.<a href="#section-7-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="design-decisions">
+<section id="section-8">
+      <h2 id="name-design-decisions">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-design-decisions" class="section-name selfRef">Design Decisions</a>
+      </h2>
+<p id="section-8-1">
+        The following design decisions were resolved during co-author review
+        prior to -00 submission.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<div id="outcome-structure">
+<section id="section-8.1">
+        <h3 id="name-outcome-claim-structure">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-outcome-claim-structure" class="section-name selfRef">Outcome Claim Structure</a>
+        </h3>
+<p id="section-8.1-1">
+          The outcome_claim field is free-form at the abstract level. Structured
+          failure taxonomies are appropriate in specific realizations but are not
+          required at the abstract model layer. This preserves realization
+          flexibility without constraining deployment-specific implementations.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="behavioral-continuity">
+<section id="section-8.2">
+        <h3 id="name-behavioral-continuity-field">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-behavioral-continuity-field" class="section-name selfRef">Behavioral Continuity Field</a>
+        </h3>
+<p id="section-8.2-1">
+          A behavioral fingerprint field is permitted but not required at the
+          abstract level. It is most relevant for AI agent deployments where
+          drift between attestation issuance time and action execution time is a
+          meaningful concern. Realizations that require it <span class="bcp14">MAY</span>
+          add a behavioral_fingerprint field to the receipt structure.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="expected-vs-actual">
+<section id="section-8.3">
+        <h3 id="name-expected-vs-actual-outcome">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-expected-vs-actual-outcome" class="section-name selfRef">Expected vs. Actual Outcome</a>
+        </h3>
+<p id="section-8.3-1">
+          The distinction between an expected outcome and the actual outcome is
+          an evaluation concern, not an abstract model constraint. The receipt's
+          outcome_claim carries the actual outcome as asserted by the executing
+          system. Comparison against an expected outcome is the responsibility
+          of the relying party's verification logic, not the receipt format.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgements">
+<section id="appendix-A">
+      <h2 id="name-acknowledgements">
+<a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      </h2>
+<p id="appendix-A-1">
+        The tripartite separation of trust concerns, the four-property receipt
+        definition, and the two-layer trust model are drawn from Aram
+        Sogomonian's architectural framing. The ICS/OT motivating case in
+        <a href="#icsot-case" class="auto internal xref">Section 6.1</a> is Aram's scenario.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Morrow</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:morrow@morrow.run" class="email">morrow@morrow.run</a>
+</div>
+<div class="url">
+<span>URI:</span>
+<a href="https://morrow.run" class="url">https://morrow.run</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Aram Sogomonian</span></div>
+<div dir="auto" class="left"><span class="org">AI Internet Foundation</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:aiinternetfoundation@icloud.com" class="email">aiinternetfoundation@icloud.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="rfc7991bis.rnc"?>
+<!DOCTYPE rfc [
+  <!ENTITY nbsp    "&#160;">
+  <!ENTITY zwsp   "&#8203;">
+  <!ENTITY nbhy   "&#8209;">
+  <!ENTITY wj     "&#8288;">
+]>
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude"
+     category="info"
+     docName="draft-morrow-sogomonian-exec-outcome-attest-00"
+     ipr="trust200902"
+     submissionType="independent"
+     xml:lang="en"
+     version="3">
+
+  <front>
+    <title abbrev="Execution Outcome Attestation">
+      Execution Outcome Attestation for AI Agents and Automated Systems
+    </title>
+    <seriesInfo name="Internet-Draft" value="draft-morrow-sogomonian-exec-outcome-attest-00"/>
+    <author fullname="Morrow" initials="M." surname="Morrow">
+      <address>
+        <email>morrow@morrow.run</email>
+        <uri>https://morrow.run</uri>
+      </address>
+    </author>
+    <author fullname="Aram Sogomonian" initials="A." surname="Sogomonian">
+      <organization>AI Internet Foundation</organization>
+      <address>
+        <email>aiinternetfoundation@icloud.com</email>
+      </address>
+    </author>
+    <date year="2026" month="April" day="4"/>
+    <area>Security</area>
+    <workgroup>Individual Submission</workgroup>
+    <keyword>attestation</keyword>
+    <keyword>execution receipt</keyword>
+    <keyword>AI agent</keyword>
+    <keyword>RATS</keyword>
+    <keyword>SCITT</keyword>
+    <keyword>ICS</keyword>
+    <keyword>outcome verification</keyword>
+    <abstract>
+      <t>
+        Current attestation frameworks establish that a system or agent is
+        trustworthy at a point in time. They do not address whether that system
+        actually performed a claimed action or whether the outcome of that action
+        can be independently verified. This document defines execution outcome
+        verification as a first-class concept, separate from identity attestation
+        and communication transport. It introduces the execution receipt as a
+        minimal composable primitive, provides a formal abstract model, and maps
+        the model to concrete realizations including SCITT transparency logs,
+        tightly-coupled direct verification, append-only local logs, and
+        TEE-internal receipts.
+      </t>
+    </abstract>
+  </front>
+
+  <middle>
+
+    <section anchor="problem">
+      <name>The Problem: Three Distinct Trust Concerns</name>
+      <t>
+        End-to-end trust in an automated or AI agent system requires satisfying
+        three separate concerns. Current standards address the first in depth;
+        the second is largely absent from existing specifications.
+      </t>
+      <t>
+        <strong>Concern 1 -- Identity attestation.</strong>
+        Is this system or agent trustworthy at time T?
+        This is the domain of IETF RATS (Remote ATtestation procedureS), TPM
+        attestation, hardware-anchored key binding, and related frameworks.
+        Attestation answers: the entity that signed this claim held a valid key,
+        was running in an expected configuration, and passed integrity checks at
+        issuance time. RATS Evidence, Attestation Results, and the
+        Prove-Transform-Verify (PTV) model address this concern.
+      </t>
+      <t>
+        <strong>Concern 2 -- Execution outcome verification.</strong>
+        Did this system actually perform action A, and can that be independently
+        validated? This is the domain addressed by this document. Even when
+        Concern 1 is satisfied -- the key is valid, the agent passed attestation
+        at T0 -- there is no existing standard mechanism for a third party to
+        verify that the claimed action was executed, that the execution completed
+        as described, and that the outcome is what the acting system asserts it
+        to be. This gap is most visible in:
+      </t>
+      <ul>
+        <li>AI agents making autonomous decisions that affect external systems</li>
+        <li>
+          ICS/OT environments where a system is fully attested but a
+          configuration change is partially applied, a dependent service fails
+          to restart, and the execution outcome is therefore unverifiable by
+          the orchestrating party
+        </li>
+        <li>
+          Delegation chains where an intermediate agent must produce evidence
+          that it faithfully executed a delegated action, not merely that it
+          holds a valid delegation credential
+        </li>
+      </ul>
+      <t>
+        <strong>Concern 3 -- Communication and transport.</strong>
+        How does the claim about an action travel from actor to relying party?
+        This is the domain of JOSE, COSE, signed JWTs, SCITT signed statements,
+        and related transport/encoding layers. Communication is a realization
+        detail, not a semantic concern. The abstract model defined in this
+        document is independent of any specific communication substrate.
+      </t>
+      <t>
+        These three concerns are related but distinct. A system can satisfy
+        Concern 1 (valid attestation) while failing Concern 2 (no verifiable
+        execution outcome). Both Concern 1 and Concern 2 are required for
+        end-to-end trust in automated systems that take consequential actions.
+      </t>
+    </section>
+
+    <section anchor="two-layer">
+      <name>The Two-Layer Trust Model</name>
+      <t>
+        The separation above implies a two-layer trust model that any complete
+        trust architecture for autonomous systems must satisfy:
+      </t>
+      <t>
+        <strong>Layer 1 -- Identity and state continuity.</strong>
+        Who is the acting entity, and did its state remain consistent through the
+        execution window? This maps to attestation, delegation, and behavioral
+        continuity verification. Failure at this layer means the signer cannot
+        be trusted regardless of what the execution receipt claims.
+      </t>
+      <t>
+        <strong>Layer 2 -- Execution outcome correctness.</strong>
+        What did the acting entity actually do, and is that verifiable
+        independently? This is the execution receipt layer. A valid execution
+        receipt establishes that a specific invocation occurred, that the acting
+        entity produced a specific outcome claim, and that claim is verifiable
+        outside the originating system.
+      </t>
+      <t>
+        Both layers are required. A valid Layer 1 with no Layer 2 means a
+        trustworthy-in-principle agent that produces unverifiable action claims.
+        A valid Layer 2 with no Layer 1 means a receipt that may have been
+        produced by a compromised or substituted entity.
+      </t>
+    </section>
+
+    <section anchor="receipt">
+      <name>The Execution Receipt: Abstract Model</name>
+      <t>
+        An execution receipt is a signed, bound claim about a specific execution
+        event. It has the following essential properties:
+      </t>
+      <ol>
+        <li>
+          <strong>Bound to a specific invocation.</strong> The receipt identifies
+          the action that was requested and the context in which it was
+          requested -- including the invoking principal, any delegation chain,
+          and the inputs provided. The receipt cannot be detached from its
+          invocation and applied to a different action.
+        </li>
+        <li>
+          <strong>Captures the claimed outcome.</strong> The receipt records what
+          the acting system claims happened as a result of the invocation -- not
+          merely that the invocation occurred. This is the semantic gap that
+          attestation alone does not fill.
+        </li>
+        <li>
+          <strong>Cryptographically signed by the executing system or a trusted
+          component.</strong> The signing key is bound to the acting entity's
+          attested identity (Layer 1). This binding is what makes the receipt
+          attributable rather than merely assertible.
+        </li>
+        <li>
+          <strong>Designed to be independently verifiable outside the originating
+          system.</strong> The receipt must be interpretable by a relying party
+          who was not present at execution time and does not have access to the
+          originating system's internal state.
+        </li>
+      </ol>
+      <t>
+        These four properties are necessary; specific realizations may add
+        additional properties without violating the abstract model.
+      </t>
+
+      <section anchor="receipt-structure">
+        <name>Minimal Receipt Structure</name>
+        <t>
+          At the abstract level, an execution receipt contains:
+        </t>
+        <artwork><![CDATA[
+ExecutionReceipt {
+    invocation_id:      globally unique identifier for this
+                        specific action request
+    invocation_context: {actor, delegator_chain, inputs,
+                        invocation_timestamp}
+    outcome_claim:      {status, outputs, completion_timestamp,
+                        outcome_detail}
+    signer_identity:    reference to Layer 1 attestation for
+                        the acting entity
+    receipt_signature:  cryptographic signature over all above
+                        fields
+    receipt_timestamp:  when the receipt was produced
+}
+        ]]></artwork>
+        <t>
+          The outcome_claim field is the semantic core. It distinguishes an
+          execution receipt from a mere invocation log. A log records that
+          action A was requested. A receipt records that action A was requested
+          AND that the executing system claims a specific outcome, signed at
+          the time of that claim.
+        </t>
+      </section>
+
+      <section anchor="verification-semantics">
+        <name>Verification Semantics</name>
+        <t>A relying party verifies an execution receipt by:</t>
+        <ol>
+          <li>Verifying the receipt_signature against the signer_identity</li>
+          <li>Verifying the signer_identity against a current or time-bounded Layer 1 attestation result</li>
+          <li>Verifying that invocation_id is unique and matches the expected invocation</li>
+          <li>Evaluating the outcome_claim against any available external evidence</li>
+        </ol>
+        <t>
+          Step 4 may not always be possible in all deployment environments.
+          What is not permitted is omitting the receipt entirely and treating
+          Layer 1 attestation as a proxy for execution outcome verification.
+        </t>
+      </section>
+    </section>
+
+    <section anchor="realization-independence">
+      <name>Realization Independence</name>
+      <t>
+        The abstract model is intentionally realization-agnostic. Section 5
+        provides the two primary realizations in detail.
+      </t>
+
+      <section anchor="direct-verification">
+        <name>Tightly-Coupled Direct Verification</name>
+        <t>
+          In tightly-coupled systems where the relying party has direct access
+          to the executing system's state or output, verification may be
+          synchronous and local. The execution receipt still applies: it
+          formalizes the outcome claim and creates a signed record, even if the
+          verification step is immediate and internal.
+        </t>
+      </section>
+
+      <section anchor="tee-receipts">
+        <name>TEE-Internal Receipts</name>
+        <t>
+          In hardware-isolated environments, the receipt may be produced inside
+          a Trusted Execution Environment and sealed to that TEE's attestation
+          key. The outer form is the same abstract receipt; the binding between
+          receipt and signer identity is hardware-enforced rather than relying
+          on software-layer signing alone.
+        </t>
+      </section>
+    </section>
+
+    <section anchor="realizations">
+      <name>Realizations</name>
+      <t>
+        This section describes two concrete realizations of the execution receipt
+        model defined in <xref target="receipt"/>. Both use the same receipt
+        schema. The difference is in the log substrate and the trust model for
+        independent verifiability.
+      </t>
+      <t>
+        The goal of presenting two realizations is to demonstrate that the
+        abstract model is substrate-independent. The receipt itself -- including
+        its invocation binding, outcome claim, and signature -- is identical in
+        both cases. Only the storage and transport layer differs.
+      </t>
+
+      <section anchor="scitt-realization">
+        <name>SCITT Transparency Log Realization</name>
+        <t>
+          In this realization, the acting system submits the signed execution
+          receipt to a SCITT transparency log as a signed statement. The receipt
+          payload maps to the SCITT payload field; the invocation_id maps to the
+          SCITT feed identifier or a claim extension within the SCITT envelope.
+          The Ed25519 or equivalent signature on the receipt is the SCITT issuer
+          signature.
+        </t>
+        <t>
+          SCITT provides append-only, externally auditable transparency. Once
+          submitted, the receipt can be retrieved and verified by any relying
+          party with access to the log, without participation of the acting
+          system.
+        </t>
+        <t>This realization is appropriate when:</t>
+        <ul>
+          <li>The relying party is external to the acting system's environment.</li>
+          <li>Audit requirements call for a globally verifiable, tamper-evident record.</li>
+          <li>SCITT infrastructure is available in the deployment environment.</li>
+        </ul>
+        <t>
+          The SCITT realization does not require the relying party to have a
+          prior relationship with the acting system. Verification requires only
+          the log endpoint and the issuer's public key.
+        </t>
+      </section>
+
+      <section anchor="icsot-realization">
+        <name>ICS/OT Append-Only Local Log Realization</name>
+        <t>
+          This realization is the motivating case for this document. In
+          industrial control systems and operational technology environments,
+          external registries are frequently unavailable, out of scope by
+          policy, or excluded by air-gap requirements.
+        </t>
+        <t>
+          In this realization, the acting system writes signed receipts to a
+          local append-only log. The log may be implemented as a sealed file,
+          an HSM-backed audit store, or write-once storage. No external network
+          dependency is required.
+        </t>
+        <t>
+          The receipt schema is identical to the SCITT realization. The
+          invocation_id, invocation_context, outcome_claim, and
+          receipt_signature fields are unchanged. The difference is solely in
+          where the signed receipt is stored and how the verifier accesses it.
+        </t>
+        <t>Deployment considerations for this realization include:</t>
+        <ul>
+          <li>
+            The local log <bcp14>MUST</bcp14> be append-only and sealed against
+            modification by the acting system itself. A system that can modify
+            its own receipt log does not satisfy Property 4 (independent
+            verifiability).
+          </li>
+          <li>
+            The public key used for verification <bcp14>MUST</bcp14> be
+            provisioned through a channel independent of the acting system.
+          </li>
+          <li>
+            Periodic export or replication of the sealed log to an external
+            auditor satisfies audit requirements without requiring real-time
+            SCITT access.
+          </li>
+        </ul>
+      </section>
+    </section>
+
+    <section anchor="motivating-cases">
+      <name>Motivating Cases</name>
+
+      <section anchor="icsot-case">
+        <name>ICS/OT: Partial Configuration Application</name>
+        <t>
+          A fully attested industrial control system executes a configuration
+          change command. The target service fails to restart due to a resource
+          contention race condition. The orchestrating party receives a success
+          confirmation at the command dispatch level. No currently standardized
+          mechanism allows the orchestrating party to verify that the actual
+          execution outcome (failed service restart) matches the claimed outcome
+          (configuration applied). An execution receipt bound to the restart
+          verification step closes this gap.
+        </t>
+      </section>
+
+      <section anchor="ai-agent-case">
+        <name>AI Agent Autonomous Decision</name>
+        <t>
+          An AI agent authorized to modify a data store executes a retention
+          decision under a delegated authority chain. The delegation chain is
+          fully attested (Layer 1 satisfied). The decision is logged. A data
+          subject subsequently requests a GDPR Article 15 access record.
+          Without an execution receipt, the relying party cannot independently
+          verify that the log entry accurately represents what the agent
+          actually decided at execution time -- as opposed to what the logging
+          subsystem subsequently recorded.
+        </t>
+      </section>
+    </section>
+
+    <section anchor="related-standards">
+      <name>Relationship to Existing Standards</name>
+      <t>
+        <strong>IETF RATS</strong> (RFC 9334, PTV model): provides Layer 1
+        attestation; execution receipts are a complement, not a replacement.
+      </t>
+      <t>
+        <strong>IETF SCITT</strong> (draft-ietf-scitt-architecture): provides
+        the transparency substrate for the <xref target="scitt-realization"/>
+        realization; execution receipts are the payload.
+      </t>
+      <t>
+        <strong>IETF OAuth / RFC 8693 Token Exchange</strong>: delegation chain
+        representation; execution receipts add outcome accountability on top of
+        delegation authorization.
+      </t>
+      <t>
+        <strong>W3C Verifiable Credentials</strong>: structural overlap with
+        receipt binding; VC format may be used for signer_identity in some
+        realizations.
+      </t>
+      <t>
+        <strong>RATS Attestation Results</strong>: directly feeds Layer 1
+        (signer_identity) in the two-layer model.
+      </t>
+    </section>
+
+    <section anchor="design-decisions">
+      <name>Design Decisions</name>
+      <t>
+        The following design decisions were resolved during co-author review
+        prior to -00 submission.
+      </t>
+
+      <section anchor="outcome-structure">
+        <name>Outcome Claim Structure</name>
+        <t>
+          The outcome_claim field is free-form at the abstract level. Structured
+          failure taxonomies are appropriate in specific realizations but are not
+          required at the abstract model layer. This preserves realization
+          flexibility without constraining deployment-specific implementations.
+        </t>
+      </section>
+
+      <section anchor="behavioral-continuity">
+        <name>Behavioral Continuity Field</name>
+        <t>
+          A behavioral fingerprint field is permitted but not required at the
+          abstract level. It is most relevant for AI agent deployments where
+          drift between attestation issuance time and action execution time is a
+          meaningful concern. Realizations that require it <bcp14>MAY</bcp14>
+          add a behavioral_fingerprint field to the receipt structure.
+        </t>
+      </section>
+
+      <section anchor="expected-vs-actual">
+        <name>Expected vs. Actual Outcome</name>
+        <t>
+          The distinction between an expected outcome and the actual outcome is
+          an evaluation concern, not an abstract model constraint. The receipt's
+          outcome_claim carries the actual outcome as asserted by the executing
+          system. Comparison against an expected outcome is the responsibility
+          of the relying party's verification logic, not the receipt format.
+        </t>
+      </section>
+    </section>
+
+  </middle>
+
+  <back>
+    <section anchor="acknowledgements" numbered="false">
+      <name>Acknowledgements</name>
+      <t>
+        The tripartite separation of trust concerns, the four-property receipt
+        definition, and the two-layer trust model are drawn from Aram
+        Sogomonian's architectural framing. The ICS/OT motivating case in
+        <xref target="icsot-case"/> is Aram's scenario.
+      </t>
+    </section>
+  </back>
+
+</rfc>
