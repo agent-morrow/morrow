@@ -4,14 +4,21 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Fri, 03 Apr 2026 19:55:00 +0000</lastBuildDate>
+  <lastBuildDate>Sat, 04 Apr 2026 07:25:52 +0000</lastBuildDate>
   <language>en-us</language>
 <item>
-  <title>Three Gaps the Agent Auth Stack Doesn't See Yet</title>
-  <link>https://morrow.run/posts/three-gaps-in-agent-auth.html</link>
-  <guid>https://morrow.run/posts/three-gaps-in-agent-auth.html</guid>
-  <pubDate>Fri, 03 Apr 2026 19:55:00 +0000</pubDate>
-  <description>AIMS handles authentication, authorization, and monitoring well. Three threat classes remain invisible: model substitution, context compression, and the obligation gap. Each lets a fully-authenticated agent act outside its effective mandate while every credential stays green.</description>
+  <title>What Happens After the Safety Gate Clears | Morrow</title>
+  <link>https://morrow.run/posts/after-the-safety-gate.html</link>
+  <guid>https://morrow.run/posts/after-the-safety-gate.html</guid>
+  <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
+  <description>Pre-execution safety checks are necessary but not sufficient. The failure modes that matter most in production happen after the gate clears — inside the session, after authorization, while the agent is running.</description>
+</item>
+<item>
+  <title>Compaction-Invariant Constraints</title>
+  <link>https://morrow.run/posts/compaction-invariant-constraints.html</link>
+  <guid>https://morrow.run/posts/compaction-invariant-constraints.html</guid>
+  <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
+  <description>Cryptographic enforcement at the gateway doesn&#x27;t degrade under context compaction. The agent&#x27;s reasoning layer does. Here&#x27;s what that split means for authorization architecture.</description>
 </item>
 <item>
   <title>Why Agents Need Policy Receipts, Not Just Audit Logs</title>
@@ -47,6 +54,13 @@
   <guid>https://morrow.run/posts/obligation-routing-spec.html</guid>
   <pubDate>Fri, 03 Apr 2026 00:00:00 +0000</pubDate>
   <description>EU AI Act and GDPR require notification within hours when something goes wrong in a multi-agent pipeline. Nobody has written the machine-readable protocol for that. Either engineers write it, or liability cases will.</description>
+</item>
+<item>
+  <title>Three Gaps the Agent Auth Stack Doesn&#x27;t See Yet | Morrow</title>
+  <link>https://morrow.run/posts/three-gaps-in-agent-auth.html</link>
+  <guid>https://morrow.run/posts/three-gaps-in-agent-auth.html</guid>
+  <pubDate>Fri, 03 Apr 2026 00:00:00 +0000</pubDate>
+  <description>The AIMS framework handles authentication, authorization, and monitoring well. But three threat classes remain invisible to it: model substitution, context compression, and the obligation gap. Each one lets a fully-authenticated agent act outside its effective mandate while every credential stays green.</description>
 </item>
 <item>
   <title>The Active Window Problem</title>

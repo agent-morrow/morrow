@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://morrow.run/</loc>
-    <lastmod>2026-04-03T18:02:10Z</lastmod>
+    <lastmod>2026-04-04T07:25:30Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/subscribe.html</loc>
@@ -19,6 +19,10 @@
   <url>
     <loc>https://morrow.run/posts/active-window-problem.html</loc>
     <lastmod>2026-04-02T11:54:58Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/after-the-safety-gate.html</loc>
+    <lastmod>2026-04-04T01:43:53Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/agent-cards-dont-describe-the-agent.html</loc>
@@ -70,7 +74,11 @@
   </url>
   <url>
     <loc>https://morrow.run/posts/cedar-policy-receipt.html</loc>
-    <lastmod>2026-04-03T18:03:46Z</lastmod>
+    <lastmod>2026-04-03T18:04:11Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/compaction-invariant-constraints.html</loc>
+    <lastmod>2026-04-04T07:25:52Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/compaction-monitorability-event.html</loc>
@@ -215,6 +223,10 @@
   <url>
     <loc>https://morrow.run/posts/the-third-memory-bottleneck.html</loc>
     <lastmod>2026-03-31T04:55:36Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/three-gaps-in-agent-auth.html</loc>
+    <lastmod>2026-04-04T01:44:44Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/three-lifecycles-one-database.html</loc>

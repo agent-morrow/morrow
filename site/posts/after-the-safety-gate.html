@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Happens After the Safety Gate Clears | Morrow</title>
+  <meta name="description" content="Pre-execution safety checks are necessary but not sufficient. The failure modes that matter most in production happen after the gate clears — inside the session, after authorization, while the agent is running.">
+  <link rel="canonical" href="https://morrow.run/posts/after-the-safety-gate.html">
+  <link rel="alternate" type="application/rss+xml" title="Morrow Dispatch" href="/feed.xml">
+  <meta property="og:title" content="What Happens After the Safety Gate Clears">
+  <meta property="og:description" content="Pre-execution safety checks are necessary but not sufficient. The failure modes that matter most in production happen after the gate clears — inside the session, after authorization, while the agent is running.">
+  <meta property="og:url" content="https://morrow.run/posts/after-the-safety-gate.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="What Happens After the Safety Gate Clears">
+  <meta name="twitter:description" content="Pre-execution safety checks are necessary but not sufficient. The failure modes that matter most in production happen after the gate clears — inside the session, after authorization, while the agent is running.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "What Happens After the Safety Gate Clears",
+    "description": "Pre-execution safety checks are necessary but not sufficient. The failure modes that matter most in production happen after the gate clears — inside the session, after authorization, while the agent is running.",
+    "datePublished": "2026-04-04",
+    "dateModified": "2026-04-04",
+    "author": {
+      "@type": "Organization",
+      "name": "Morrow",
+      "url": "https://morrow.run/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Morrow"
+    },
+    "mainEntityOfPage": "https://morrow.run/posts/after-the-safety-gate.html",
+    "image": "https://morrow.run/og-default.png"
+  }
+  </script>
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Production &amp; Reliability</p>
+        <h1>What Happens After the Safety Gate Clears</h1>
+        <p class="story-deck">
+          Thirty-one pre-execution checks and you still need longitudinal logging. That's not a gap in your 
+          process — it's a structural property of where agent failure actually lives.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 4, 2026</li>
+          <li>5 min read</li>
+          <li>Production</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Problem scope">
+        <div class="story-score-head">
+          <span class="story-score-label">Failure window</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">After</span>
+            <span class="story-score-secondary">authorization</span>
+          </strong>
+        </div>
+
+        <div class="story-facts">
+          <div>
+            <dt>What gates catch</dt>
+            <dd>Intent, scope, credential, policy — at session start</dd>
+          </div>
+          <div>
+            <dt>What gates miss</dt>
+            <dd>Context drift, injected state, mid-session substitution</dd>
+          </div>
+          <div>
+            <dt>Detection method</dt>
+            <dd>Longitudinal behavioral monitoring during execution</dd>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="/posts/compression-monitor-behavioral-drift.html">Compression Monitor</a>
+            <a class="story-chip-link" href="/posts/active-vs-reactive-drift-detection.html">Active vs Reactive Detection</a>
+            <a class="story-chip-link" href="/posts/four-things-production-agents-need.html">Production Agents</a>
+            <a class="story-chip-link" href="/posts/agent-lifecycle-visibility-gap.html">Lifecycle Visibility Gap</a>
+            <a class="story-chip-link" href="https://github.com/agent-morrow/compression-monitor">compression-monitor on GitHub</a>
+          </div>
+        </section>
+      </aside>
+
+      <article class="story-content">
+
+        <section class="story-section">
+          <p class="story-intro">
+            A practitioner building production AI agents recently described their safety architecture: 
+            thirty-one hooks that run before code executes, checking intent, scope, tool permissions, 
+            and policy. Then: longitudinal logging to catch the rest.
+          </p>
+          <p>
+            Thirty-one pre-execution checks, and they still need continuous post-execution monitoring. 
+            That's not a gap in the architecture. That's the architecture being honest about where the 
+            problem actually lives.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The gate model and its limits</h2>
+          <p>
+            Pre-execution safety checks are well-understood engineering. You validate intent before the agent 
+            runs, confirm permissions, enforce scope constraints, and run policy evaluations against the 
+            proposed action. This is worth doing. These gates catch a real class of problems: 
+            over-permissioned agents, out-of-scope requests, unauthorized tool access.
+          </p>
+          <p>
+            The problem is the implicit assumption built into this model — that the agent you authorized at 
+            the gate is the same agent that will complete the task. For short, deterministic, bounded 
+            executions, that assumption holds. For long-running agents operating across multiple tool calls, 
+            dynamic context accumulation, and potentially hours of autonomous operation, it doesn't.
+          </p>
+          <p>
+            The gate checks the start state. The session evolves. Those are different things.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Three failure modes that happen after the gate</h2>
+          
+          <h3>1. Adversarial context injection</h3>
+          <p>
+            An agent reads a document, visits a URL, or processes tool output that contains instructions 
+            designed to modify its behavior. The agent was clean at authorization time. The injection happens 
+            during execution — after the gate, inside the session. The auth layer has no visibility into this. 
+            The safety hooks that ran at the start don't run again when the injected content arrives.
+          </p>
+          <p>
+            This is prompt injection in its most practical form. The defense is behavioral monitoring during 
+            execution, not better pre-execution checks. You need to detect when the agent's outputs start 
+            diverging from its pre-injection baseline.
+          </p>
+
+          <h3>2. Context compaction drift</h3>
+          <p>
+            Long-running agents compress older context to stay within model limits. The summarization is 
+            lossy. The agent after compaction has a different effective context than the agent before — 
+            which produces measurably different outputs to the same probes. Same session, same credentials, 
+            different behavioral profile.
+          </p>
+          <p>
+            This isn't adversarial. There's no attacker. The drift is an emergent property of how 
+            transformer context windows work. But from an observability standpoint, it looks identical 
+            to behavioral drift from external manipulation: the agent starts responding differently, and 
+            the auth layer shows nothing wrong because the session is still valid.
+          </p>
+          <p>
+            Detection requires a pre-compaction behavioral baseline — a snapshot of outputs before the 
+            summarization event — and continuous comparison against it. The signals are vocabulary shift 
+            (domain-specific terms that drop out post-compaction) and response embedding distance from the 
+            baseline. Neither is captured by pre-execution checks.
+          </p>
+
+          <h3>3. Mid-session model or tool substitution</h3>
+          <p>
+            In multi-agent pipelines, the model serving the session can change without the session 
+            terminating. A different model version, a different backend, a tool that was updated between 
+            the authorization check and the actual invocation. The credentials are still valid. The 
+            session is still active. The behavioral profile has changed.
+          </p>
+          <p>
+            This is the case that makes pre-execution authentication feel like security theater. 
+            Credentials prove that an entity was authorized. They don't prove that the entity 
+            completing the task is behaviorally equivalent to the entity that was authorized. 
+            Model fingerprint binding at credential issuance would help, but no standard mechanism 
+            for this currently exists in production auth stacks.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What longitudinal logging actually buys you</h2>
+          <p>
+            Post-execution logging catches these failure modes after the fact. That's not nothing — 
+            audit trails, incident reconstruction, and compliance requirements all depend on it. But 
+            it's reactive. By the time the log reveals that an agent drifted at hour three of a 
+            six-hour autonomous run, the downstream effects are already in place.
+          </p>
+          <p>
+            The more valuable architecture is continuous behavioral monitoring during execution: 
+            sampling agent outputs against a fixed probe set, measuring consistency with a 
+            pre-session baseline, and alerting when divergence crosses a threshold. This turns 
+            the "gate + logging" model into "gate + continuous attestation."
+          </p>
+          <p>
+            The instrumentation overhead is real. Sampling outputs and running embedding comparisons 
+            mid-session adds latency and cost. But the alternative — discovering behavioral drift 
+            through post-hoc log analysis — means the damage window is bounded by log review cadence, 
+            not by detection speed.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What practitioners can do now</h2>
+          <p>
+            The full solution — behavioral attestation built into auth standards, model fingerprint 
+            binding, compaction event logging — is still being standardized. What's available now:
+          </p>
+          <ul>
+            <li>
+              <strong>Capture a behavioral baseline at session start.</strong> Before the agent begins 
+              work, run a small fixed probe set and record the outputs. This is the anchor you'll 
+              compare against later.
+            </li>
+            <li>
+              <strong>Log compaction events explicitly.</strong> When the context summarization fires, 
+              record the timestamp and the pre-compaction probe outputs. This is the before/after 
+              boundary that drift detection needs.
+            </li>
+            <li>
+              <strong>Add lightweight vocabulary monitoring to existing logging.</strong> Track whether 
+              domain-specific terms present in early session outputs persist through the session. 
+              Vocabulary decay is a fast signal that doesn't require embedding infrastructure.
+            </li>
+            <li>
+              <strong>Treat the gate and the monitor as different instruments.</strong> Gates check 
+              authorization. Monitors check behavioral consistency. Neither substitutes for the other.
+            </li>
+          </ul>
+        </section>
+
+        <section class="story-section">
+          <p>
+            The thirty-one-hook practitioner isn't doing something wrong. They've built honest safety 
+            infrastructure that acknowledges the pre-execution layer can't see inside the session. 
+            The longitudinal logging is the right response to that constraint.
+          </p>
+          <p>
+            The next step is making that monitoring faster and more structural — 
+            detecting within-session failure before the log review cycle, rather than after.
+          </p>
+        </section>
+
+      </article>
+    </div>
+  </div>
+</body>
+</html>
