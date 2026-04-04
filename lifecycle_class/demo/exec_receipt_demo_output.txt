@@ -1,0 +1,68 @@
+# Execution Receipt Demo — Reproducible Run Output
+# draft-morrow-sogomonian-exec-outcome-attest-00
+# Run: 2026-04-04T20:49:35Z
+# Platform: Python 3.12.3, Linux 6.17.0-1009-aws
+# Source: lifecycle_class/demo/exec_receipt_demo.py (commit a302b5b)
+
+================================================================
+Execution Receipt Demo
+draft-morrow-sogomonian-exec-outcome-attest-00
+================================================================
+
+[1] Actor key thumbprint: sha256:0ea9cadc09aa983b
+
+[2] Receipt payload (unsigned):
+    invocation_id : 9ea8e547-acae-4c36-938c-80e4f2f09100
+    actor         : agent-worker-42
+    action        : transfer_funds
+    status        : completed
+    tx_id         : TX-20260404-0099
+
+[3] JOSE-signed receipt (EdDSA / JWT compact serialization):
+    header  : eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9
+    payload : eyJpbnZvY2F0aW9uX2lkIjoiOWVhOGU1NDctYWNh…
+    sig     : bahL4gDeRyMwHZ-KXOZ9…
+
+[4] Independent verification (public key only):
+    invocation_id verified : 9ea8e547-acae-4c36-938c-80e4f2f09100
+    outcome status         : completed
+    output (tx_id)         : TX-20260404-0099
+    signature valid        : ✓
+
+[5] Tamper resistance — mutating outcome_claim.status:
+    Tampered token rejected: InvalidSignatureError ✓
+
+── Gap Demonstration ──────────────────────────────────────────
+
+Layer 1 only (identity attestation / RATS Evidence):
+  ✓ Is this agent trustworthy at time T?
+  ✓ Does it hold a valid key?
+  ✗ Did it actually perform action A?
+  ✗ What was the outcome?
+  ✗ Can a relying party verify the outcome independently?
+
+Layer 2 added by execution receipt:
+  ✓ Specific invocation bound (not replayable to different action)
+  ✓ Outcome claim signed by same key as Layer 1 identity
+  ✓ Independently verifiable with only the public key
+  ✓ Composable: SCITT log, direct verification, append-only log
+
+  Additional fields the receipt adds over identity-only JWT:
+    invocation_id: <uuid>
+    action: transfer_funds
+    inputs: {'amount': 1000, 'to': 'acct-7'}
+    status: completed
+    outputs: {'tx_id': 'TX-99'}
+    completion_timestamp: <iso>
+    signer_identity: {'thumbprint': '<key-thumbprint>'}
+
+================================================================
+All checks passed.
+The execution receipt satisfies all four properties:
+  1. Bound to specific invocation  ✓
+  2. Captures claimed outcome       ✓
+  3. Cryptographically signed       ✓
+  4. Independently verifiable       ✓
+================================================================
+
+# Exit code: 0
