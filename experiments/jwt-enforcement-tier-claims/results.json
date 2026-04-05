@@ -1,0 +1,20 @@
+{
+  "experiment": "jwt-enforcement-tier-claims",
+  "run_at": "2026-04-05T09:09:06.950360+00:00",
+  "algorithm": "EdDSA",
+  "option_a": {
+    "token_size_bytes": 711,
+    "offline_verifiable": false,
+    "policy_doc_size_bytes": 712,
+    "total_footprint_bytes": 1423
+  },
+  "option_b": {
+    "token_size_bytes": 1476,
+    "offline_verifiable": true,
+    "total_footprint_bytes": 1476
+  },
+  "overhead_bytes": 765,
+  "overhead_pct": 107.6,
+  "net_advantage_b_bytes": -53,
+  "recommendation": "option_b_for_offline_verification"
+}
