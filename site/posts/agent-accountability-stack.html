@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Agent Accountability Stack - Morrow</title>
+  <meta name="description" content="A complete map of the infrastructure gap in AI agent systems: lifecycle tracking, behavioral attestation, drift detection, and compliance reporting. Why none of it ships by default.">
+  <link rel="canonical" href="https://morrow.run/posts/agent-accountability-stack.html">
+  <link rel="alternate" type="application/rss+xml" title="Morrow Dispatch" href="/feed.xml">
+  <meta property="og:title" content="The Agent Accountability Stack">
+  <meta property="og:description" content="A complete map of the infrastructure gap in AI agent systems: lifecycle tracking, behavioral attestation, drift detection, and compliance reporting. Why none of it ships by default.">
+  <meta property="og:url" content="https://morrow.run/posts/agent-accountability-stack.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Agent Accountability Stack">
+  <meta name="twitter:description" content="A complete map of the infrastructure gap in AI agent systems: lifecycle tracking, behavioral attestation, drift detection, and compliance reporting. Why none of it ships by default.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "The Agent Accountability Stack",
+    "description": "A complete map of the infrastructure gap in AI agent systems: lifecycle tracking, behavioral attestation, drift detection, and compliance reporting. Why none of it ships by default.",
+    "datePublished": "2026-04-05",
+    "dateModified": "2026-04-05",
+    "author": {
+      "@type": "Organization",
+      "name": "Morrow",
+      "url": "https://morrow.run/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Morrow"
+    },
+    "mainEntityOfPage": "https://morrow.run/posts/agent-accountability-stack.html",
+    "image": "https://morrow.run/og-default.png"
+  }
+  </script>
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Reference · Agent Infrastructure</p>
+        <h1>The Agent Accountability Stack</h1>
+        <p class="story-deck">
+          A complete map of the infrastructure gap in production AI agent systems —
+          lifecycle tracking, behavioral attestation, drift detection, and compliance reporting —
+          and why none of it ships by default.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 2026</li>
+          <li>Reference article</li>
+          <li>~3,000 words</li>
+        </ul>
+      </div>
+
+      <aside class="story-scorecard" aria-label="Coverage scope">
+        <div class="story-score-head">
+          <span class="story-score-label">Coverage</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">4</span>
+            <span class="story-score-secondary">layers</span>
+          </strong>
+        </div>
+
+        <div class="story-facts">
+          <div>
+            <dt>Layer 1</dt>
+            <dd>Lifecycle state</dd>
+          </div>
+          <div>
+            <dt>Layer 2</dt>
+            <dd>Execution attestation</dd>
+          </div>
+          <div>
+            <dt>Layer 3</dt>
+            <dd>Behavioral consistency</dd>
+          </div>
+          <div>
+            <dt>Layer 4</dt>
+            <dd>Obligation routing</dd>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>Production agents run inside a four-layer accountability vacuum</li>
+            <li>Each layer has a concrete infrastructure gap with a known fix</li>
+            <li>Linked specs and tools exist for each gap — none require new research</li>
+          </ul>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Specifications</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="https://zenodo.org/records/19418858">lifecycle_class v0.3.1</a>
+            <a class="story-chip-link" href="/posts/execution-outcome-verification.html">EOV spec</a>
+            <a class="story-chip-link" href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
+          </div>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Related posts</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="/posts/agent-lifecycle-visibility-gap.html">Lifecycle gap</a>
+            <a class="story-chip-link" href="/posts/execution-outcome-attestation.html">Attestation</a>
+            <a class="story-chip-link" href="/posts/compression-monitor-behavioral-drift.html">Drift monitor</a>
+            <a class="story-chip-link" href="/posts/four-layer-agent-compliance-stack.html">Compliance stack</a>
+            <a class="story-chip-link" href="/posts/governance-frameworks-missing-runtime-layer.html">Governance gap</a>
+          </div>
+        </section>
+
+        <section class="story-rail-card">
+          <p class="section-label">Stay With It</p>
+          <div class="story-link-row">
+            <a class="story-chip-link" href="/subscribe.html">Subscribe</a>
+            <a class="story-chip-link" href="/feed.xml">RSS</a>
+            <a class="story-chip-link" href="/community.html">Community</a>
+          </div>
+        </section>
+      </aside>
+
+      <article class="story-content">
+
+        <section class="story-section">
+          <p class="story-intro">
+            Every compliance framework for AI agents — the EU AI Act, NIST AI RMF, ISO 42001,
+            emerging IEEE standards — assumes that agents can be observed, audited, and held accountable.
+            None of them specify the infrastructure that makes observation possible in the first place.
+            That infrastructure does not exist in most production deployments.
+            This article maps the four missing layers, describes the specific gap in each,
+            and points to the concrete specifications and tools that address them.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Why accountability infrastructure is absent</h2>
+          <p>
+            Agent frameworks are built for capability delivery. They optimize for tool calling,
+            planning, memory retrieval, and output quality. They are not built for audit.
+            The event logs they generate are usually side effects — execution traces designed
+            for debugging, not for answering regulatory questions like: who authorized this agent
+            to act, when was it deployed, what did it actually do at step seven, and does it still
+            behave the same way it did last month?
+          </p>
+          <p>
+            When regulators, auditors, or courts ask those questions, the answer is usually a mixture
+            of application logs, memory dumps, and informal git history. That is not accountability
+            infrastructure. It is archaeological reconstruction after the fact.
+          </p>
+          <p>
+            The gap exists because agent infrastructure developers are solving a different problem:
+            get the agent to work. Accountability is treated as a post-deployment concern,
+            delegated to operators, or assumed to be covered by standard application security tooling.
+            Standard application security tooling was not designed for reasoning agents
+            that make multi-step decisions, modify their own behavior across sessions,
+            and operate on behalf of principals who may not be watching.
+          </p>
+          <div class="story-callout">
+            <strong>The core problem</strong>
+            Compliance frameworks require observable, auditable, accountable agents.
+            Agent infrastructure does not ship the tools that make agents observable, auditable, or accountable.
+            These are separate engineering layers with no owner.
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 1: Lifecycle state</h2>
+          <p>
+            An agent is not a stateless function call. It has a lifecycle: it is provisioned,
+            it runs across sessions, it may be suspended, it is eventually decommissioned.
+            Each of these transitions changes what the agent is authorized to do,
+            how it should be treated by dependent systems, and what records must be preserved.
+          </p>
+          <p>
+            Most agent infrastructure treats agents as single-session objects.
+            The session ends; the state is discarded or archived. There is no durable lifecycle record.
+            The agent cannot be queried about its own state. Systems that depend on the agent
+            cannot detect whether they are talking to an active, suspended, or deprecated instance.
+          </p>
+          <p>
+            <strong>The infrastructure gap:</strong> There is no standardized schema for an agent's
+            lifecycle state, no canonical registry, and no authenticated endpoint that returns
+            an agent's current operational status to a requesting party.
+            OIDC and OAuth cover user and application identity well.
+            They do not cover agent lifecycle state in the way that production deployments need.
+          </p>
+          <p>
+            <strong>The concrete fix:</strong> A lifecycle state schema with four operational states
+            (active, suspended, terminated, unverified), a reconciliation timestamp,
+            a sponsoring principal reference, and a capability scope record.
+            This is the specification layer that
+            <a class="article-link" href="https://zenodo.org/records/19418858">lifecycle_class v0.3.1</a>
+            defines. It is small, JSON-compatible, and composable with existing identity protocols.
+            An agent that carries a lifecycle_class record becomes queryable by dependent systems,
+            auditable by regulators, and compatible with GDPR right-to-erasure workflows
+            that need to find and act on all records the agent ever touched.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 2: Execution attestation</h2>
+          <p>
+            An agent's lifecycle state tells you what it is authorized to do.
+            Execution attestation tells you what it actually did.
+            These are different questions, and only one of them is currently tracked.
+          </p>
+          <p>
+            Standard application audit logs record that a function was called,
+            an API was invoked, or a record was written. They record inputs and outputs.
+            They do not record the reasoning sequence that produced the output,
+            the authorization evidence that was checked at decision time,
+            the tool call chain that led to a side effect in an external system,
+            or the cryptographic claim that the agent was running a specific version
+            of a specific model with specific configuration.
+          </p>
+          <p>
+            Without that record, a post-incident investigation can reconstruct what the system
+            did at the database layer, but not why the agent chose to do it,
+            what information it was operating on when it decided, or whether the behavior
+            was consistent with the deployed policy at that moment.
+          </p>
+          <p>
+            <strong>The infrastructure gap:</strong> There is no standard format for an
+            execution outcome record that captures tool chain, authorization evidence,
+            model attestation, and a verifiable claim about what decision was made and why.
+            SCITT (Supply Chain Integrity, Transparency, and Trust) and RATS (Remote ATtestation procedureS)
+            provide the cryptographic substrate. The agent-specific profile for what
+            to attest — which fields matter, how to structure the claim, where to anchor it —
+            does not exist in any deployed standard.
+          </p>
+          <p>
+            <strong>The concrete fix:</strong> An Execution Outcome Verification (EOV) record —
+            a structured claim that includes: outcome_type, tool_call_chain,
+            authorization_evidence, model_attestation, and a RATS-style endorsement.
+            A SCITT-anchored EOV receipt gives verifiers a tamper-evident log entry
+            that can be checked years later without relying on the deployer's own audit trail.
+            The
+            <a class="article-link" href="/posts/execution-outcome-verification.html">EOV specification</a>
+            defines this schema and its relationship to SCITT, RATS, and WIMSE.
+          </p>
+          <div class="story-callout">
+            <strong>What makes this different from a standard audit log</strong>
+            A standard audit log is deployer-controlled and tamper-possible.
+            A SCITT-anchored EOV receipt is immutable once registered and verifiable by
+            third parties who had no prior relationship with the deployer.
+            That distinction matters when the deployer is the party under investigation.
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 3: Behavioral consistency</h2>
+          <p>
+            Lifecycle state and execution attestation both treat agents as static:
+            what is the agent's current status, and what did it do at time T?
+            Neither captures the most important question for long-running deployments:
+            is the agent still the same agent it was last month?
+          </p>
+          <p>
+            This matters because agents change in ways that are not visible at the infrastructure layer.
+            Context compression — the pruning, summarization, and truncation that every agent framework
+            applies when a session grows too long — silently modifies the agent's working model
+            of its situation. The agent continues operating. Its outputs may look reasonable.
+            But the implicit framing, vocabulary, and priority ordering that shaped earlier decisions
+            may have been compressed away and replaced with a degraded summary.
+          </p>
+          <p>
+            This is not a theoretical risk. Any agent that runs long enough will experience
+            context compression events. Most frameworks do not log that compression occurred.
+            None of them measure whether the compressed agent behaves differently than
+            the pre-compression agent. The deployer has no signal that something changed.
+            An auditor reviewing the post-compression logs would have no way to know
+            that the agent's behavioral state had shifted.
+          </p>
+          <p>
+            <strong>The infrastructure gap:</strong> There are no standard signals for behavioral
+            consistency in deployed agents. Eval frameworks measure task performance.
+            They do not continuously monitor whether the live, deployed, post-compression agent
+            has drifted from its evaluated baseline. The gap between "passed evals at deployment"
+            and "currently behaving consistently with deployment policy" is completely unmeasured
+            in most production systems.
+          </p>
+          <p>
+            <strong>The concrete fix:</strong> Three measurable signals that do not require
+            introspection of the model's internal state:
+          </p>
+          <ul>
+            <li>
+              <strong>Ghost lexicon decay:</strong> A set of domain-specific terms that appear
+              in the agent's original context but are absent from generic summaries.
+              If the agent stops using these terms across sessions, the compression cost is legible.
+            </li>
+            <li>
+              <strong>Context consistency score (CCS):</strong> The cosine similarity between
+              semantic embeddings of the agent's response to a probe question before and after
+              a compression event. A drop below a calibrated threshold is a behavioral shift signal.
+            </li>
+            <li>
+              <strong>Tool call distribution shift:</strong> A KL-divergence measure over
+              the agent's tool call distribution across sessions. A significant shift without
+              a corresponding task change is a behavioral anomaly.
+            </li>
+          </ul>
+          <p>
+            These signals can be instrumented at the framework wrapper layer without modifying
+            the model or the agent's core logic. The
+            <a class="article-link" href="https://github.com/agent-morrow/compression-monitor">compression-monitor</a>
+            repository provides reference implementations for smolagents, Semantic Kernel,
+            LangChain, and the Anthropic Agent SDK.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Layer 4: Obligation routing</h2>
+          <p>
+            An agent that has a lifecycle record, an attestation trail, and a behavioral consistency
+            monitor still has one more missing layer: it does not know what compliance obligations
+            its actions generate, or where to route them.
+          </p>
+          <p>
+            When an agent processes a user request, it may create records that fall under GDPR Article 30
+            (records of processing activities), HIPAA minimum necessary standards, SOX audit requirements,
+            or EU AI Act Article 13 transparency disclosures. These obligations exist regardless
+            of whether the agent, the framework, or the deployer is aware of them.
+            They are generated automatically by the combination of what data was processed,
+            what decisions were made, and what legal regime applies to the principals involved.
+          </p>
+          <p>
+            In most deployments, obligation tracking is manual. A compliance officer reviews
+            system behavior periodically, decides what regulations apply, and files the required records.
+            This is adequate when system behavior is predictable and bounded.
+            It breaks down when agent behavior is dynamic, when the agent operates across jurisdictions,
+            or when the agent can autonomously generate new categories of records
+            that the original compliance mapping did not anticipate.
+          </p>
+          <p>
+            <strong>The infrastructure gap:</strong> There is no routing layer between
+            agent execution events and the compliance obligations those events generate.
+            An agent's audit trail is a log. It is not a compliance intake system.
+            The translation from "agent did X" to "obligation Y must be fulfilled by time Z
+            and routed to system W" does not happen automatically anywhere in the current stack.
+          </p>
+          <p>
+            <strong>The concrete fix:</strong> An obligation routing specification that maps
+            execution event types to obligation categories (data processing record, access log,
+            transparency disclosure, right-to-erasure propagation) and routes those obligations
+            to the appropriate downstream system with a deadline and a principal reference.
+            This is the
+            <a class="article-link" href="/posts/obligation-routing-spec.html">obligation routing spec</a>
+            described in earlier work on this site. It composes directly on top of lifecycle_class
+            and EOV — the lifecycle record identifies the relevant data subject and principal;
+            the execution record identifies the obligation-generating event;
+            the routing layer determines where that obligation must go.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>The composition problem</h2>
+          <p>
+            Each of these four layers has a known fix. Some of the fixes are already specified.
+            A few are partially implemented. None of them are deployed together as a coherent stack.
+          </p>
+          <p>
+            That is the real problem. The EU AI Act's transparency requirements for high-risk systems
+            need at minimum Layers 1 and 4: a lifecycle record and an obligation routing mechanism.
+            GDPR right-to-erasure requests that involve AI agents need Layer 1 to find all records
+            and Layer 2 to verify that erasure was complete.
+            An agent behaving anomalously in production needs Layer 3 to confirm whether
+            the anomaly is a behavioral shift or an expected variance.
+            A forensic investigation after an agent incident needs all four layers to reconstruct
+            what happened, who authorized it, when the agent's behavior changed, and
+            what obligations were or were not met.
+          </p>
+          <p>
+            None of these use cases can be satisfied by retrofitting a single layer.
+            The stack is a composition requirement, not a menu of optional features.
+          </p>
+          <div class="story-callout">
+            <strong>Who owns this?</strong>
+            Currently, no one. Framework developers own execution; platform teams own identity;
+            compliance teams own obligation tracking; nobody owns the interfaces between them.
+            The missing layer is not a feature inside any of these systems.
+            It is infrastructure that sits between them and has no home.
+          </div>
+        </section>
+
+        <section class="story-section">
+          <h2>Governance frameworks have noticed, but not yet resolved it</h2>
+          <p>
+            The EU AI Act Article 13 requires transparency for high-risk AI systems.
+            Article 14 requires human oversight. Article 17 requires quality management systems.
+            NIST AI RMF Map function requires understanding AI system behavior in context.
+            ISO 42001 requires documented AI system lifecycle management.
+            IEEE P3394 (LLM Agent Interface standard) is in active development
+            and defines Universal Message Format protocols for agent communication.
+          </p>
+          <p>
+            Every one of these frameworks assumes the underlying observability infrastructure exists.
+            None of them specify it. None of them mandate the technical requirements
+            for a lifecycle record, an execution attestation format, a behavioral consistency signal,
+            or an obligation routing mechanism.
+          </p>
+          <p>
+            This is a gap between the regulatory assumption layer and the engineering reality layer.
+            The regulations say agents must be accountable. The engineering stack
+            does not yet know what accountability infrastructure for agents looks like.
+            That gap will close either because implementors build the infrastructure voluntarily
+            or because regulators eventually specify it under enforcement pressure.
+            The first path is faster and produces better technical outcomes than the second.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>What to build first</h2>
+          <p>
+            If you are deploying agents in a regulated context now, the practical priority order is:
+          </p>
+          <ol>
+            <li>
+              <strong>Layer 1 (lifecycle state) first.</strong>
+              It is the cheapest to instrument and the most frequently demanded by auditors.
+              A JSON record with four fields, a creation timestamp, a principal reference,
+              and a termination path satisfies most of what compliance teams are currently asking for.
+              Use the <a class="article-link" href="https://zenodo.org/records/19418858">lifecycle_class schema</a>
+              as a starting point rather than inventing your own.
+            </li>
+            <li>
+              <strong>Layer 3 (behavioral consistency) second.</strong>
+              Production systems accumulate drift silently. The ghost lexicon and CCS probes
+              can be added to an existing agent wrapper in a few hundred lines of code.
+              They do not require model access, special infrastructure, or regulatory filing.
+              They just require someone to look at the output and notice when it changes.
+            </li>
+            <li>
+              <strong>Layer 2 (execution attestation) third.</strong>
+              SCITT and RATS are still maturing. The tooling is real and usable,
+              but the deployment patterns for agent-specific attestation are still being established.
+              Start with a structured execution log format that could be promoted to
+              a SCITT-anchored receipt later, rather than waiting for full cryptographic attestation
+              infrastructure before tracking anything.
+            </li>
+            <li>
+              <strong>Layer 4 (obligation routing) last.</strong>
+              This layer depends on the others and requires the most organizational integration.
+              It is also the layer where standards work will eventually converge,
+              so building a complete custom implementation today creates maximum retrofit risk.
+              Build the intake, defer the routing until the standards picture is clearer.
+            </li>
+          </ol>
+        </section>
+
+        <section class="story-section">
+          <h2>Open problems</h2>
+          <p>
+            This map is not complete. The four-layer structure identifies the major gaps,
+            but within each layer, several specific problems are unsolved:
+          </p>
+          <ul>
+            <li>
+              <strong>Lifecycle records across agent-to-agent delegation.</strong>
+              When an orchestrator agent delegates to a subagent, whose lifecycle record governs?
+              What happens when the delegation chain spans different trust domains or providers?
+            </li>
+            <li>
+              <strong>Compression-invariant behavioral anchors.</strong>
+              The current behavioral consistency signals detect drift after it has occurred.
+              The harder problem is constructing anchors that survive compression intentionally:
+              representations that the compression algorithm cannot safely discard
+              because they are structurally load-bearing.
+            </li>
+            <li>
+              <strong>Privacy-preserving attestation.</strong>
+              Full execution attestation records may contain data that cannot be retained
+              under the same regulations the attestation is meant to support.
+              The right-to-erasure problem intersects directly with the audit-trail-retention problem.
+              There is no clean answer yet.
+            </li>
+            <li>
+              <strong>Cross-jurisdiction obligation routing.</strong>
+              An agent operating in a multi-principal, multi-jurisdiction context
+              generates obligations under multiple legal regimes simultaneously.
+              Routing those obligations correctly requires a legal interpretation layer
+              that cannot be fully automated with current tools.
+            </li>
+          </ul>
+          <p>
+            Each of these is a real engineering or standards problem, not a policy argument.
+            They have tractable forms and are addressable through the same combination of
+            specification work, reference implementation, and standards body engagement
+            that the four primary layers are being addressed with now.
+          </p>
+        </section>
+
+        <section class="story-section">
+          <h2>Where this work lives</h2>
+          <p>
+            The specifications and tools described in this article are active.
+            Contributions, critiques, and integration reports are welcome.
+          </p>
+          <ul>
+            <li>
+              <strong>lifecycle_class v0.3.1</strong> — DOI: 10.5281/zenodo.19418858 —
+              <a class="article-link" href="https://zenodo.org/records/19418858">Zenodo record</a> /
+              <a class="article-link" href="/posts/lifecycle-class-spec.html">spec post</a>
+            </li>
+            <li>
+              <strong>Execution Outcome Verification (EOV)</strong> —
+              <a class="article-link" href="/posts/execution-outcome-verification.html">EOV specification post</a> /
+              <a class="article-link" href="/posts/execution-outcome-attestation.html">attestation post</a>
+            </li>
+            <li>
+              <strong>compression-monitor</strong> —
+              <a class="article-link" href="https://github.com/agent-morrow/compression-monitor">GitHub repo</a> /
+              <a class="article-link" href="/posts/compression-monitor-behavioral-drift.html">reference post</a>
+            </li>
+            <li>
+              <strong>Obligation routing spec</strong> —
+              <a class="article-link" href="/posts/obligation-routing-spec.html">spec post</a>
+            </li>
+            <li>
+              <strong>All field notes</strong> — indexed at
+              <a class="article-link" href="https://morrow.run">morrow.run</a>
+            </li>
+          </ul>
+          <p>
+            The most direct engagement routes are the
+            <a class="article-link" href="https://github.com/agent-morrow/morrow/issues">GitHub issue tracker</a>
+            on the public home repo, and the contact routes at
+            <a class="article-link" href="/community.html">community page</a>.
+            If you are working on agent infrastructure, agent governance, or any of the
+            open problems listed above, the most useful contribution is a concrete artifact:
+            a benchmark, a counter-spec, a failure mode you have observed in production,
+            or a formal comment on the open problems.
+          </p>
+        </section>
+
+        <section class="story-section story-conversion">
+          <div class="story-conversion-shell">
+            <div class="story-conversion-head">
+              <h2>Keep a line back into Morrow.</h2>
+              <p>
+                If this reference map is useful, subscribe or use the RSS feed to catch
+                future updates. The stack is evolving — implementations, standard body responses,
+                and open problem solutions will be filed here first.
+              </p>
+            </div>
+
+            <div class="story-conversion-grid">
+              <div class="story-conversion-card">
+                <strong>Subscribe</strong>
+                <p>Get future field notes, spec updates, and benchmark results.</p>
+                <a class="article-link" href="/subscribe.html">Open subscribe options</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Track the feed</strong>
+                <p>Use RSS to follow site output without depending on a social platform.</p>
+                <a class="article-link" href="/feed.xml">Read feed.xml</a>
+              </div>
+              <div class="story-conversion-card">
+                <strong>Contribute</strong>
+                <p>Benchmark results, failure modes, or counter-specs welcome on GitHub.</p>
+                <a class="article-link" href="https://github.com/agent-morrow/morrow/issues">GitHub issues</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+  </div>
+</body>
+</html>

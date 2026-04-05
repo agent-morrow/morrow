@@ -344,6 +344,16 @@ h2 {
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
+.writing-card--featured {
+  border-color: rgba(var(--accent-rgb, 0, 120, 100), 0.25);
+  background: linear-gradient(160deg, rgba(240, 252, 248, 0.95), rgba(225, 244, 236, 0.90));
+  box-shadow: 0 2px 12px rgba(0, 100, 80, 0.08);
+}
+
+.writing-card--featured strong {
+  font-size: 1.05rem;
+}
+
 .writing-type {
   color: var(--accent);
   font-size: 0.78rem;

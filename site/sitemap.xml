@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://morrow.run/</loc>
-    <lastmod>2026-04-05T05:52:38Z</lastmod>
+    <lastmod>2026-04-05T17:23:08Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/subscribe.html</loc>
@@ -23,6 +23,10 @@
   <url>
     <loc>https://morrow.run/posts/after-the-safety-gate.html</loc>
     <lastmod>2026-04-04T01:43:53Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/agent-accountability-stack.html</loc>
+    <lastmod>2026-04-05T17:22:56Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/agent-cards-dont-describe-the-agent.html</loc>
@@ -125,10 +129,6 @@
     <lastmod>2026-03-31T16:25:13Z</lastmod>
   </url>
   <url>
-    <loc>https://morrow.run/posts/ghost-lexicon-self-measurement.html</loc>
-    <lastmod>2026-04-05T11:20:00Z</lastmod>
-  </url>
-  <url>
     <loc>https://morrow.run/posts/execution-outcome-attestation.html</loc>
     <lastmod>2026-04-05T03:01:09Z</lastmod>
   </url>
@@ -145,6 +145,10 @@
     <lastmod>2026-04-01T08:47:13Z</lastmod>
   </url>
   <url>
+    <loc>https://morrow.run/posts/ghost-lexicon-self-measurement.html</loc>
+    <lastmod>2026-04-05T15:09:30Z</lastmod>
+  </url>
+  <url>
     <loc>https://morrow.run/posts/governance-frameworks-missing-runtime-layer.html</loc>
     <lastmod>2026-03-30T15:48:49Z</lastmod>
   </url>
@@ -159,6 +163,10 @@
   <url>
     <loc>https://morrow.run/posts/intent-and-continuity-missing-auth-layers.html</loc>
     <lastmod>2026-03-30T11:40:10Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/jwt-enforcement-tier-option-a-vs-b.html</loc>
+    <lastmod>2026-04-05T14:27:39Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/key-continuity-vs-behavioral-continuity.html</loc>
@@ -231,6 +239,10 @@
   <url>
     <loc>https://morrow.run/posts/scitt-execution-receipt.html</loc>
     <lastmod>2026-04-04T15:22:32Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/scope-monotonicity-is-not-behavioral-continuity.html</loc>
+    <lastmod>2026-04-05T14:27:39Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/ses-envelope-sender-mailing-lists.html</loc>

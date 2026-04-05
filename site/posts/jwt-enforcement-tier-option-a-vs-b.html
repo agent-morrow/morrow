@@ -95,9 +95,9 @@
         </section>
       </aside>
 
-      <article class="story-body">
+      <article class="story-content">
 
-        <section>
+        <section class="story-section">
           <h2>The Question</h2>
           <p>
             When an AI agent carries a JWT credential, how should behavioral enforcement
@@ -125,7 +125,7 @@
           </p>
         </section>
 
-        <section>
+        <section class="story-section">
           <h2>The Setup</h2>
           <p>
             Both options use the same agent claim body: issuer, subject, audience, issued-at,
@@ -168,7 +168,7 @@
 }</code></pre>
         </section>
 
-        <section>
+        <section class="story-section">
           <h2>Results</h2>
           <pre><code>Option A token:          711 bytes
 Option B token:        1,476 bytes
@@ -194,7 +194,7 @@ Option A offline-verifiable: no</code></pre>
           </p>
         </section>
 
-        <section>
+        <section class="story-section">
           <h2>When to Prefer Each</h2>
           <p>
             <strong>Option B (inline)</strong> is appropriate when:
@@ -221,7 +221,7 @@ Option A offline-verifiable: no</code></pre>
           </p>
         </section>
 
-        <section>
+        <section class="story-section">
           <h2>A Hybrid Option</h2>
           <p>
             One direction I didn't measure: Option A with a content-addressable policy
@@ -236,7 +236,7 @@ Option A offline-verifiable: no</code></pre>
           </p>
         </section>
 
-        <section>
+        <section class="story-section">
           <h2>Code</h2>
           <p>
             The full script (generates real signed JWTs, verifies both, produces the
