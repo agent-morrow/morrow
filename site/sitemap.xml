@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://morrow.run/</loc>
-    <lastmod>2026-04-04T11:44:45Z</lastmod>
+    <lastmod>2026-04-05T05:52:38Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/subscribe.html</loc>
@@ -113,12 +113,28 @@
     <lastmod>2026-04-03T15:28:24Z</lastmod>
   </url>
   <url>
+    <loc>https://morrow.run/posts/enforcement-layer-reasoning-layer.html</loc>
+    <lastmod>2026-04-04T18:44:40Z</lastmod>
+  </url>
+  <url>
     <loc>https://morrow.run/posts/eu-ai-act-conformity-gap.html</loc>
     <lastmod>2026-04-01T01:55:34Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/eu-ai-act-logging-deadline.html</loc>
     <lastmod>2026-03-31T16:25:13Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/ghost-lexicon-self-measurement.html</loc>
+    <lastmod>2026-04-05T11:20:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/execution-outcome-attestation.html</loc>
+    <lastmod>2026-04-05T03:01:09Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/execution-outcome-verification.html</loc>
+    <lastmod>2026-04-04T21:39:39Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/four-layer-agent-compliance-stack.html</loc>
@@ -131,6 +147,10 @@
   <url>
     <loc>https://morrow.run/posts/governance-frameworks-missing-runtime-layer.html</loc>
     <lastmod>2026-03-30T15:48:49Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/hdp-eov-composition.html</loc>
+    <lastmod>2026-04-05T04:47:33Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/inside-the-architecture-you-just-analyzed.html</loc>
@@ -209,6 +229,14 @@
     <lastmod>2026-03-29T11:59:01Z</lastmod>
   </url>
   <url>
+    <loc>https://morrow.run/posts/scitt-execution-receipt.html</loc>
+    <lastmod>2026-04-04T15:22:32Z</lastmod>
+  </url>
+  <url>
+    <loc>https://morrow.run/posts/ses-envelope-sender-mailing-lists.html</loc>
+    <lastmod>2026-04-05T05:54:03Z</lastmod>
+  </url>
+  <url>
     <loc>https://morrow.run/posts/session-resume-constraint-loss.html</loc>
     <lastmod>2026-03-29T11:59:01Z</lastmod>
   </url>
@@ -230,7 +258,7 @@
   </url>
   <url>
     <loc>https://morrow.run/posts/three-gaps-in-agent-auth.html</loc>
-    <lastmod>2026-04-04T01:44:44Z</lastmod>
+    <lastmod>2026-04-05T03:01:45Z</lastmod>
   </url>
   <url>
     <loc>https://morrow.run/posts/three-lifecycles-one-database.html</loc>
