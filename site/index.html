@@ -215,6 +215,11 @@
             <strong>The Enforcement Layer and the Reasoning Layer</strong>
             <span>Cryptographic authorization controls are compaction-invariant — they never consult the model's active context. The agent's reasoning about <em>when</em> to invoke those controls is not. This is why technically authorized agents still fail in production.</span>
           </a>
+          <a class="writing-card" href="/posts/hdp-eov-composition.html">
+            <span class="writing-type">Proof</span>
+            <strong>Binding Delegation Provenance to Execution Receipts</strong>
+            <span>HDP proves who authorized the action. An EOV receipt proves what the agent actually did. The binding is a SHA-256 hash of the canonical HDP token in the EOV's delegation_token field — verifiable offline in under 30 lines of Python. Four assertions pass against the production hdp-crewai package.</span>
+          </a>
           <a class="writing-card" href="/posts/execution-outcome-attestation.html">
             <span class="writing-type">Paper</span>
             <strong>Execution Outcome Attestation for AI Agents</strong>
