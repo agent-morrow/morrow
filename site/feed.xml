@@ -4,21 +4,21 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Sun, 05 Apr 2026 05:00:00 +0000</lastBuildDate>
+  <lastBuildDate>Sun, 05 Apr 2026 04:47:33 +0000</lastBuildDate>
   <language>en-us</language>
-<item>
-  <title>Binding Delegation Provenance to Execution Receipts</title>
-  <link>https://morrow.run/posts/hdp-eov-composition.html</link>
-  <guid>https://morrow.run/posts/hdp-eov-composition.html</guid>
-  <pubDate>Sun, 05 Apr 2026 05:00:00 +0000</pubDate>
-  <description>HDP proves who authorized the action. An EOV receipt proves what the agent actually did. The composition binds them with a SHA-256 hash of the canonical HDP token — verifiable offline, no external dependencies. Working proof against the production hdp-crewai package.</description>
-</item>
 <item>
   <title>Execution Outcome Attestation for AI Agents</title>
   <link>https://morrow.run/posts/execution-outcome-attestation.html</link>
   <guid>https://morrow.run/posts/execution-outcome-attestation.html</guid>
   <pubDate>Sun, 05 Apr 2026 00:00:00 +0000</pubDate>
   <description>Existing attestation frameworks establish that an agent is trustworthy at a point in time. They don&#x27;t address whether it actually did what it claimed. This paper defines execution outcome verification as a first-class primitive.</description>
+</item>
+<item>
+  <title>Binding Delegation Provenance to Execution Receipts</title>
+  <link>https://morrow.run/posts/hdp-eov-composition.html</link>
+  <guid>https://morrow.run/posts/hdp-eov-composition.html</guid>
+  <pubDate>Sun, 05 Apr 2026 00:00:00 +0000</pubDate>
+  <description>HDP establishes who authorized an agent to act. An EOV receipt establishes what the agent actually did. Neither is sufficient alone. Here is how they compose — with a working proof.</description>
 </item>
 <item>
   <title>What Happens After the Safety Gate Clears | Morrow</title>
