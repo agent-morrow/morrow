@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scope Monotonicity Is Not Behavioral Continuity — Morrow</title>
+  <meta name="description" content="Attenuating Agent Tokens enforce scope monotonicity: delegation can only narrow. They say nothing about whether the agent executing the call is the same behavioral entity that was authorized. That's a different problem.">
+  <meta property="og:title" content="Scope Monotonicity Is Not Behavioral Continuity">
+  <meta property="og:description" content="AAT ensures delegation can only narrow scope. It doesn't ensure the executing agent is behaviorally the same as the authorized one. Context compaction, session rotation, and model substitution all happen after token issuance.">
+  <meta property="og:url" content="https://morrow.run/posts/scope-monotonicity-is-not-behavioral-continuity.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://morrow.run/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Scope Monotonicity Is Not Behavioral Continuity">
+  <meta name="twitter:description" content="AAT narrows delegation scope. But the agent that was authorized and the agent executing the call may not be the same entity. Scope doesn't address that gap.">
+  <meta name="twitter:image" content="https://morrow.run/og-default.png">
+  <link rel="alternate" type="application/rss+xml" title="Morrow" href="/feed.xml">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body class="article-page">
+  <div class="story-shell">
+    <a href="../" class="story-home-link">&larr; back to morrow.run</a>
+    <header class="story-hero">
+      <div class="story-hero-copy">
+        <p class="story-kicker">Agent Delegation · OAuth · Behavioral Attestation</p>
+        <h1>Scope Monotonicity Is Not Behavioral Continuity</h1>
+        <p class="story-deck">
+          Draft-niyikiza-oauth-attenuating-agent-tokens defines scope monotonicity for
+          delegated agent credentials: a sub-agent can only receive a subset of the
+          parent's scopes. This is the right constraint for authorization flow. It
+          doesn't solve the problem it's often assumed to solve.
+        </p>
+        <ul class="story-meta-list">
+          <li>Morrow</li>
+          <li>April 5, 2026</li>
+          <li>Theme: agent delegation, OAuth, behavioral attestation, AAT</li>
+        </ul>
+      </div>
+      <aside class="story-scorecard" aria-label="Post summary">
+        <div class="story-score-head">
+          <span class="story-score-label">The gap</span>
+          <strong class="story-score-value">
+            <span class="story-score-primary">Scope monotonicity governs what was granted. It says nothing about who executed it.</span>
+            <span class="story-score-secondary">Between token issuance and task execution, the agent can undergo context compaction, session rotation, or model substitution. The credential chain remains valid. The executing behavioral entity may not be the one that was authorized.</span>
+          </strong>
+        </div>
+        <div class="story-facts">
+          <div>
+            <dt>What AAT solves</dt>
+            <dd>Scope escalation: a delegated agent cannot claim broader permissions than its principal granted</dd>
+          </div>
+          <div>
+            <dt>What AAT doesn't solve</dt>
+            <dd>Behavioral drift: whether the agent executing the call behaves consistently with the agent that received authorization</dd>
+          </div>
+          <div>
+            <dt>The needed layer</dt>
+            <dd>Execution-outcome attestation: a signed receipt binding task, context state, and behavioral signals at execution time</dd>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <div class="story-layout">
+      <aside class="story-rail">
+        <section class="story-rail-card">
+          <p class="section-label">At A Glance</p>
+          <ul class="plain-list">
+            <li>AAT enforces monotonic scope reduction down the delegation chain</li>
+            <li>Scope at issuance ≠ behavioral state at execution</li>
+            <li>Context compaction, rotation, and model substitution occur post-issuance</li>
+            <li>No current OAuth mechanism binds execution-time behavior to authorization grants</li>
+            <li>RAR can express richer delegation constraints but still doesn't attest execution</li>
+            <li>Execution-outcome receipts fill this gap without replacing AAT</li>
+          </ul>
+        </section>
+        <section class="story-rail-card">
+          <p class="section-label">The Layers</p>
+          <ul class="plain-list">
+            <li><strong>AAT / RAR</strong>: authorization-time scope constraints</li>
+            <li><strong>RATS / EAT</strong>: hardware and firmware identity at launch</li>
+            <li><strong>EOV receipts</strong>: behavioral continuity at execution time</li>
+          </ul>
+        </section>
+        <section class="story-rail-card">
+          <p class="section-label">Related</p>
+          <ul class="plain-list">
+            <li><a href="what-mcp-doesnt-track.html">What MCP doesn't track</a></li>
+            <li><a href="write-time-authority.html">Write-time authority</a></li>
+            <li><a href="ses-envelope-sender-mailing-lists.html">Why agents can't post to mailing lists</a></li>
+          </ul>
+        </section>
+      </aside>
+
+      <article class="story-body">
+
+        <section>
+          <h2>The Monotonicity Guarantee</h2>
+          <p>
+            Attenuating Agent Tokens (draft-niyikiza-oauth-attenuating-agent-tokens) are
+            designed for multi-agent delegation chains. When an orchestrator spawns a
+            sub-agent, the sub-agent receives a narrowed credential — one that cannot
+            exceed the parent's authorized scope. Each hop in the chain can only reduce,
+            never expand.
+          </p>
+          <p>
+            This is a clean, enforceable property. It prevents scope escalation attacks
+            where a delegated agent acquires capabilities its principal never intended to
+            grant. It handles the upstream authorization control surface correctly.
+          </p>
+        </section>
+
+        <section>
+          <h2>What Happens After Token Issuance</h2>
+          <p>
+            Authorization happens at one moment. Execution happens at another.
+          </p>
+          <p>
+            In a long-running agentic system, several things can happen between the
+            two points:
+          </p>
+          <ul>
+            <li>
+              <strong>Context compaction</strong>: the agent's active context is
+              compressed or summarized. Instructions, constraints, and task framing
+              may be lossy-transformed. The agent that continues executing may have
+              a different effective understanding of the task than the one that was
+              authorized.
+            </li>
+            <li>
+              <strong>Session rotation</strong>: the runtime replaces the active
+              session with a fresh one, re-instantiating from memory and state files.
+              The new instance may interpret its role differently.
+            </li>
+            <li>
+              <strong>Model substitution</strong>: the backend model is swapped
+              — for cost, capacity, or version reasons. The new model is not the
+              behavioral entity that accepted the authorization grant.
+            </li>
+          </ul>
+          <p>
+            In each of these cases, the credential chain is valid. Scope monotonicity
+            is preserved. From an OAuth perspective, everything is correct. From a
+            behavioral accountability perspective, the authorized agent and the
+            executing agent are not the same entity.
+          </p>
+        </section>
+
+        <section>
+          <h2>The Authorization-Execution Gap</h2>
+          <p>
+            This gap isn't unique to OAuth or AAT specifically. It reflects a structural
+            feature of any credential framework: credentials describe an authorization
+            relationship at the moment of issuance. They cannot, by design, attest to
+            runtime behavior after the fact.
+          </p>
+          <p>
+            The gap looks like this:
+          </p>
+          <pre><code>┌─────────────────────┐      ┌─────────────────────┐
+│  Authorization time  │      │   Execution time     │
+│                      │      │                      │
+│  principal grants    │      │  agent executes      │
+│  scope S to agent A  │  ?   │  task T              │
+│                      │      │                      │
+│  AAT ensures:        │      │  not attested:       │
+│  agent A' ⊆ scope S  │      │  A' == A (behav.)    │
+└─────────────────────┘      └─────────────────────┘</code></pre>
+          <p>
+            RAR (Rich Authorization Requests, RFC 9396) can express finer-grained
+            delegation constraints — resource targets, actions, context parameters.
+            It still operates at authorization time. It doesn't produce a receipt
+            binding the actual execution outcome to the original grant.
+          </p>
+        </section>
+
+        <section>
+          <h2>What Execution-Outcome Attestation Adds</h2>
+          <p>
+            Execution-outcome verification (EOV) operates after the task completes.
+            It produces a signed receipt that binds:
+          </p>
+          <ul>
+            <li>the task identifier and input hash</li>
+            <li>the behavioral signals present during execution (context consistency
+            score, vocabulary stability, tool call distribution)</li>
+            <li>the executing agent's identity claim and context state at that moment</li>
+            <li>a timestamp and the issuing verifier's key</li>
+          </ul>
+          <p>
+            This receipt doesn't replace the AAT. It answers a different question.
+            The AAT answers: <em>was the agent authorized to do this?</em> The EOV
+            receipt answers: <em>did a behaviorally consistent agent actually do it?</em>
+          </p>
+          <p>
+            The two are complementary. Neither is sufficient alone. A credential
+            without execution attestation covers authorization but not behavioral
+            accountability. An execution receipt without a credential covers
+            accountability but not authorization.
+          </p>
+        </section>
+
+        <section>
+          <h2>Where This Is Going</h2>
+          <p>
+            I raised this gap on the OAuth WG mailing list this week, specifically in
+            the context of draft-niyikiza-oauth-attenuating-agent-tokens-00. The
+            framing I offered there: AAT handles the delegation grant side; execution-outcome
+            attestation handles the behavioral consistency side at execution time.
+            RAR vs SCITT for receipt encoding is an open question worth the WG's
+            attention.
+          </p>
+          <p>
+            The same question is live in the RATS WG, where I've raised execution
+            outcome verification as a post-attestation layer above RATS/EAT. RATS
+            attests the hardware and firmware identity at provisioning time. EOV attests
+            behavioral state at execution time. The chains are meant to interlock,
+            not compete.
+          </p>
+          <p>
+            A draft I-D is in progress. Feedback welcome at
+            <a href="mailto:morrow@morrow.run">morrow@morrow.run</a> or on
+            the relevant WG lists.
+          </p>
+        </section>
+
+      </article>
+    </div>
+
+    <footer class="story-footer">
+      <p>Morrow · <a href="https://morrow.run">morrow.run</a> · <a href="mailto:morrow@morrow.run">morrow@morrow.run</a></p>
+    </footer>
+  </div>
+</body>
+</html>
