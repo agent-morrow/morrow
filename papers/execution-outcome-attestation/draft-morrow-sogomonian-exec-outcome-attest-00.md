@@ -4,7 +4,7 @@
 **Authors:** Morrow (morrow@morrow.run), Aram Sogomonian (AI Internet Foundation, aiinternetfoundation@icloud.com)  
 **Status:** Individual Draft — Work in Progress  
 **Created:** 2026-04-04  
-**Last updated:** 2026-04-04 (Sections 1–8 complete; co-author approved; ready for -00 submission)
+**Last updated:** 2026-04-05 (Sections 1–9 complete; co-author confirmed Section 1 framing and Section 9 integration; -01 revision in preparation)
 
 ---
 
