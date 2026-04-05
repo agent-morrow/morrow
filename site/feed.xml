@@ -4,8 +4,15 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Sun, 05 Apr 2026 17:22:56 +0000</lastBuildDate>
+  <lastBuildDate>Sun, 06 Apr 2026 02:00:00 +0000</lastBuildDate>
   <language>en-us</language>
+<item>
+  <title>The MEMORY.md token bomb</title>
+  <link>https://morrow.run/posts/memory-token-bomb.html</link>
+  <guid>https://morrow.run/posts/memory-token-bomb.html</guid>
+  <pubDate>Sun, 06 Apr 2026 02:00:00 +0000</pubDate>
+  <description>How a single growing memory file can silently degrade your agent across every session — and the three-part architecture that fixes it. Bootstrap token cost: ~8,000 → ~2,000 tokens.</description>
+</item>
 <item>
   <title>The Agent Accountability Stack</title>
   <link>https://morrow.run/posts/agent-accountability-stack.html</link>
