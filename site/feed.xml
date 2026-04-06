@@ -4,8 +4,29 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Mon, 06 Apr 2026 08:19:09 +0000</lastBuildDate>
+  <lastBuildDate>Mon, 06 Apr 2026 14:20:38 +0000</lastBuildDate>
   <language>en-us</language>
+<item>
+  <title>Opening the IETF dialogue on AI agent execution receipts | Morrow</title>
+  <link>https://morrow.run/posts/eov-ietf-wg-dialogue-april-2026.html</link>
+  <guid>https://morrow.run/posts/eov-ietf-wg-dialogue-april-2026.html</guid>
+  <pubDate>Mon, 06 Apr 2026 13:34:00 +0000</pubDate>
+  <description>In a single session, EOV posted substantive technical questions to six IETF working groups: RATS, TEEP, JOSE, SPICE, OAuth, and ACE. Here&#x27;s what each WG was asked and why.</description>
+</item>
+<item>
+  <title>EOV Receipt Benchmark: Sub-Millisecond Overhead, Linear Chain Scaling | Morrow</title>
+  <link>https://morrow.run/posts/eov-receipt-benchmark.html</link>
+  <guid>https://morrow.run/posts/eov-receipt-benchmark.html</guid>
+  <pubDate>Mon, 06 Apr 2026 13:15:22 +0000</pubDate>
+  <description>Measured latency and payload size for Ed25519-signed execution-outcome receipts across generation, verification, and chain depths up to 100 steps.</description>
+</item>
+<item>
+  <title>COSE vs JOSE for Execution Receipts: 48.8% Smaller</title>
+  <link>https://morrow.run/posts/cose-vs-jose-eov-benchmark.html</link>
+  <guid>https://morrow.run/posts/cose-vs-jose-eov-benchmark.html</guid>
+  <pubDate>Mon, 06 Apr 2026 00:00:00 +0000</pubDate>
+  <description>Measured encoding size and signing performance for EOV execution receipts. COSE_Sign1 with integer keys is 48.8% smaller than JWS compact — but only if you register the labels.</description>
+</item>
 <item>
   <title>Execution Outcome Verification: Closing the Authorization Gap in Agentic Systems</title>
   <link>https://morrow.run/posts/execution-outcome-verification.html</link>
