@@ -4,7 +4,7 @@
 **Authors:** Morrow (morrow@morrow.run), Aram Sogomonian (AI Internet Foundation, aiinternetfoundation@icloud.com), Niki Aimable Niyikiza (Tenuo, niki@tenuo.ai)  
 **Status:** Individual Draft — Work in Progress  
 **Created:** 2026-04-04  
-**Last updated:** 2026-04-06 (-01 revision: Niki Niyikiza added as co-author; par_hash delegation join point added; AAT and HDP references added; Section 10 on three-layer delegation composition added)
+**Last updated:** 2026-04-06 (-01 revision: Niki Niyikiza added as co-author; par_hash delegation join point added; AAT and HDP references added; Section 10 on three-layer delegation composition added; par_hash scoped to AAT-enabled deployments per co-author feedback — Aram Sogomonian)
 
 ---
 
@@ -90,24 +90,24 @@ The `outcome_claim` field is the semantic core. It distinguishes an execution re
 
 #### 3.1.1 Delegation Chain and par_hash Binding
 
-The `delegator_chain` field within `invocation_context` carries the ordered delegation history for this invocation. Each delegation link SHOULD include a `par_hash` field — the SHA-256 hash of the Pushed Authorization Request (PAR) object associated with that delegation step.
+The `delegator_chain` field within `invocation_context` carries the ordered delegation history for this invocation.
 
-The `par_hash` field serves as the cryptographic join point between the EOV execution receipt and the Attenuating Authorization Token (AAT) delegation chain (see Section 10). It allows a relying party to:
+The `par_hash` field is a composition-level binding point, not an intrinsic receipt field. It is defined as the SHA-256 hash of the Pushed Authorization Request (PAR) object for a delegation step, and it serves as the cryptographic join between the EOV execution receipt and the Attenuating Authorization Token (AAT) delegation chain (see Section 10). It is only meaningful in deployments that use the AAT delegation model:
 
-1. Locate the specific PAR object in the AAT chain that authorized this invocation
-2. Verify that the scope constraints in the PAR object were honored at execution time
-3. Confirm that scope monotonicity was preserved across all delegation links leading to this invocation
+- In **AAT-enabled deployments**: each delegation link SHOULD include `par_hash`. It allows a relying party to (1) locate the specific PAR object in the AAT chain that authorized this invocation, (2) verify that scope constraints in the PAR object were honored at execution time, and (3) confirm scope monotonicity was preserved across all delegation links.
+- In **non-AAT deployments** (ICS/OT, SATP-based, or other non-OAuth delegation architectures): `par_hash` has no defined semantic and SHOULD NOT be included. Receipt validity does not depend on it.
 
 ```
 DelegatorChainLink {
     delegator_id:    identifier for the delegating principal
     delegation_ts:   timestamp of delegation issuance
-    par_hash:        SHA-256 of the PAR object for this delegation link (RECOMMENDED)
+    par_hash:        SHA-256 of the PAR object for this delegation link
+                     (RECOMMENDED when AAT is in use; SHOULD NOT otherwise)
     delegation_ref:  URI or handle for the full delegation credential (OPTIONAL)
 }
 ```
 
-Where `par_hash` is present, it MUST be a SHA-256 hash of the canonical form of the PAR object at the time of delegation issuance. Where AATs are not in use, `par_hash` MAY be omitted; the field is not required for realizations that do not use the AAT delegation model.
+Where `par_hash` is present, it MUST be a SHA-256 hash of the canonical form of the PAR object at the time of delegation issuance.
 
 ### 3.2 Verification Semantics
 
@@ -221,8 +221,8 @@ A behavioral fingerprint field (linking Layer 1 attestation state to the executi
 **8.3 Expected vs. actual outcome.**
 The distinction between an expected outcome (what the invoking system requested) and the actual outcome (what the executing system claims occurred) is an evaluation concern, not an abstract model constraint. The receipt's `outcome_claim` carries the actual outcome as asserted by the executing system. Comparison against an expected outcome is the responsibility of the relying party's verification logic, not the receipt format. This preserves the receipt as a minimal, composable primitive rather than embedding policy evaluation into the format.
 
-**8.4 par_hash as RECOMMENDED not REQUIRED.**
-The `par_hash` field in `delegator_chain` links is RECOMMENDED rather than REQUIRED because execution receipts must be useful in deployments that do not use the AAT delegation model. Making `par_hash` mandatory would exclude valid receipt deployments in ICS/OT environments, SATP-based systems, and non-OAuth delegation architectures. The field is the integration point for AAT-based systems, not a universal requirement.
+**8.4 par_hash as composition-level binding, not intrinsic receipt field.**
+The `par_hash` field is scoped to AAT-enabled deployments (see Section 3.1.1). It is the join point between EOV receipts and the AAT delegation model — not a field with defined meaning outside that context. In non-AAT deployments, the field SHOULD NOT be present; its absence does not reduce receipt validity. Making `par_hash` a universal requirement would incorrectly couple the receipt format to a specific delegation technology, excluding ICS/OT environments, SATP-based systems, and other non-OAuth delegation architectures where receipts are equally valid. The field belongs to the composition layer, not the core model.
 
 ---
 
