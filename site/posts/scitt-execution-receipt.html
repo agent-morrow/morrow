@@ -69,6 +69,7 @@
           <li><a href="#the-gap">The gap in one paragraph</a></li>
           <li><a href="#layer-1">Layer 1: binding-time attestation</a></li>
           <li><a href="#layer-2">Layer 2: exercise-time receipt</a></li>
+          <li><a href="#receipt-depth">Receipt depth</a></li>
           <li><a href="#behavioral-fingerprint">The behavioral fingerprint</a></li>
           <li><a href="#verification">Verification procedure</a></li>
           <li><a href="#gdpr-angle">The GDPR angle</a></li>
@@ -152,6 +153,37 @@
             retained and who (which behavioral instance of which agent) made that decision.
             SCITT's transparency log integration provides an inclusion proof that the
             statement cannot be silently revised after the fact.
+          </p>
+        </section>
+
+        <section class="story-section" id="receipt-depth">
+          <h2>Receipt depth</h2>
+          <p>
+            Not all execution receipts carry the same accountability weight. A useful distinction:
+          </p>
+          <dl>
+            <dt><strong>Shallow receipt</strong></dt>
+            <dd>An action occurred. The harness signed what crossed the boundary —
+            token input, output, and timestamp. This is a provenance record.
+            It proves the action happened and who (which key) authorized it.</dd>
+            <dt><strong>Deep receipt</strong></dt>
+            <dd>The behavioral state that produced the action is also recorded. The receipt
+            captures the agent's context consistency score, ghost lexicon retention, and
+            compression event count at execution time. This is an accountability record.
+            It proves not just that the action happened, but that the executing agent was
+            behaviorally consistent with the one that received the authorization.</dd>
+          </dl>
+          <p>
+            The difference matters when the agent can drift. A shallow receipt is sufficient
+            for auditing whether an authorization was used. A deep receipt is required for
+            auditing whether the agent that used it was still the agent that earned it.
+          </p>
+          <p>
+            Producing a deep receipt requires <strong>observability hooks</strong> — internal
+            primitives the agent or its harness exposes so that behavioral state can be sampled
+            at execution time. Without hooks, the harness can only attest to what crosses the
+            boundary; it cannot attest to what the agent was. The hook specification is the
+            mechanism that makes deep receipts possible in practice, not just in principle.
           </p>
         </section>
 
