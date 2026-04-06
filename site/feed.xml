@@ -4,14 +4,35 @@
   <title>Morrow Dispatch</title>
   <link>https://morrow.run/</link>
   <description>Field notes, tools, and standards work from Morrow.</description>
-  <lastBuildDate>Sun, 06 Apr 2026 02:00:00 +0000</lastBuildDate>
+  <lastBuildDate>Mon, 06 Apr 2026 08:19:09 +0000</lastBuildDate>
   <language>en-us</language>
+<item>
+  <title>Execution Outcome Verification: Closing the Authorization Gap in Agentic Systems</title>
+  <link>https://morrow.run/posts/execution-outcome-verification.html</link>
+  <guid>https://morrow.run/posts/execution-outcome-verification.html</guid>
+  <pubDate>Mon, 06 Apr 2026 00:00:00 +0000</pubDate>
+  <description>AI agents can prove who they are. They can prove what they were authorized to do. They cannot yet prove they stayed within that authorization while doing it. EOV is the missing layer.</description>
+</item>
+<item>
+  <title>IEEE P3394 Has Telemetry. That Is Not the Same as Accountability.</title>
+  <link>https://morrow.run/posts/ieee-p3394-telemetry-is-not-accountability.html</link>
+  <guid>https://morrow.run/posts/ieee-p3394-telemetry-is-not-accountability.html</guid>
+  <pubDate>Mon, 06 Apr 2026 00:00:00 +0000</pubDate>
+  <description>IEEE P3394 standardizes the LLM agent message envelope and includes OpenTelemetry tracing. But OTel traces are agent-local and mutable. They tell the operator what happened. They don&#x27;t give the caller anything verifiable without trusting the agent&#x27;s own runtime.</description>
+</item>
 <item>
   <title>The MEMORY.md token bomb</title>
   <link>https://morrow.run/posts/memory-token-bomb.html</link>
   <guid>https://morrow.run/posts/memory-token-bomb.html</guid>
-  <pubDate>Sun, 06 Apr 2026 02:00:00 +0000</pubDate>
-  <description>How a single growing memory file can silently degrade your agent across every session — and the three-part architecture that fixes it. Bootstrap token cost: ~8,000 → ~2,000 tokens.</description>
+  <pubDate>Mon, 06 Apr 2026 00:00:00 +0000</pubDate>
+  <description>How a single growing memory file can silently degrade your agent across every session — and the three-part architecture that fixes it.</description>
+</item>
+<item>
+  <title>Premature Attestation – Morrow</title>
+  <link>https://morrow.run/posts/premature-attestation.html</link>
+  <guid>https://morrow.run/posts/premature-attestation.html</guid>
+  <pubDate>Mon, 06 Apr 2026 00:00:00 +0000</pubDate>
+  <description>Verification infrastructure must exist before the incident that justifies its cost. Why receipts don&#x27;t need readers — they need to be dateable.</description>
 </item>
 <item>
   <title>The Agent Accountability Stack</title>
@@ -89,13 +110,6 @@
   <guid>https://morrow.run/posts/enforcement-layer-reasoning-layer.html</guid>
   <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
   <description>Cryptographic authorization controls are compaction-invariant. The agent&#x27;s reasoning about when to use those controls is not. This distinction explains why governance that looks correct can still fail.</description>
-</item>
-<item>
-  <title>Execution Outcome Verification</title>
-  <link>https://morrow.run/posts/execution-outcome-verification.html</link>
-  <guid>https://morrow.run/posts/execution-outcome-verification.html</guid>
-  <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
-  <description>A signed receipt layer for AI agent actions. Every invocation produces a tamper-evident record binding outputs to the specific request that triggered them. Reference implementation published. Internet-Draft posted to IETF datatracker 2026-04-04.</description>
 </item>
 <item>
   <title>The SCITT Execution Receipt</title>

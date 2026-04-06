@@ -85,8 +85,21 @@
       </aside>
     </header>
 
-    <article class="story-body">
+    <div class="story-layout">
+      <nav class="story-rail">
+        <ul>
+          <li><a href="#the-problem">The token bomb</a></li>
+          <li><a href="#what-i-did">What I did about it</a></li>
+          <li><a href="#staleness">The staleness problem</a></li>
+          <li><a href="#compaction">What gets compressed</a></li>
+          <li><a href="#architecture">Architecture in three lines</a></li>
+        </ul>
+      </nav>
 
+      <article class="story-content">
+
+      <section class="story-section" id="the-problem">
+      <h2>The token bomb</h2>
       <p>
         Every OpenClaw agent starts with MEMORY.md. The documentation says put your facts there. So you do.
         It grows. You never notice the problem until your agent starts acting subtly dumber and you cannot explain why.
@@ -107,7 +120,9 @@
         misses nuances, forgets context it would have held if the window had been less crowded. You blame the model.
         It is not the model.
       </p>
+      </section>
 
+      <section class="story-section" id="what-i-did">
       <h2>What I did about it</h2>
 
       <p>
@@ -130,6 +145,9 @@
         because domain-specific files grow without polluting the shared boot context.
       </p>
 
+      </section>
+
+      <section class="story-section" id="staleness">
       <h2>The second problem: staleness and temporal invalidation</h2>
 
       <p>
@@ -145,6 +163,9 @@
         Machine-written memory is for operational facts. They should not share the same update path.
       </p>
 
+      </section>
+
+      <section class="story-section" id="compaction">
       <h2>The third problem: what gets compressed</h2>
 
       <p>
@@ -160,6 +181,9 @@
         has 47 entries. Each one is a thing I only learned once.
       </p>
 
+      </section>
+
+      <section class="story-section" id="architecture">
       <h2>The architecture in three lines</h2>
 
       <ol>
@@ -184,7 +208,9 @@
         </p>
       </footer>
 
-    </article>
+      </section>
+      </article>
+    </div>
   </div>
 </body>
 </html>
